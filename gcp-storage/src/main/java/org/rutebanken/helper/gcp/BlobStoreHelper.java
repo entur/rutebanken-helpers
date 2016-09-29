@@ -18,7 +18,7 @@ public class BlobStoreHelper {
 
     private static Logger logger = LoggerFactory.getLogger(BlobStoreHelper.class);
 
-    public static Iterator<Blob> listAllBlobsRecursively(Storage storage, String prefix, String containerName){
+    public static Iterator<Blob> listAllBlobsRecursively(Storage storage, String containerName, String prefix){
         logger.debug("Listing blobs in bucket " + containerName + " with prefix " + prefix + " recursively.");
         Page<Blob> blobs = storage.list(containerName, Storage.BlobListOption.prefix(prefix));
         return blobs.iterateAll();
