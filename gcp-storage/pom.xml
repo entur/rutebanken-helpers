@@ -19,6 +19,18 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
     <dependencies>
       <!--- NOTICE that you put the versions in the parent dependency
       management section, and artifacts without version here. -->
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-storage</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
