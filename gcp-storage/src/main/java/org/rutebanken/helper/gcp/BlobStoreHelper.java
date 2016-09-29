@@ -16,21 +16,15 @@ import java.util.Iterator;
 
 public class BlobStoreHelper {
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static Logger logger = LoggerFactory.getLogger(BlobStoreHelper.class);
 
-    private Storage storage;
-
-    public BlobStoreHelper(Storage storage) {
-        this.storage = storage;
-    }
-
-    public Iterator<Blob> listAllBlobsRecursively(String prefix, String containerName){
+    public static Iterator<Blob> listAllBlobsRecursively(Storage storage, String prefix, String containerName){
         logger.debug("Listing blobs in bucket " + containerName + " with prefix " + prefix + " recursively.");
         Page<Blob> blobs = storage.list(containerName, Storage.BlobListOption.prefix(prefix));
         return blobs.iterateAll();
     }
 
-    public Blob uploadBlob(String containerName, String name, InputStream inputStream, boolean makePublic) {
+    public static Blob uploadBlob(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic) {
         logger.debug("Uploading blob " + name + " to bucket " + containerName);
         BlobId blobId = BlobId.of(containerName, name);
         BlobInfo.Builder builder = BlobInfo.builder(blobId).contentType("application/octet-stream");
@@ -43,7 +37,7 @@ public class BlobStoreHelper {
         return blob;
     }
 
-    public InputStream getBlob(String containerName, String name) {
+    public static InputStream getBlob(Storage storage, String containerName, String name) {
         logger.debug("Fetching blob " + name + " from bucket " + containerName);
         BlobId blobId = BlobId.of(containerName, name);
         Blob blob = storage.get(blobId);
