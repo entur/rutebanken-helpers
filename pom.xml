@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <parent>
+       <groupId>org.rutebanken.superpom</groupId>
+       <artifactId>superpom</artifactId>
+       <version>0.0.2</version>
+   </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <packaging>pom</packaging>
+
+    <groupId>org.rutebanken.helpers</groupId>
+    <artifactId>helper</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+
+    <name>helper</name>
+
+    <scm>
+      <connection>scm:git:ssh://git@github.org/rutebanken/rutebanken-helpers.git</connection>
+      <developerConnection>scm:git:ssh://git@github.org/rutebanken/rutebanken-helpers.git</developerConnection>
+  </scm>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+        </dependencies>
+    </dependencyManagement>
+
+    <modules>
+      <module>gcp-storage</module>
+    </modules>
+</project>
