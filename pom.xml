@@ -15,14 +15,14 @@
 
     <name>helper</name>
 
-    <!-- TODO this should be inherited, but seems not to... -->
+    <!-- Not sure why I need to have this here, when it is present in parent pom -->
     <distributionManagement>
       <snapshotRepository>
           <id>Nexus</id>
           <url>https://nexus.rutebanken.org/content/repositories/snapshots</url>
       </snapshotRepository>
     </distributionManagement>
-    <!-- /this should be inherited, but seems not to... -->
+    <!-- /Not sure why... -->
 
     <scm>
       <connection>scm:git:ssh://git@github.org/rutebanken/rutebanken-helpers.git</connection>
