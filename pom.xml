@@ -15,15 +15,6 @@
 
     <name>helper</name>
 
-    <!-- TODO this should be inherited, but seems not to... -->
-    <distributionManagement>
-      <snapshotRepository>
-          <id>Nexus</id>
-          <url>https://nexus.rutebanken.org/content/repositories/snapshots</url>
-      </snapshotRepository>
-    </distributionManagement>
-    <!-- /this should be inherited, but seems not to... -->
-
     <scm>
       <connection>scm:git:ssh://git@github.org/rutebanken/rutebanken-helpers.git</connection>
       <developerConnection>scm:git:ssh://git@github.org/rutebanken/rutebanken-helpers.git</developerConnection>
