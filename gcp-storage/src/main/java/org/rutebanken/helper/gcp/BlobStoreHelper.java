@@ -3,6 +3,7 @@ package org.rutebanken.helper.gcp;
 import com.google.cloud.AuthCredentials;
 import com.google.cloud.Page;
 import com.google.cloud.ReadChannel;
+import com.google.cloud.WriteChannel;
 import com.google.cloud.storage.*;
 import com.google.common.collect.ImmutableList;
 import org.slf4j.Logger;
@@ -12,11 +13,16 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Iterator;
 
 public class BlobStoreHelper {
 
     private static Logger logger = LoggerFactory.getLogger(BlobStoreHelper.class);
+
+    private static final long FILE_SIZE_LIMIT = 1_000_000;
+    private static final int BUFFER_CHUNK_SIZE = 1024;
 
     public static Iterator<Blob> listAllBlobsRecursively(Storage storage, String containerName, String prefix){
         logger.debug("Listing blobs in bucket " + containerName + " with prefix " + prefix + " recursively.");
@@ -35,6 +41,32 @@ public class BlobStoreHelper {
         Blob blob = storage.create(blobInfo, inputStream);
         logger.debug("Stored blob with name '" + blob.name() + "' and size '" + blob.size() + "' in bucket '" + blob.bucket() + "'");
         return blob;
+    }
+
+    public static void uploadBlob(Storage storage, String containerName, String blobPath, Path filePath, boolean makePublic) throws Exception {
+        logger.debug("Uploading blob " + filePath.getFileName().toString() + " to bucket " + containerName);
+        String blobIdName = blobPath + filePath.getFileName().toString();
+        BlobId blobId = BlobId.of(containerName, blobIdName);
+        BlobInfo.Builder builder = BlobInfo.builder(blobId).contentType("application/octet-stream");
+        if (makePublic) {
+            builder.acl(ImmutableList.of(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER)));
+        }
+        BlobInfo blobInfo = builder.build();
+        if (Files.size(filePath) > FILE_SIZE_LIMIT) {
+            try (WriteChannel writer = storage.writer(blobInfo)) {
+                byte[] buffer = new byte[BUFFER_CHUNK_SIZE];
+                try (InputStream inputStream = Files.newInputStream(filePath)) {
+                    int limit;
+                    while ((limit = inputStream.read(buffer)) >= 0) {
+                        writer.write(ByteBuffer.wrap(buffer, 0, limit));
+                    }
+                }
+            }
+        } else {
+            byte[] bytes = Files.readAllBytes(filePath);
+            storage.create(blobInfo, bytes);
+        }
+        logger.debug("Stored blob with name '" + blobInfo.name() + "' and size '" + blobInfo.size() + "' in bucket '" + blobInfo.bucket() + "'");
     }
 
     public static InputStream getBlob(Storage storage, String containerName, String name) {
