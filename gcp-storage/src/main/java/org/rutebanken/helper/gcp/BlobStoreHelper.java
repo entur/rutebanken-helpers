@@ -24,6 +24,10 @@ public class BlobStoreHelper {
     private static final long FILE_SIZE_LIMIT = 1_000_000;
     private static final int BUFFER_CHUNK_SIZE = 1024;
 
+    private BlobStoreHelper(){
+
+    }
+
     public static Iterator<Blob> listAllBlobsRecursively(Storage storage, String containerName, String prefix){
         logger.debug("Listing blobs in bucket " + containerName + " with prefix " + prefix + " recursively.");
         Page<Blob> blobs = storage.list(containerName, Storage.BlobListOption.prefix(prefix));
@@ -93,6 +97,10 @@ public class BlobStoreHelper {
             logger.warn("Could not find '" + blobId.name() + "' in bucket '" + blobId.bucket() + "'");
         }
         return result;
+    }
+
+    public static boolean delete(Storage storage, BlobId blobId) {
+        return storage.delete(blobId);
     }
 
     public static Storage getStorage(String credentialPath, String projectId) {
