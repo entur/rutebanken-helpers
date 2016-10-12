@@ -6,7 +6,7 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
     <parent>
         <groupId>org.rutebanken.helpers</groupId>
         <artifactId>helper</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.0.1</version>
         <relativePath>..</relativePath>
     </parent>
 

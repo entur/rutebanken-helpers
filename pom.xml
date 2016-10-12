@@ -11,14 +11,15 @@
 
     <groupId>org.rutebanken.helpers</groupId>
     <artifactId>helper</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
 
     <name>helper</name>
 
     <scm>
         <connection>scm:git:ssh://git@github.com/rutebanken/rutebanken-helpers.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/rutebanken/rutebanken-helpers.git</developerConnection>
-    </scm>
+      <tag>helper-0.0.1</tag>
+  </scm>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <google.cloud.version>0.4.0</google.cloud.version>
