@@ -44,6 +44,10 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
             <artifactId>v1</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.google.cloud.trace</groupId>
+            <artifactId>grpc-sink</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <scope>test</scope>
@@ -53,6 +57,23 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency> -->
+        <dependency>
+            <groupId>com.google.auth</groupId>
+            <artifactId>google-auth-library-oauth2-http</artifactId>
+            <version>0.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-netty</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-tcnative-boringssl-static</artifactId>
+            <version>1.1.33.Fork23</version>
+            <classifier>linux-x86_64</classifier>
+            <!-- classifier>${os.detected.classifier}</classifier -->
+        </dependency>
     </dependencies>
 
     <build>
