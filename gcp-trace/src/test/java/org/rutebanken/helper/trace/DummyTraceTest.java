@@ -14,6 +14,12 @@ public class DummyTraceTest {
     public void dummy() throws IOException {
         log.info("Performing mock call");
         new DummyTrace().call();
+
+        // export GOOGLE_APPLICATION_CREDENTIALS=$HOME/Private/Carbon-eb93b021fde2.json
+        // or
+        // String clientSecretsFile = System.getProperty("clientSecretsFile");
+        //GoogleCredentials.fromStream(new FileInputStream(clientSecretsFile))
+
         log.info("Done");
     }
 }

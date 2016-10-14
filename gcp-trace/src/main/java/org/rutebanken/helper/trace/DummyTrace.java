@@ -49,7 +49,7 @@ public class DummyTrace {
         // Create some trace data.
         managedTracer.startSpan("rutebanken-helper");
 
-        managedTracer.startSpan("dummy");
+        managedTracer.startSpan("junit");
 
         StackTrace.Builder stackTraceBuilder = ThrowableStackTraceHelper.createBuilder(new Exception());
         managedTracer.setStackTrace(stackTraceBuilder.build());
