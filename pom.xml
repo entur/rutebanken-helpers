@@ -54,7 +54,22 @@
                 <version>${junit.jupiter.version}</version>
                 <scope>test</scope>
             </dependency>
-        <!--    <dependency>
+            <dependency>
+                <groupId>com.google.cloud.trace</groupId>
+                <artifactId>core</artifactId>
+                <version>0.1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.cloud.trace</groupId>
+                <artifactId>java-timestamp</artifactId>
+                <version>0.1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.cloud.trace</groupId>
+                <artifactId>v1</artifactId>
+                <version>0.1.0</version>
+            </dependency>
+              <!--    <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>${junit.version}</version>
@@ -100,6 +115,7 @@
     </build>
 
     <modules>
+        <module>gcp-trace</module>
         <module>gcp-storage</module>
     </modules>
 </project>
