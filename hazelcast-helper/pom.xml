@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>org.rutebanken.helpers</groupId>
+        <artifactId>helper</artifactId>
+        <version>0.0.2-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <properties>
+        <!--<junit.platform.version>1.0.0-M2</junit.platform.version>-->
+    </properties>
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>hazelcast-helper</artifactId>
+
+    <name>hazelcast-helper</name>
+
+    <dependencies>
+        <!-- NOTICE that you put the versions in the parent dependency
+        management section, and artifacts without version here. -->
+
+
+        <!-- There exists a kubernetes-api project too. Not
+            sure about the exact differences between these two -->
+        <dependency>
+            <groupId>io.fabric8</groupId>
+            <artifactId>kubernetes-client</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.hazelcast</groupId>
+            <artifactId>hazelcast-client</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+       <!-- <plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+        </plugins>-->
+    </build>
+
+</project>

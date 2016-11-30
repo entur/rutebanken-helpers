@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.rutebanken.superpom</groupId>
         <artifactId>superpom</artifactId>
-        <version>0.0.5</version>
+        <version>0.0.6</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -75,12 +75,35 @@
                 <artifactId>grpc-sink</artifactId>
                 <version>0.1.0</version>
             </dependency>
-              <!--    <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>${junit.version}</version>
-                <scope>test</scope>
-            </dependency> -->
+
+
+            <!-- There exists a kubernetes-api project too. Not
+                sure about the exact differences between these two -->
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>kubernetes-client</artifactId>
+                <version>1.4.21</version>
+                <!--version>1.3.66</version-->
+            </dependency>
+
+            <dependency>
+                <groupId>com.hazelcast</groupId>
+                <artifactId>hazelcast-client</artifactId>
+                <version>3.7.3</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId>
+                <version>4.3.4.RELEASE</version>
+            </dependency>
+
+            <!--    <dependency>
+              <groupId>junit</groupId>
+              <artifactId>junit</artifactId>
+              <version>${junit.version}</version>
+              <scope>test</scope>
+          </dependency> -->
         </dependencies>
     </dependencyManagement>
 
@@ -121,7 +144,7 @@
     </build>
 
     <modules>
-        <module>gcp-trace</module>
         <module>gcp-storage</module>
+        <module>hazelcast-helper</module>
     </modules>
 </project>
