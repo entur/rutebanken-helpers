@@ -18,14 +18,12 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 @Service
 public class HazelCastService {
     private static final Logger log = LoggerFactory.getLogger(HazelCastService.class);
 
-    private HazelcastInstance hazelcast;
+    protected HazelcastInstance hazelcast;
 
     private boolean startupOk = false;
 
@@ -50,13 +48,6 @@ public class HazelCastService {
         }
     }
 
-
-    public ConcurrentMap<String, String> mapFor( String name ) {
-        // TODO Fix implementation when not using hz if this works
-        return hazelcast == null
-                ? new ConcurrentHashMap<>()
-                : hazelcast.getMap(name);
-    }
 
     @PreDestroy
     public void shutdown() {

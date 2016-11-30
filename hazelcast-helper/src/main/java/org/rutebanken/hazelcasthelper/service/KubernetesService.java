@@ -20,16 +20,16 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-public final class KubernetesService {
+public class KubernetesService {
     private static final Logger log = LoggerFactory.getLogger(KubernetesService .class);
 
     @Value("${babylon.kubernetes.url:}")
     private String kubernetesUrl;
 
     @Value("${babylon.kubernetes.namespace:default}")
-    private String namespace;
+    protected String namespace;
 
-    private KubernetesClient kube;
+    protected KubernetesClient kube;
 
     @PostConstruct
     public void init() {
