@@ -90,7 +90,8 @@ public class HazelCastService {
         // configure Hazelcast instance
         final Config cfg = new Config()
                 .setInstanceName(UUID.randomUUID().toString())
-                .setGroupConfig(new GroupConfig(groupName, password));
+                .setGroupConfig(new GroupConfig(groupName, password))
+                .setProperty("hazelcast.phone.home.enabled","false");
 
         // tcp
         final TcpIpConfig tcpCfg = new TcpIpConfig();
