@@ -11,15 +11,10 @@ import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.util.List;
 import java.util.UUID;
 
-@Service
 public class HazelCastService {
     private static final Logger log = LoggerFactory.getLogger(HazelCastService.class);
 
@@ -27,14 +22,18 @@ public class HazelCastService {
 
     private boolean startupOk = false;
 
-    @Autowired
     private KubernetesService kubernetesService;
 
-    @PostConstruct
+    private boolean hazelcastEnabled;;
+
+    public HazelCastService(KubernetesService kubernetesService) {
+        this.kubernetesService = kubernetesService;
+        this.hazelcastEnabled = kubernetesService != null;
+    }
+
     public void init() {
-        String supress = System.getProperty("suppress", "false");
-        if ( supress.equals("false")) {
-            log.info("Configuring up hazelcast");
+        if ( hazelcastEnabled ) {
+            log.info("Configuring hazelcast");
             try {
                 String name = kubernetesService.findDeploymentName();
                 // Consider: The password part could be a kubernetes secret
@@ -44,12 +43,10 @@ public class HazelCastService {
                 log.error("Could not run init. HZ will be null and dummy implementation used",e);
             }
         } else {
-            log.info("Hazelcast is NOT active as supress="+supress);
+            log.info("Hazelcast is NOT active as rutebanken.hazelcast.enabled="+hazelcastEnabled);
         }
     }
 
-
-    @PreDestroy
     public void shutdown() {
         if ( hazelcast != null ) {
             hazelcast.shutdown();
@@ -79,7 +76,9 @@ public class HazelCastService {
     }
 
     public int numberOfClusterMemembers() {
-        return hazelcast.getCluster().getMembers().size();
+        return hazelcast == null
+                ? 0
+                : hazelcast.getCluster().getMembers().size();
     }
 
     private HazelcastInstance runHazelcast(final List<String> nodes, String groupName, String password) {

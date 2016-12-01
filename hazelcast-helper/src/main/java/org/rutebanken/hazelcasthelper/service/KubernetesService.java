@@ -7,11 +7,7 @@ import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -19,20 +15,32 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@Service
 public class KubernetesService {
     private static final Logger log = LoggerFactory.getLogger(KubernetesService .class);
 
-    @Value("${babylon.kubernetes.url:}")
-    private String kubernetesUrl;
+    private final String kubernetesUrl;
 
-    @Value("${babylon.kubernetes.namespace:default}")
-    protected String namespace;
+    protected final String namespace;
+
+    private final boolean kuberentesEnabled;
 
     protected KubernetesClient kube;
 
-    @PostConstruct
+    public KubernetesService(String kubernetesUrl, String namespace, boolean kuberentesEnabled) {
+        this.kubernetesUrl = kubernetesUrl;
+        this.namespace = namespace;
+        this.kuberentesEnabled = kuberentesEnabled;
+    }
+
+    public KubernetesService(String namespace, boolean kuberentesEnabled) {
+        this( null, namespace, kuberentesEnabled );
+    }
+
     public void init() {
+        if ( !kuberentesEnabled ) {
+            log.warn("Disabling kubernetes connection as rutebanken.kubernetes.enabled="+kuberentesEnabled);
+            return;
+        }
         if ( kubernetesUrl != null && !"".equals( kubernetesUrl )) {
             log.info("Connecting to "+kubernetesUrl );
             kube = new DefaultKubernetesClient("http://localhost:8000/");
@@ -42,9 +50,10 @@ public class KubernetesService {
         }
     }
 
-    @PreDestroy
     public void end() {
-        kube.close();
+        if ( kube != null ) {
+            kube.close();
+        }
     }
 
     public List<String> findEndpoints() {
