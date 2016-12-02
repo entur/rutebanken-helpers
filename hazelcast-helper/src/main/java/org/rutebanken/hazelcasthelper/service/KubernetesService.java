@@ -81,6 +81,9 @@ public class KubernetesService {
      * @return Endpoints found for the given service name, both the ready and not ready endpoints
      */
     public List<String> findEndpoints(String serviceName) {
+        if ( kube == null ) {
+            return new ArrayList<>();
+        }
         Endpoints eps = kube.endpoints().inNamespace(namespace).withName(serviceName).get();
         List<String> ready    = addressesFrom( eps, EndpointSubset::getAddresses);
         List<String> notready = addressesFrom( eps, EndpointSubset::getNotReadyAddresses);
