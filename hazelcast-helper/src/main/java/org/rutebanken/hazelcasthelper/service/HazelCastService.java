@@ -31,6 +31,25 @@ public class HazelCastService {
         this.hazelcastEnabled = kubernetesService != null;
     }
 
+    public void initForLocalHz() {
+        log.warn("** WARNING ** This methods should be replaced with autowired spring niceness");
+        log.warn("              Running hazelcast with LOCAL configuration ONLY");
+        final Config cfg = new Config()
+                .setInstanceName(UUID.randomUUID().toString())
+                .setProperty("hazelcast.phone.home.enabled", "false");
+        final JoinConfig joinCfg = new JoinConfig()
+                .setMulticastConfig(new MulticastConfig().setEnabled(false))
+                .setTcpIpConfig(new TcpIpConfig().setEnabled(false));
+        cfg.setNetworkConfig(
+                new NetworkConfig()
+                        .setPortAutoIncrement(true)
+                        .setJoin(joinCfg)
+                        .setSSLConfig(new SSLConfig().setEnabled(false))
+        );
+
+        hazelcast = Hazelcast.newHazelcastInstance(cfg);
+    }
+
     public void init() {
         if ( hazelcastEnabled ) {
             log.info("Configuring hazelcast");
@@ -46,6 +65,8 @@ public class HazelCastService {
             log.info("Hazelcast is NOT active as rutebanken.hazelcast.enabled="+hazelcastEnabled);
         }
     }
+
+
 
     public void shutdown() {
         if ( hazelcast != null ) {
