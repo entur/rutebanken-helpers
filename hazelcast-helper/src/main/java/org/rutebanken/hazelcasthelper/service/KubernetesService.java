@@ -56,6 +56,10 @@ public class KubernetesService {
         }
     }
 
+    public boolean isKuberentesEnabled() {
+        return kuberentesEnabled;
+    }
+
     public List<String> findEndpoints() {
         String serviceName = findDeploymentName();
         log.info("Shall find endpoints for "+serviceName);

@@ -34,7 +34,7 @@ public class HazelCastService {
     }
 
     public void init() {
-        if ( kubernetesService != null) {
+        if ( kubernetesService != null && kubernetesService.isKuberentesEnabled()) {
             log.info("Configuring hazelcast");
             try {
                 String name = kubernetesService.findDeploymentName();
