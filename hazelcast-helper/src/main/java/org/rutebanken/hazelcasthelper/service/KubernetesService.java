@@ -62,6 +62,10 @@ public class KubernetesService {
         return findEndpoints( serviceName );
     }
 
+    /**
+     * When running on kubernetes, the deployment name is part of the hostname.
+     * TODO It is known that this will fail if the hostname contains dashes. Improve later
+     */
     public String findDeploymentName() {
         String hostname = System.getenv("HOSTNAME");
         if ( hostname == null ) {

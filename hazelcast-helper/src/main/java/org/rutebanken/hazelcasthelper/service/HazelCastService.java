@@ -24,34 +24,17 @@ public class HazelCastService {
 
     private KubernetesService kubernetesService;
 
-    private boolean hazelcastEnabled;;
-
+    /**
+     * Create a networked hazelcast instance, or
+     * @param kubernetesService A networked hazelcast instance is only set up if
+     *                          kubernetesService is not null
+     */
     public HazelCastService(KubernetesService kubernetesService) {
         this.kubernetesService = kubernetesService;
-        this.hazelcastEnabled = kubernetesService != null;
-    }
-
-    public void initForLocalHz() {
-        log.warn("** WARNING ** This methods should be replaced with autowired spring niceness");
-        log.warn("              Running hazelcast with LOCAL configuration ONLY");
-        final Config cfg = new Config()
-                .setInstanceName(UUID.randomUUID().toString())
-                .setProperty("hazelcast.phone.home.enabled", "false");
-        final JoinConfig joinCfg = new JoinConfig()
-                .setMulticastConfig(new MulticastConfig().setEnabled(false))
-                .setTcpIpConfig(new TcpIpConfig().setEnabled(false));
-        cfg.setNetworkConfig(
-                new NetworkConfig()
-                        .setPortAutoIncrement(true)
-                        .setJoin(joinCfg)
-                        .setSSLConfig(new SSLConfig().setEnabled(false))
-        );
-
-        hazelcast = Hazelcast.newHazelcastInstance(cfg);
     }
 
     public void init() {
-        if ( hazelcastEnabled ) {
+        if ( kubernetesService != null) {
             log.info("Configuring hazelcast");
             try {
                 String name = kubernetesService.findDeploymentName();
@@ -59,25 +42,28 @@ public class HazelCastService {
                 hazelcast = runHazelcast( kubernetesService.findEndpoints(), name, name+"_pw" );
                 startupOk = true;
             } catch ( Exception e ) {
-                log.error("Could not run init. HZ will be null and dummy implementation used",e);
+                throw new RutebankenHazelcastException("Could not run initialization of hazelcast.",e);
             }
         } else {
-            log.info("Hazelcast is NOT active as rutebanken.hazelcast.enabled="+hazelcastEnabled);
+            hazelcast = initForLocalHazelCast();
         }
     }
-
 
 
     public void shutdown() {
-        if ( hazelcast != null ) {
-            hazelcast.shutdown();
-        }
+        hazelcast.shutdown();
     }
 
+    /**
+     * Method to be used as part of liveness test for a k8s service
+     */
     public Boolean getStartupOk() {
-        return startupOk && numberOfClusterMemembers() > 0;
+        return startupOk && numberOfClusterMembers() > 0;
     }
 
+    /**
+     * @return Just debug information - format may change over time
+     */
     public String information() {
         if ( hazelcast == null ) {
             return "Hazelcast is null, i.e. not configured.";
@@ -96,7 +82,7 @@ public class HazelCastService {
         return sb.toString();
     }
 
-    public int numberOfClusterMemembers() {
+    public int numberOfClusterMembers() {
         return hazelcast == null
                 ? 0
                 : hazelcast.getCluster().getMembers().size();
@@ -133,4 +119,23 @@ public class HazelCastService {
         return Hazelcast.newHazelcastInstance(cfg);
     }
 
+    /**
+     * Initialize a VM local instance of hazelcast
+     */
+    private HazelcastInstance initForLocalHazelCast() {
+        log.info("Running hazelcast with LOCAL configuration ONLY - this is for junit tests and when you do not have a kubernetes environment");
+        final Config cfg = new Config()
+                .setInstanceName(UUID.randomUUID().toString())
+                .setProperty("hazelcast.phone.home.enabled", "false");
+        final JoinConfig joinCfg = new JoinConfig()
+                .setMulticastConfig(new MulticastConfig().setEnabled(false))
+                .setTcpIpConfig(new TcpIpConfig().setEnabled(false));
+        NetworkConfig networkCfg = new NetworkConfig()
+                .setJoin(joinCfg);
+        networkCfg.getInterfaces()
+                .setEnabled(false);
+        cfg.setNetworkConfig( networkCfg );
+
+        return Hazelcast.newHazelcastInstance(cfg);
+    }
 }
