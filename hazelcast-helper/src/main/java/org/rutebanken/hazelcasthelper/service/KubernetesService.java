@@ -7,7 +7,10 @@ import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -15,6 +18,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Service
 public class KubernetesService {
     private static final Logger log = LoggerFactory.getLogger(KubernetesService .class);
 
@@ -36,7 +40,8 @@ public class KubernetesService {
         this( null, namespace, kuberentesEnabled );
     }
 
-    public void init() {
+    @PostConstruct
+    public final void init() {
         if ( !kuberentesEnabled ) {
             log.warn("Disabling kubernetes connection as rutebanken.kubernetes.enabled="+kuberentesEnabled);
             return;
@@ -50,7 +55,8 @@ public class KubernetesService {
         }
     }
 
-    public void end() {
+    @PreDestroy
+    public final void end() {
         if ( kube != null ) {
             kube.close();
         }

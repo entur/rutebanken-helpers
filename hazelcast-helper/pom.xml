@@ -48,6 +48,11 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

@@ -11,10 +11,14 @@ import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.List;
 import java.util.UUID;
 
+@Service
 public class HazelCastService {
     private static final Logger log = LoggerFactory.getLogger(HazelCastService.class);
 
@@ -33,7 +37,8 @@ public class HazelCastService {
         this.kubernetesService = kubernetesService;
     }
 
-    public void init() {
+    @PostConstruct
+    public final void init() {
         if ( kubernetesService != null && kubernetesService.isKuberentesEnabled()) {
             log.info("Configuring hazelcast");
             try {
@@ -45,12 +50,14 @@ public class HazelCastService {
                 throw new RutebankenHazelcastException("Could not run initialization of hazelcast.",e);
             }
         } else {
+            log.warn("Using local hazelcast as we do not have kubernetes");
             hazelcast = initForLocalHazelCast();
         }
     }
 
 
-    public void shutdown() {
+    @PreDestroy
+    public final void shutdown() {
         hazelcast.shutdown();
     }
 
