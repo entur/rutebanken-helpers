@@ -3,6 +3,7 @@ package org.rutebanken.hazelcasthelper.service;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.GroupConfig;
 import com.hazelcast.config.JoinConfig;
+import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.MulticastConfig;
 import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.config.SSLConfig;
@@ -53,6 +54,12 @@ public class HazelCastService {
             log.warn("Using local hazelcast as we do not have kubernetes");
             hazelcast = initForLocalHazelCast();
         }
+        Runtime.getRuntime().addShutdownHook(new Thread(){
+            @Override
+            public void run() {
+                hazelcast.shutdown();
+            }
+        });
     }
 
 
@@ -60,6 +67,7 @@ public class HazelCastService {
     public final void shutdown() {
         hazelcast.shutdown();
     }
+
 
     /**
      * Method to be used as part of liveness test for a k8s service
@@ -121,6 +129,14 @@ public class HazelCastService {
                 .setPort(HC_PORT)
                 .setJoin(joinCfg)
                 .setSSLConfig(new SSLConfig().setEnabled(false));
+
+        MapConfig mapConfig = cfg.getMapConfig("default");
+        log.info("Old config: b_count "+mapConfig.getBackupCount()+" async_b_count "+mapConfig.getAsyncBackupCount()+" read_backup_data "+mapConfig.isReadBackupData());
+        mapConfig.setBackupCount( 2 )
+                .setAsyncBackupCount( 2 )
+                .setReadBackupData( true );
+
+        log.info("Updated config: b_count "+mapConfig.getBackupCount()+" async_b_count "+mapConfig.getAsyncBackupCount()+" read_backup_data "+mapConfig.isReadBackupData());
 
         cfg.setNetworkConfig(netCfg);
         return Hazelcast.newHazelcastInstance(cfg);
