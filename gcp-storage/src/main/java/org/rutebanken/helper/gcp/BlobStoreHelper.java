@@ -1,6 +1,6 @@
 package org.rutebanken.helper.gcp;
 
-import com.google.cloud.AuthCredentials;
+import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.cloud.Page;
 import com.google.cloud.ReadChannel;
 import com.google.cloud.WriteChannel;
@@ -37,21 +37,22 @@ public class BlobStoreHelper {
     public static Blob uploadBlob(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic) {
         logger.debug("Uploading blob " + name + " to bucket " + containerName);
         BlobId blobId = BlobId.of(containerName, name);
-        BlobInfo.Builder builder = BlobInfo.builder(blobId).contentType("application/octet-stream");
+        BlobInfo.Builder builder = BlobInfo.newBuilder(blobId).setContentType("application/octet-stream");
         if (makePublic) {
-            builder.acl(ImmutableList.of(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER)));
+            builder.setAcl(ImmutableList.of(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER)));
         }
         BlobInfo blobInfo = builder.build();
         Blob blob = storage.create(blobInfo, inputStream);
-        logger.debug("Stored blob with name '" + blob.name() + "' and size '" + blob.size() + "' in bucket '" + blob.bucket() + "'");
+        logger.debug("Stored blob with name '" + blob.getName() + "' and size '" + blob.getSize() + "' in bucket '" + blob.getBucket() + "'");
         return blob;
     }
 
+    @Deprecated
     public static void uploadBlob(Storage storage, String containerName, String blobPath, Path filePath, boolean makePublic) throws Exception {
         logger.debug("Uploading blob " + filePath.getFileName().toString() + " to bucket " + containerName);
         String blobIdName = blobPath + filePath.getFileName().toString();
         BlobId blobId = BlobId.of(containerName, blobIdName);
-        BlobInfo.Builder builder = BlobInfo.builder(blobId).contentType("application/octet-stream");
+        BlobInfo.Builder builder = BlobInfo.newBuilder(blobId).setContentType("application/octet-stream");
         if (makePublic) {
             builder.acl(ImmutableList.of(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER)));
         }
@@ -70,7 +71,7 @@ public class BlobStoreHelper {
             byte[] bytes = Files.readAllBytes(filePath);
             storage.create(blobInfo, bytes);
         }
-        logger.debug("Stored blob with name '" + blobInfo.name() + "' and size '" + blobInfo.size() + "' in bucket '" + blobInfo.bucket() + "'");
+        logger.debug("Stored blob with name '" + blobInfo.getName() + "' and size '" + blobInfo.getSize() + "' in bucket '" + blobInfo.getBucket() + "'");
     }
 
     public static InputStream getBlob(Storage storage, String containerName, String name) {
@@ -89,12 +90,12 @@ public class BlobStoreHelper {
                     bytes.clear();
                 }
                 result = new ByteArrayInputStream(outputStream.toByteArray());
-                logger.debug("Retrieved blob with name '" + blob.name() + "' and size '" + blob.size() + "' from bucket '" + blob.bucket() + "'");
+                logger.debug("Retrieved blob with name '" + blob.getName() + "' and size '" + blob.getSize() + "' from bucket '" + blob.getBucket() + "'");
             } catch (IOException e){
                 throw new RuntimeException(e);
             }
         } else {
-            logger.warn("Could not find '" + blobId.name() + "' in bucket '" + blobId.bucket() + "'");
+            logger.warn("Could not find '" + blobId.getName() + "' in bucket '" + blobId.getBucket() + "'");
         }
         return result;
     }
@@ -103,13 +104,12 @@ public class BlobStoreHelper {
         return storage.delete(blobId);
     }
 
-    public static Storage getStorage(String credentialPath, String projectId) {
+    public static Storage getStorage(String credentialPath) {
         try {
-            StorageOptions options = StorageOptions.builder()
-                    .projectId(projectId)
-                    .authCredentials(AuthCredentials.createForJson(
-                            new FileInputStream(credentialPath))).build();
-            return options.service();
+              return StorageOptions.newBuilder()
+                    .setCredentials(ServiceAccountCredentials.fromStream(new FileInputStream(credentialPath)))
+                    .build()
+                    .getService();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

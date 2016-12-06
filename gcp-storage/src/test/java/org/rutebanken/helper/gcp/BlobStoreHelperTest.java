@@ -1,50 +1,42 @@
 package org.rutebanken.helper.gcp;
 
-
-import com.google.cloud.AuthCredentials;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageOptions;
 import com.google.common.io.ByteStreams;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Disabled
 public class BlobStoreHelperTest {
 
     private static final String BUCKET_NAME = "marduk-test";
-    private static final String credentialPath = "/home/tomgag/.ssh/Carbon-a4d50ca8176c.json";
+    private static final String credentialPath = "/home/tomgag/.ssh/Carbon-ef49cabc6d04.json";
     private static final String directory = "test/";
 
     private static Storage storage;
-    private static String projectId = "carbon-1287";
-    private final String fileName = "avinor-netex.zip";
+    private final String fileName = "avinor-netex-dummy.zip";
     private final String blobName = directory + fileName;
 
     @BeforeAll
     public static void beforeAll() throws IOException {
-        StorageOptions options = StorageOptions.builder()
-                .projectId(projectId)
-                .authCredentials(AuthCredentials.createForJson(
-                        new FileInputStream(credentialPath))).build();
-        storage = options.service();
+        storage = BlobStoreHelper.getStorage(credentialPath);
     }
 
     @BeforeEach
     public void beforeEach() {
         // Eating our own dog food here
         Iterator<Blob> blobIterator = BlobStoreHelper.listAllBlobsRecursively(storage, BUCKET_NAME, directory);
-        blobIterator.forEachRemaining(blob -> BlobStoreHelper.delete(storage, BlobId.of(BUCKET_NAME, blob.name())));
+        blobIterator.forEachRemaining(blob -> BlobStoreHelper.delete(storage, BlobId.of(BUCKET_NAME, blob.getName())));
     }
 
     @Test
@@ -59,7 +51,8 @@ public class BlobStoreHelperTest {
         Iterator<Blob> blobIterator = BlobStoreHelper.listAllBlobsRecursively(storage, BUCKET_NAME, directory);
         assertEquals(true, blobIterator.hasNext());
         Blob result = blobIterator.next();
-        assertEquals(blobName, result.name());
+        System.out.println(result.getBlobId());
+        assertEquals(blobName, result.getName());
         assertEquals(false, blobIterator.hasNext());
     }
 
