@@ -65,7 +65,9 @@ public class HazelCastService {
 
     @PreDestroy
     public final void shutdown() {
+        log.info("Shutdown initiated");
         hazelcast.shutdown();
+        log.info("Shutdown finished");
     }
 
 
@@ -130,10 +132,11 @@ public class HazelCastService {
                 .setJoin(joinCfg)
                 .setSSLConfig(new SSLConfig().setEnabled(false));
 
+        // http://docs.hazelcast.org/docs/3.7/manual/html-single/index.html#backing-up-maps
         MapConfig mapConfig = cfg.getMapConfig("default");
         log.info("Old config: b_count "+mapConfig.getBackupCount()+" async_b_count "+mapConfig.getAsyncBackupCount()+" read_backup_data "+mapConfig.isReadBackupData());
         mapConfig.setBackupCount( 2 )
-                .setAsyncBackupCount( 2 )
+                .setAsyncBackupCount( 0 )
                 .setReadBackupData( true );
 
         log.info("Updated config: b_count "+mapConfig.getBackupCount()+" async_b_count "+mapConfig.getAsyncBackupCount()+" read_backup_data "+mapConfig.isReadBackupData());
