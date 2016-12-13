@@ -29,7 +29,7 @@ public class BlobStoreHelperTest {
 
     @BeforeAll
     public static void beforeAll() throws IOException {
-        storage = BlobStoreHelper.getStorage(credentialPath);
+        storage = BlobStoreHelper.getStorage(credentialPath, "carbon-1287");
     }
 
     @BeforeEach

@@ -104,12 +104,12 @@ public class BlobStoreHelper {
         return storage.delete(blobId);
     }
 
-    public static Storage getStorage(String credentialPath) {
+    public static Storage getStorage(String credentialPath, String projectId) {
         try {
               return StorageOptions.newBuilder()
                     .setCredentials(ServiceAccountCredentials.fromStream(new FileInputStream(credentialPath)))
-                    .build()
-                    .getService();
+                    .setProjectId(projectId)
+                    .build().getService();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
