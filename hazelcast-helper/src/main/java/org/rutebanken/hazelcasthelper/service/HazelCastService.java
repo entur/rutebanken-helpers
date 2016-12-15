@@ -3,6 +3,7 @@ package org.rutebanken.hazelcasthelper.service;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.GroupConfig;
 import com.hazelcast.config.JoinConfig;
+import com.hazelcast.config.ManagementCenterConfig;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.MulticastConfig;
 import com.hazelcast.config.NetworkConfig;
@@ -29,14 +30,22 @@ public class HazelCastService {
 
     private KubernetesService kubernetesService;
 
+    private final String managementUrl;
+
     /**
      * Create a networked hazelcast instance, or
      * @param kubernetesService A networked hazelcast instance is only set up if
      *                          kubernetesService is not null
      */
     public HazelCastService(KubernetesService kubernetesService) {
-        this.kubernetesService = kubernetesService;
+        this(kubernetesService, null);
     }
+
+    public HazelCastService(KubernetesService kubernetesService, String managementUrl) {
+        this.kubernetesService = kubernetesService;
+        this.managementUrl = managementUrl;
+    }
+
 
     @PostConstruct
     public final void init() {
@@ -141,8 +150,22 @@ public class HazelCastService {
 
         log.info("Updated config: b_count "+mapConfig.getBackupCount()+" async_b_count "+mapConfig.getAsyncBackupCount()+" read_backup_data "+mapConfig.isReadBackupData());
 
+        addMgmtIfConfigured(cfg);
+
         cfg.setNetworkConfig(netCfg);
         return Hazelcast.newHazelcastInstance(cfg);
+    }
+
+    /**
+     * Adding management configuration if it has been given
+     */
+    private void addMgmtIfConfigured(Config cfg) {
+        if ( managementUrl != null ) {
+            ManagementCenterConfig mcc = new ManagementCenterConfig(managementUrl, 3);
+            mcc.setEnabled(true);
+            cfg.setManagementCenterConfig(mcc);
+            log.info("Added management URL: "+managementUrl);
+        }
     }
 
     /**
@@ -161,6 +184,7 @@ public class HazelCastService {
         networkCfg.getInterfaces()
                 .setEnabled(false);
         cfg.setNetworkConfig( networkCfg );
+        addMgmtIfConfigured(cfg);
 
         return Hazelcast.newHazelcastInstance(cfg);
     }
