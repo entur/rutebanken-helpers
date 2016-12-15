@@ -160,7 +160,7 @@ public class HazelCastService {
      * Adding management configuration if it has been given
      */
     private void addMgmtIfConfigured(Config cfg) {
-        if ( managementUrl != null ) {
+        if ( managementUrl != null && !managementUrl.isEmpty() ) {
             ManagementCenterConfig mcc = new ManagementCenterConfig(managementUrl, 3);
             mcc.setEnabled(true);
             cfg.setManagementCenterConfig(mcc);
