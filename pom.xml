@@ -98,12 +98,12 @@
                 <version>4.3.5.RELEASE</version>
             </dependency>
 
-            <!--    <dependency>
+            <dependency>
               <groupId>junit</groupId>
               <artifactId>junit</artifactId>
               <version>${junit.version}</version>
               <scope>test</scope>
-          </dependency> -->
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -146,5 +146,6 @@
     <modules>
         <module>gcp-storage</module>
         <module>hazelcast-helper</module>
+        <module>calendar-helper</module>
     </modules>
 </project>
