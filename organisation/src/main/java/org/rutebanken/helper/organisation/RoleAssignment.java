@@ -38,6 +38,22 @@ public class RoleAssignment {
 	public Map<String, List<String>> e;
 
 
+	public String getRole() {
+		return r;
+	}
+
+	public String getOrganisation() {
+		return o;
+	}
+
+	public String getAdministrativeZone() {
+		return z;
+	}
+
+	public Map<String, List<String>> getE() {
+		return e;
+	}
+
 	public static Builder builder() {
 		return new Builder();
 	}
