@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +37,10 @@ public class KeycloakRoleAssignmentExtractor implements RoleAssignmentExtractor 
             Object roleAssignments = token.getOtherClaims().get(ATTRIBUTE_NAME_ROLE_ASSIGNMENT);
 
             List<Object> roleAssignmentList;
-            if (roleAssignments instanceof List) {
+            if (roleAssignments == null){
+                return new ArrayList<>();
+            }
+            else if (roleAssignments instanceof List) {
                 roleAssignmentList = (List) roleAssignments;
             } else if (roleAssignments instanceof String) {
                 roleAssignmentList = Arrays.asList(((String) roleAssignments).split("##"));
