@@ -50,7 +50,7 @@ public class KeycloakRoleAssignmentExtractor implements RoleAssignmentExtractor 
 
             return roleAssignmentList.stream().map(m -> parse(m)).collect(Collectors.toList());
         } else {
-            throw new NotAuthenticatedException("Not authorized with token");
+            throw new NotAuthenticatedException("Not authenticated with token");
         }
     }
 
