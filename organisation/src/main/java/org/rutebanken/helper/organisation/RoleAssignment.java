@@ -51,7 +51,7 @@ public class RoleAssignment {
         return z;
     }
     @JsonIgnore
-    public Map<String, List<String>> getE() {
+    public Map<String, List<String>> getEntityClassifications() {
         return e;
     }
 
