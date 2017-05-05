@@ -1,14 +1,6 @@
 package org.rutebanken.hazelcasthelper.service;
 
-import com.hazelcast.config.Config;
-import com.hazelcast.config.GroupConfig;
-import com.hazelcast.config.JoinConfig;
-import com.hazelcast.config.ManagementCenterConfig;
-import com.hazelcast.config.MapConfig;
-import com.hazelcast.config.MulticastConfig;
-import com.hazelcast.config.NetworkConfig;
-import com.hazelcast.config.SSLConfig;
-import com.hazelcast.config.TcpIpConfig;
+import com.hazelcast.config.*;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import org.slf4j.Logger;
@@ -17,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -153,7 +146,14 @@ public class HazelCastService {
         addMgmtIfConfigured(cfg);
 
         cfg.setNetworkConfig(netCfg);
+
+        getAdditionalMapConfigurations().forEach(cfg::addMapConfig);
+
         return Hazelcast.newHazelcastInstance(cfg);
+    }
+
+    public List<MapConfig> getAdditionalMapConfigurations() {
+        return new ArrayList<>();
     }
 
     /**
