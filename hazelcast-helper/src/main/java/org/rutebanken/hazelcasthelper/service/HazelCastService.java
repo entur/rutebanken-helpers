@@ -107,53 +107,6 @@ public class HazelCastService {
                 : hazelcast.getCluster().getMembers().size();
     }
 
-    private HazelcastInstance runHazelcast(final List<String> nodes, String groupName, String password) {
-        final int HC_PORT = 5701;
-        if ( nodes.isEmpty() ) {
-            log.warn("No nodes given - will start lonely HZ");
-        }
-        // configure Hazelcast instance
-        final Config cfg = new Config()
-                .setInstanceName(UUID.randomUUID().toString())
-                .setGroupConfig(new GroupConfig(groupName, password))
-                .setProperty("hazelcast.phone.home.enabled","false");
-
-        // tcp
-        final TcpIpConfig tcpCfg = new TcpIpConfig();
-        nodes.forEach(tcpCfg::addMember);
-        tcpCfg.setEnabled(true);
-
-        // network join configuration
-        final JoinConfig joinCfg = new JoinConfig()
-                .setMulticastConfig(new MulticastConfig().setEnabled(false))
-                .setTcpIpConfig(tcpCfg);
-
-        final NetworkConfig netCfg = new NetworkConfig()
-                .setPortAutoIncrement(false)
-                .setPort(HC_PORT)
-                .setJoin(joinCfg)
-                .setSSLConfig(new SSLConfig().setEnabled(false));
-
-        MapConfig mapConfig = cfg.getMapConfig("default");
-        updateDefaultMapConfig(mapConfig);
-
-        log.info("Old config: b_count "+mapConfig.getBackupCount()+" async_b_count "+mapConfig.getAsyncBackupCount()+" read_backup_data "+mapConfig.isReadBackupData());
-        // http://docs.hazelcast.org/docs/3.7/manual/html-single/index.html#backing-up-maps
-        mapConfig.setBackupCount( 2 )
-                .setAsyncBackupCount( 0 )
-                .setReadBackupData( true );
-
-        log.info("Updated config: b_count "+mapConfig.getBackupCount()+" async_b_count "+mapConfig.getAsyncBackupCount()+" read_backup_data "+mapConfig.isReadBackupData());
-
-        addMgmtIfConfigured(cfg);
-
-        cfg.setNetworkConfig(netCfg);
-
-        getAdditionalMapConfigurations().forEach(cfg::addMapConfig);
-
-        return Hazelcast.newHazelcastInstance(cfg);
-    }
-
     /**
      * Override this method if you want to provide additional configuration to the map config with name "default".
      * The map config will be updated with some configuration for backup, after the execution of this very method.
@@ -206,6 +159,53 @@ public class HazelCastService {
      */
     public List<MapConfig> getAdditionalMapConfigurations() {
         return new ArrayList<>();
+    }
+
+    private HazelcastInstance runHazelcast(final List<String> nodes, String groupName, String password) {
+        final int HC_PORT = 5701;
+        if ( nodes.isEmpty() ) {
+            log.warn("No nodes given - will start lonely HZ");
+        }
+        // configure Hazelcast instance
+        final Config cfg = new Config()
+                .setInstanceName(UUID.randomUUID().toString())
+                .setGroupConfig(new GroupConfig(groupName, password))
+                .setProperty("hazelcast.phone.home.enabled","false");
+
+        // tcp
+        final TcpIpConfig tcpCfg = new TcpIpConfig();
+        nodes.forEach(tcpCfg::addMember);
+        tcpCfg.setEnabled(true);
+
+        // network join configuration
+        final JoinConfig joinCfg = new JoinConfig()
+                .setMulticastConfig(new MulticastConfig().setEnabled(false))
+                .setTcpIpConfig(tcpCfg);
+
+        final NetworkConfig netCfg = new NetworkConfig()
+                .setPortAutoIncrement(false)
+                .setPort(HC_PORT)
+                .setJoin(joinCfg)
+                .setSSLConfig(new SSLConfig().setEnabled(false));
+
+        MapConfig mapConfig = cfg.getMapConfig("default");
+        updateDefaultMapConfig(mapConfig);
+
+        log.info("Old config: b_count "+mapConfig.getBackupCount()+" async_b_count "+mapConfig.getAsyncBackupCount()+" read_backup_data "+mapConfig.isReadBackupData());
+        // http://docs.hazelcast.org/docs/3.7/manual/html-single/index.html#backing-up-maps
+        mapConfig.setBackupCount( 2 )
+                .setAsyncBackupCount( 0 )
+                .setReadBackupData( true );
+
+        log.info("Updated config: b_count "+mapConfig.getBackupCount()+" async_b_count "+mapConfig.getAsyncBackupCount()+" read_backup_data "+mapConfig.isReadBackupData());
+
+        addMgmtIfConfigured(cfg);
+
+        cfg.setNetworkConfig(netCfg);
+
+        getAdditionalMapConfigurations().forEach(cfg::addMapConfig);
+
+        return Hazelcast.newHazelcastInstance(cfg);
     }
 
     /**
