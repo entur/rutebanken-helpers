@@ -155,15 +155,36 @@ public class HazelCastService {
     }
 
     /**
-     * Override this method if you want to provide additional configuration to the map config with name "default"
+     * Override this method if you want to provide additional configuration to the map config with name "default".
+     * The map config will be updated with some configuration for backup execution of this very method.
+     * See code example in Tiamat: <a href="https://github.com/rutebanken/tiamat/blob/master/src/main/java/org/rutebanken/tiamat/hazelcast/ExtendedHazelcastService.java">ExtendedHazelcastService</a>
      *
-     * @param defaultMapConfig The map config with name "default"
+     * @param defaultMapConfig The map config with name "default" to make updates on.
      */
     public void updateDefaultMapConfig(MapConfig defaultMapConfig) {}
 
 
     /**
      * If you want to provide additional map configurations to hazelcast.
+     * This list will be added to the Hazelcast configuration. See {@link com.hazelcast.config.Config#addMapConfig(MapConfig)}
+     *
+     * Refer to the Hazelcast documentation for configuring maps programmatically.
+     * <a href="http://docs.hazelcast.org/docs/3.8/manual/html-single/index.html#configuring-programmatically">Configuring Programmatically</a>
+     *
+     * See the below example for how to configure a map by name by overriding this method.
+     * <pre>
+     * {@code
+     *
+     *  @Override
+     *  public List<MapConfig> getAdditionalMapConfigurations() {
+     *      return Arrays.asList(
+     *          new MapConfig()
+     *              .setName("myVeryImportantMap")
+     *              .setBackupCount(2)
+     *              .setTimeToLiveSeconds(300));
+     *  }
+     * }
+     * </pre>
      *
      * @return a list with desired map configurations
      */
