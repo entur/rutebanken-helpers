@@ -156,8 +156,23 @@ public class HazelCastService {
 
     /**
      * Override this method if you want to provide additional configuration to the map config with name "default".
-     * The map config will be updated with some configuration for backup execution of this very method.
-     * See code example in Tiamat: <a href="https://github.com/rutebanken/tiamat/blob/master/src/main/java/org/rutebanken/tiamat/hazelcast/ExtendedHazelcastService.java">ExtendedHazelcastService</a>
+     * The map config will be updated with some configuration for backup, after the execution of this very method.
+     *
+     * See the example below for overriding:
+     *
+     * <pre>
+     * {@code
+     *  @Override
+     *  public void updateDefaultMapConfig(MapConfig mapConfig) {
+     *     mapConfig
+     *       .setEvictionPolicy(EvictionPolicy.LRU)
+     *       .setTimeToLiveSeconds(604800)
+     *       .setMaxSizeConfig(
+     *         new MaxSizeConfig(70, MaxSizeConfig.MaxSizePolicy.USED_HEAP_PERCENTAGE));
+     *     logger.info("Map config: {}", mapConfig);
+     *  }
+     * }
+     * </pre>
      *
      * @param defaultMapConfig The map config with name "default" to make updates on.
      */
@@ -165,13 +180,15 @@ public class HazelCastService {
 
 
     /**
-     * If you want to provide additional map configurations to hazelcast.
+     * If you want to provide additional map configurations to hazelcast, you can override this method.
      * This list will be added to the Hazelcast configuration. See {@link com.hazelcast.config.Config#addMapConfig(MapConfig)}
      *
      * Refer to the Hazelcast documentation for configuring maps programmatically.
      * <a href="http://docs.hazelcast.org/docs/3.8/manual/html-single/index.html#configuring-programmatically">Configuring Programmatically</a>
      *
-     * See the below example for how to configure a map by name by overriding this method.
+     * See code example in Tiamat: <a href="https://github.com/rutebanken/tiamat/blob/master/src/main/java/org/rutebanken/tiamat/hazelcast/ExtendedHazelcastService.java">ExtendedHazelcastService</a>
+     *
+     * See the below example below for how to configure one or more maps by overriding this method.
      * <pre>
      * {@code
      *
