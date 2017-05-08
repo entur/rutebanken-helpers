@@ -199,6 +199,11 @@ public class HazelCastService {
         networkCfg.getInterfaces()
                 .setEnabled(false);
         cfg.setNetworkConfig( networkCfg );
+
+        MapConfig mapConfig = cfg.getMapConfig("default");
+        updateDefaultMapConfig(mapConfig);
+        getAdditionalMapConfigurations().forEach(cfg::addMapConfig);
+        
         addMgmtIfConfigured(cfg);
 
         return Hazelcast.newHazelcastInstance(cfg);
