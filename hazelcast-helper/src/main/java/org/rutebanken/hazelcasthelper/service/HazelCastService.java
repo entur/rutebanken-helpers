@@ -191,14 +191,13 @@ public class HazelCastService {
      * See the below example below for how to configure one or more maps by overriding this method.
      * <pre>
      * {@code
-     *
      *  @Override
      *  public List<MapConfig> getAdditionalMapConfigurations() {
-     *      return Arrays.asList(
-     *          new MapConfig()
-     *              .setName("myVeryImportantMap")
-     *              .setBackupCount(2)
-     *              .setTimeToLiveSeconds(300));
+     *     return Arrays.asList(
+     *       new MapConfig()
+     *         .setName("myVeryImportantMap")
+     *         .setBackupCount(2)
+     *         .setTimeToLiveSeconds(300));
      *  }
      * }
      * </pre>
