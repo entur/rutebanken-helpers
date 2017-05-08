@@ -136,6 +136,8 @@ public class HazelCastService {
 
         // http://docs.hazelcast.org/docs/3.7/manual/html-single/index.html#backing-up-maps
         MapConfig mapConfig = cfg.getMapConfig("default");
+        updateDefaultMapConfig(mapConfig);
+
         log.info("Old config: b_count "+mapConfig.getBackupCount()+" async_b_count "+mapConfig.getAsyncBackupCount()+" read_backup_data "+mapConfig.isReadBackupData());
         mapConfig.setBackupCount( 2 )
                 .setAsyncBackupCount( 0 )
@@ -152,6 +154,19 @@ public class HazelCastService {
         return Hazelcast.newHazelcastInstance(cfg);
     }
 
+    /**
+     * Override this method if you want to provide additional configuration to the map config with name "default"
+     *
+     * @param defaultMapConfig The map config with name "default"
+     */
+    public void updateDefaultMapConfig(MapConfig defaultMapConfig) {}
+
+
+    /**
+     * If you want to provide additional map configurations to hazelcast.
+     *
+     * @return a list with desired map configurations
+     */
     public List<MapConfig> getAdditionalMapConfigurations() {
         return new ArrayList<>();
     }
