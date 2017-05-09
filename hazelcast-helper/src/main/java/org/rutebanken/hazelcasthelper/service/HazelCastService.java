@@ -1,14 +1,6 @@
 package org.rutebanken.hazelcasthelper.service;
 
-import com.hazelcast.config.Config;
-import com.hazelcast.config.GroupConfig;
-import com.hazelcast.config.JoinConfig;
-import com.hazelcast.config.ManagementCenterConfig;
-import com.hazelcast.config.MapConfig;
-import com.hazelcast.config.MulticastConfig;
-import com.hazelcast.config.NetworkConfig;
-import com.hazelcast.config.SSLConfig;
-import com.hazelcast.config.TcpIpConfig;
+import com.hazelcast.config.*;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import org.slf4j.Logger;
@@ -17,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -114,6 +107,60 @@ public class HazelCastService {
                 : hazelcast.getCluster().getMembers().size();
     }
 
+    /**
+     * Override this method if you want to provide additional configuration to the map config with name "default".
+     * The map config will be updated with some configuration for backup, after the execution of this very method.
+     *
+     * See the example below for overriding:
+     *
+     * <pre>
+     * {@code
+     *  @Override
+     *  public void updateDefaultMapConfig(MapConfig mapConfig) {
+     *     mapConfig
+     *       .setEvictionPolicy(EvictionPolicy.LRU)
+     *       .setTimeToLiveSeconds(604800)
+     *       .setMaxSizeConfig(
+     *         new MaxSizeConfig(70, MaxSizeConfig.MaxSizePolicy.USED_HEAP_PERCENTAGE));
+     *     logger.info("Map config: {}", mapConfig);
+     *  }
+     * }
+     * </pre>
+     *
+     * @param defaultMapConfig The map config with name "default" to make updates on.
+     */
+    public void updateDefaultMapConfig(MapConfig defaultMapConfig) {}
+
+
+    /**
+     * If you want to provide additional map configurations to hazelcast, you can override this method.
+     * This list will be added to the Hazelcast configuration. See {@link com.hazelcast.config.Config#addMapConfig(MapConfig)}
+     *
+     * Refer to the Hazelcast documentation for configuring maps programmatically.
+     * <a href="http://docs.hazelcast.org/docs/3.8/manual/html-single/index.html#configuring-programmatically">Configuring Programmatically</a>
+     *
+     * See code example in Tiamat: <a href="https://github.com/rutebanken/tiamat/blob/master/src/main/java/org/rutebanken/tiamat/hazelcast/ExtendedHazelcastService.java">ExtendedHazelcastService</a>
+     *
+     * See the below example below for how to configure one or more maps by overriding this method.
+     * <pre>
+     * {@code
+     *  @Override
+     *  public List<MapConfig> getAdditionalMapConfigurations() {
+     *     return Arrays.asList(
+     *       new MapConfig()
+     *         .setName("myVeryImportantMap")
+     *         .setBackupCount(2)
+     *         .setTimeToLiveSeconds(300));
+     *  }
+     * }
+     * </pre>
+     *
+     * @return a list with desired map configurations
+     */
+    public List<MapConfig> getAdditionalMapConfigurations() {
+        return new ArrayList<>();
+    }
+
     private HazelcastInstance runHazelcast(final List<String> nodes, String groupName, String password) {
         final int HC_PORT = 5701;
         if ( nodes.isEmpty() ) {
@@ -141,9 +188,11 @@ public class HazelCastService {
                 .setJoin(joinCfg)
                 .setSSLConfig(new SSLConfig().setEnabled(false));
 
-        // http://docs.hazelcast.org/docs/3.7/manual/html-single/index.html#backing-up-maps
         MapConfig mapConfig = cfg.getMapConfig("default");
+        updateDefaultMapConfig(mapConfig);
+
         log.info("Old config: b_count "+mapConfig.getBackupCount()+" async_b_count "+mapConfig.getAsyncBackupCount()+" read_backup_data "+mapConfig.isReadBackupData());
+        // http://docs.hazelcast.org/docs/3.7/manual/html-single/index.html#backing-up-maps
         mapConfig.setBackupCount( 2 )
                 .setAsyncBackupCount( 0 )
                 .setReadBackupData( true );
@@ -153,6 +202,9 @@ public class HazelCastService {
         addMgmtIfConfigured(cfg);
 
         cfg.setNetworkConfig(netCfg);
+
+        getAdditionalMapConfigurations().forEach(cfg::addMapConfig);
+
         return Hazelcast.newHazelcastInstance(cfg);
     }
 
@@ -184,6 +236,11 @@ public class HazelCastService {
         networkCfg.getInterfaces()
                 .setEnabled(false);
         cfg.setNetworkConfig( networkCfg );
+
+        MapConfig mapConfig = cfg.getMapConfig("default");
+        updateDefaultMapConfig(mapConfig);
+        getAdditionalMapConfigurations().forEach(cfg::addMapConfig);
+        
         addMgmtIfConfigured(cfg);
 
         return Hazelcast.newHazelcastInstance(cfg);
