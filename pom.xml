@@ -160,5 +160,6 @@
         <module>hazelcast-helper</module>
         <module>calendar-helper</module>
         <module>organisation</module>
+        <module>jms-batch</module>
     </modules>
 </project>

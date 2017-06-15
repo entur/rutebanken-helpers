@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>org.rutebanken.helpers</groupId>
+        <artifactId>helper</artifactId>
+        <version>0.0.3-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <properties>
+        <activemq.version>5.13.4</activemq.version>
+    </properties>
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>jms-batch</artifactId>
+
+    <name>jms-batch</name>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-camel</artifactId>
+                <version>${activemq.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <!-- NOTICE that you put the versions in the parent dependency
+        management section, and artifacts without version here. -->
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-camel</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <!-- <plugins>
+             <plugin>
+                 <artifactId>maven-surefire-plugin</artifactId>
+             </plugin>
+         </plugins>-->
+    </build>
+
+</project>
