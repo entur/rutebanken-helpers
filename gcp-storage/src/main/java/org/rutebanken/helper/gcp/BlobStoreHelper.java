@@ -15,7 +15,9 @@ import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class BlobStoreHelper {
 
@@ -102,6 +104,17 @@ public class BlobStoreHelper {
 
     public static boolean delete(Storage storage, BlobId blobId) {
         return storage.delete(blobId);
+    }
+
+    public static boolean deleteBlobsByPrefix(Storage storage, String containerName, String prefix) {
+        List<BlobId> blobIdList = new ArrayList<>();
+        listAllBlobsRecursively(storage, containerName, prefix).forEachRemaining(blob -> blobIdList.add(blob.getBlobId()));
+        if (blobIdList.isEmpty()) {
+            return false;
+        }
+
+
+        return storage.delete(blobIdList).stream().allMatch(ret -> ret);
     }
 
     public static Storage getStorage(String credentialPath, String projectId) {
