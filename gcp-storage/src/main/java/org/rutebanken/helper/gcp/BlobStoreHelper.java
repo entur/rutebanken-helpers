@@ -37,9 +37,13 @@ public class BlobStoreHelper {
     }
 
     public static Blob uploadBlob(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic) {
+        return uploadBlob(storage, containerName, name, inputStream, makePublic, "application/octet-stream");
+    }
+
+    public static Blob uploadBlob(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic, String contentType) {
         logger.debug("Uploading blob " + name + " to bucket " + containerName);
         BlobId blobId = BlobId.of(containerName, name);
-        BlobInfo.Builder builder = BlobInfo.newBuilder(blobId).setContentType("application/octet-stream");
+        BlobInfo.Builder builder = BlobInfo.newBuilder(blobId).setContentType(contentType);
         if (makePublic) {
             builder.setAcl(ImmutableList.of(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER)));
         }
