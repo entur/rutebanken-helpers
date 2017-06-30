@@ -9,4 +9,7 @@ public class AuthorizationConstants {
     public static final String ROLE_ROUTE_DATA_ADMIN = "adminEditRouteData";
 
     public static final String ENTITY_CLASSIFIER_ALL_TYPES = "*";
+    public static final String ENTITY_TYPE = "EntityType";
+
+    public static final String ENTITY_CLASSIFIER_ALL_ATTRIBUTES = "*";
 }
