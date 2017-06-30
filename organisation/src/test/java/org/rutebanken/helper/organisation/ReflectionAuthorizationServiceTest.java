@@ -2,7 +2,7 @@ package org.rutebanken.helper.organisation;
 
 import org.junit.Test;
 
-import java.util.stream.Stream;
+import java.util.Arrays;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -178,8 +178,36 @@ public class ReflectionAuthorizationServiceTest {
     }
 
 
-    public static class StopPlace {
-        public enum StopPlaceType {
+    @Test
+    public void authorizedForCertainEnumValues() {
+
+        for(StopPlace.StopPlaceType enumValue : StopPlace.StopPlaceType.values()){
+            RoleAssignment roleAssignment = RoleAssignment.builder()
+                    .withRole("editEnums")
+                    .withAdministrativeZone("01")
+                    .withOrganisation("OST")
+                    .withEntityClassification(ENTITY_TYPE, "StopPlace")
+                    .withEntityClassification("StopPlaceType", "!"+enumValue)
+                    .build();
+
+            StopPlace stopPlace = new StopPlace();
+            stopPlace.stopPlaceType = enumValue;
+
+            boolean authorized = reflectionAuthorizationService.authorized(roleAssignment, stopPlace, roleAssignment.r);
+            assertThat("should not be authorized as negation is on !", authorized, is(false));
+
+            Arrays.stream(StopPlace.StopPlaceType.values()).forEach(otherEnum -> {
+                if(otherEnum != enumValue) {
+                    stopPlace.stopPlaceType = otherEnum;
+                    assertThat("One value is not allowed " + enumValue + ", but " + otherEnum + " is",
+                            reflectionAuthorizationService.authorized(roleAssignment, stopPlace, roleAssignment.r), is(true));
+                }
+            });
+        }
+    }
+
+    private static class StopPlace {
+        enum StopPlaceType {
             ONSTREET_BUS("onstreetBus"),
             ONSTREET_TRAM("onstreetTram"),
             AIRPORT("airport");
@@ -188,18 +216,10 @@ public class ReflectionAuthorizationServiceTest {
             StopPlaceType(String v) {
                 value = v;
             }
-
-            public static StopPlaceType fromValue(String value) {
-                return Stream.of(StopPlaceType.values()).filter(stopType -> stopType.value.equals(value)).findFirst().get();
-            }
-
-            public String value() {
-                return value;
-            }
         }
 
-        public StopPlaceType stopPlaceType;
-        public String submode;
+        StopPlaceType stopPlaceType;
+        String submode;
     }
 
 }

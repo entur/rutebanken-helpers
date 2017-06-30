@@ -9,9 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static org.rutebanken.helper.organisation.AuthorizationConstants.ENTITY_CLASSIFIER_ALL_ATTRIBUTES;
-import static org.rutebanken.helper.organisation.AuthorizationConstants.ENTITY_CLASSIFIER_ALL_TYPES;
-import static org.rutebanken.helper.organisation.AuthorizationConstants.ENTITY_TYPE;
+import static org.rutebanken.helper.organisation.AuthorizationConstants.*;
 
 @Service
 public class ReflectionAuthorizationService {
@@ -19,16 +17,15 @@ public class ReflectionAuthorizationService {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionAuthorizationService.class);
 
 
-
     public boolean authorized(RoleAssignment roleAssignment, Object entity, String requiredRole) {
 
 
-        if(roleAssignment.getEntityClassifications() == null) {
+        if (roleAssignment.getEntityClassifications() == null) {
             logger.info("Role assignment entity classifications cannot be null");
             return false;
         }
 
-        if(!roleAssignment.getRole().equals(requiredRole)) {
+        if (!roleAssignment.getRole().equals(requiredRole)) {
             logger.debug("No role match for required role {}, {}", requiredRole, roleAssignment);
             return false;
         }
@@ -37,13 +34,13 @@ public class ReflectionAuthorizationService {
 
         String entityTypename = entity.getClass().getSimpleName();
 
-        if(!checkEntityClassifications(entityTypename, entity, roleAssignment, requiredRole)) {
+        if (!checkEntityClassifications(entityTypename, entity, roleAssignment, requiredRole)) {
             logger.debug("Entity classification. Not authorized: {}, {}", requiredRole, roleAssignment);
             return false;
         }
 
 
-        if(!checkAdministrativeZone(roleAssignment, entity)) {
+        if (!checkAdministrativeZone(roleAssignment, entity)) {
             logger.info("Entity type does not match");
             return false;
         }
@@ -53,16 +50,16 @@ public class ReflectionAuthorizationService {
 
     private boolean checkEntityClassifications(String entityTypename, Object entity, RoleAssignment roleAssignment, String requiredRole) {
 
-        if(!containsEntityTypeOrAll(roleAssignment, entityTypename)) {
+        if (!containsEntityTypeOrAll(roleAssignment, entityTypename)) {
             logger.info("No match for entity type {} for required role {}. Role assignment: {}",
                     entity.getClass().getSimpleName(), requiredRole, roleAssignment);
             return false;
         }
 
-        for(String entityType : roleAssignment.getEntityClassifications().keySet()) {
+        for (String entityType : roleAssignment.getEntityClassifications().keySet()) {
             boolean authorized = checkEntityClassification(entityType, entity, roleAssignment.getEntityClassifications().get(entityType));
 
-            if(!authorized) {
+            if (!authorized) {
                 logger.info("Not authorized for entity {} and role assignment {}", entity, roleAssignment);
                 return false;
             }
@@ -72,12 +69,12 @@ public class ReflectionAuthorizationService {
     }
 
     private boolean checkEntityClassification(String entityType, Object entity, List<String> classificationsForEntityType) {
-        if(entityType.equals(ENTITY_TYPE)) {
+        if (entityType.equals(ENTITY_TYPE)) {
             // Already checked
             return true;
         }
 
-        if(classificationsForEntityType.contains(ENTITY_CLASSIFIER_ALL_ATTRIBUTES)) {
+        if (classificationsForEntityType.contains(ENTITY_CLASSIFIER_ALL_ATTRIBUTES)) {
             logger.info("Contains {} means true", ENTITY_CLASSIFIER_ALL_ATTRIBUTES);
             return true;
 
@@ -85,7 +82,7 @@ public class ReflectionAuthorizationService {
 
         Optional<Field> optionalField = findFieldFromClassifier(entityType, entity);
 
-        if(!optionalField.isPresent()) {
+        if (!optionalField.isPresent()) {
             return true;
         }
 
@@ -93,17 +90,17 @@ public class ReflectionAuthorizationService {
         field.setAccessible(true);
         Optional<Object> optionalValue = getFieldValue(field, entity);
 
-        if(!optionalValue.isPresent()) {
+        if (!optionalValue.isPresent()) {
             logger.info("Cannot resolve value for {}, entity: {}", field, entity);
             return true;
         }
 
         Object value = optionalValue.get();
 
-        for(String classification : classificationsForEntityType) {
+        for (String classification : classificationsForEntityType) {
             logger.trace("Matches on field name {}", classification);
             boolean match = classificationMatchesObjectValue(classification, value);
-            if(! match) {
+            if (!match) {
                 return false;
             }
         }
@@ -129,11 +126,11 @@ public class ReflectionAuthorizationService {
     private boolean classificationMatchesObjectValue(String classification, Object value) {
         boolean negate = classification.startsWith("!");
 
-        if(negate) {
+        if (negate) {
             classification = classification.substring(1);
         }
 
-        if(value.toString().equalsIgnoreCase(classification)) {
+        if (value.toString().equalsIgnoreCase(classification)) {
             return !negate;
         }
         return negate;
@@ -141,7 +138,7 @@ public class ReflectionAuthorizationService {
 
 
     public boolean checkAdministrativeZone(RoleAssignment roleAssignment, Object entity) {
-        if(roleAssignment.getAdministrativeZone() == null || roleAssignment.getAdministrativeZone().isEmpty()) {
+        if (roleAssignment.getAdministrativeZone() == null || roleAssignment.getAdministrativeZone().isEmpty()) {
             return true;
         }
 
@@ -155,11 +152,11 @@ public class ReflectionAuthorizationService {
 
     private boolean containsEntityTypeOrAll(RoleAssignment roleAssignment, String entityTypeName) {
 
-        for(String entityType : roleAssignment.getEntityClassifications().get(ENTITY_TYPE)) {
-            if(entityType.equalsIgnoreCase(entityTypeName)) {
+        for (String entityType : roleAssignment.getEntityClassifications().get(ENTITY_TYPE)) {
+            if (entityType.equalsIgnoreCase(entityTypeName)) {
                 return true;
             }
-            if(ENTITY_CLASSIFIER_ALL_TYPES.equals(entityType)) {
+            if (ENTITY_CLASSIFIER_ALL_TYPES.equals(entityType)) {
                 return true;
             }
         }
