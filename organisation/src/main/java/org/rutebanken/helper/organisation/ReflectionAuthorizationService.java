@@ -21,7 +21,7 @@ public class ReflectionAuthorizationService {
 
 
         if (roleAssignment.getEntityClassifications() == null) {
-            logger.info("Role assignment entity classifications cannot be null");
+            logger.warn("Role assignment entity classifications cannot be null: {}", roleAssignment);
             return false;
         }
 
@@ -30,7 +30,7 @@ public class ReflectionAuthorizationService {
             return false;
         }
 
-        // Org check ?
+        // Organization check ?
 
         String entityTypename = entity.getClass().getSimpleName();
 
@@ -39,9 +39,8 @@ public class ReflectionAuthorizationService {
             return false;
         }
 
-
         if (!checkAdministrativeZone(roleAssignment, entity)) {
-            logger.info("Entity type does not match");
+            logger.debug("Entity type administrative zone no match: {} entity: {}", roleAssignment, entity);
             return false;
         }
 
@@ -51,7 +50,7 @@ public class ReflectionAuthorizationService {
     private boolean checkEntityClassifications(String entityTypename, Object entity, RoleAssignment roleAssignment, String requiredRole) {
 
         if (!containsEntityTypeOrAll(roleAssignment, entityTypename)) {
-            logger.info("No match for entity type {} for required role {}. Role assignment: {}",
+            logger.debug("No match for entity type {} for required role {}. Role assignment: {}",
                     entity.getClass().getSimpleName(), requiredRole, roleAssignment);
             return false;
         }
@@ -60,7 +59,7 @@ public class ReflectionAuthorizationService {
             boolean authorized = checkEntityClassification(entityType, entity, roleAssignment.getEntityClassifications().get(entityType));
 
             if (!authorized) {
-                logger.info("Not authorized for entity {} and role assignment {}", entity, roleAssignment);
+                logger.info ("Not authorized for entity {} and role assignment {}", entity, roleAssignment);
                 return false;
             }
 
@@ -75,7 +74,7 @@ public class ReflectionAuthorizationService {
         }
 
         if (classificationsForEntityType.contains(ENTITY_CLASSIFIER_ALL_ATTRIBUTES)) {
-            logger.info("Contains {} means true", ENTITY_CLASSIFIER_ALL_ATTRIBUTES);
+            logger.debug("Contains {} for {}", ENTITY_CLASSIFIER_ALL_ATTRIBUTES, entityType);
             return true;
 
         }
@@ -83,22 +82,25 @@ public class ReflectionAuthorizationService {
         Optional<Field> optionalField = findFieldFromClassifier(entityType, entity);
 
         if (!optionalField.isPresent()) {
+            logger.debug("Cannot fetch field for entity type {}. entity: {}", entityType, entity);
             return true;
         }
 
         Field field = optionalField.get();
+
+        logger.debug("Found field {} from classifier {}", field, entityType);
+
         field.setAccessible(true);
         Optional<Object> optionalValue = getFieldValue(field, entity);
 
         if (!optionalValue.isPresent()) {
-            logger.info("Cannot resolve value for {}, entity: {}", field, entity);
+            logger.debug("Cannot resolve value for {}, entity: {}", field, entity);
             return true;
         }
 
         Object value = optionalValue.get();
 
         for (String classification : classificationsForEntityType) {
-            logger.trace("Matches on field name {}", classification);
             boolean match = classificationMatchesObjectValue(classification, value);
             if (!match) {
                 return false;
@@ -108,9 +110,9 @@ public class ReflectionAuthorizationService {
         return true;
     }
 
-    private Optional<Field> findFieldFromClassifier(String entityType, Object entity) {
+    private Optional<Field> findFieldFromClassifier(String classifier, Object entity) {
         return Stream.of(entity.getClass().getDeclaredFields())
-                .filter(field -> entityType.equalsIgnoreCase(field.getName()))
+                .filter(field -> classifier.equalsIgnoreCase(field.getName()))
                 .findFirst();
     }
 
