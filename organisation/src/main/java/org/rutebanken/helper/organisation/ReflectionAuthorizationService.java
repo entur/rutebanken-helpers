@@ -100,13 +100,15 @@ public class ReflectionAuthorizationService {
 
         Object value = optionalValue.get();
 
-        for (String classification : classificationsForEntityType) {
-            boolean match = classificationMatchesObjectValue(classification, value);
-            if (!match) {
-                return false;
-            }
-        }
+        boolean anyMatch = classificationsForEntityType.stream()
+                .anyMatch(classification -> classificationMatchesObjectValue(classification, value));
 
+
+        if(!anyMatch) {
+            logger.debug("Classification does not match on object value. Not authorized." +
+                    " EntityType: {}. Entity: {}", entityType, entity);
+            return false;
+        }
         return true;
     }
 

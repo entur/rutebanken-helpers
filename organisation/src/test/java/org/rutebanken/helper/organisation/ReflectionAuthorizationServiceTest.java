@@ -3,7 +3,10 @@ package org.rutebanken.helper.organisation;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.rutebanken.helper.organisation.AuthorizationConstants.ENTITY_TYPE;
@@ -176,6 +179,63 @@ public class ReflectionAuthorizationServiceTest {
         boolean authorized = reflectionAuthorizationService.authorized(roleAssignment, stopPlace, roleAssignment.r);
         assertThat(authorized, is(false));
     }
+
+    @Test
+    public void multipleEnumsShouldBeAllowed() {
+
+        List<StopPlace.StopPlaceType> types = Arrays.asList(
+                StopPlace.StopPlaceType.AIRPORT,
+                StopPlace.StopPlaceType.ONSTREET_TRAM,
+                StopPlace.StopPlaceType.ONSTREET_BUS
+        );
+
+
+        RoleAssignment roleAssignment = RoleAssignment.builder()
+                .withRole("editStops")
+                .withAdministrativeZone("01")
+                .withOrganisation("OST")
+                .withEntityClassification(ENTITY_TYPE, "StopPlace")
+                .build();
+
+        roleAssignment.getEntityClassifications().put("StopPlaceType", types.stream().map(Enum::toString).collect(toList()));
+
+
+        StopPlace stopPlace = new StopPlace();
+
+        types.forEach(type -> {
+            stopPlace.stopPlaceType = type;
+            boolean authorized = reflectionAuthorizationService.authorized(roleAssignment, stopPlace, roleAssignment.r);
+            assertThat("Should have access to edit stop with type "+ type, authorized, is(true));
+        });
+    }
+
+    @Test
+    public void mixNegationForEnums() {
+            RoleAssignment roleAssignment = RoleAssignment.builder()
+                .withRole("editStops")
+                .withAdministrativeZone("01")
+                .withOrganisation("OST")
+                .withEntityClassification(ENTITY_TYPE, "StopPlace")
+                .withEntityClassification("StopPlaceType", StopPlace.StopPlaceType.AIRPORT.toString())
+                .withEntityClassification("StopPlaceType", "!"+StopPlace.StopPlaceType.ONSTREET_BUS.toString())
+                .withEntityClassification("StopPlaceType", StopPlace.StopPlaceType.ONSTREET_TRAM.toString())
+                .build();
+
+
+        StopPlace stopPlace = new StopPlace();
+
+        stopPlace.stopPlaceType = StopPlace.StopPlaceType.AIRPORT;
+        assertThat(reflectionAuthorizationService.authorized(roleAssignment, stopPlace, roleAssignment.r), is(true));
+
+
+        stopPlace.stopPlaceType = StopPlace.StopPlaceType.ONSTREET_BUS;
+        assertThat("no access for bus", reflectionAuthorizationService.authorized(roleAssignment, stopPlace, roleAssignment.r), is(false));
+
+
+        stopPlace.stopPlaceType = StopPlace.StopPlaceType.ONSTREET_TRAM;
+        assertThat(reflectionAuthorizationService.authorized(roleAssignment, stopPlace, roleAssignment.r), is(true));
+    }
+
 
 
     @Test
