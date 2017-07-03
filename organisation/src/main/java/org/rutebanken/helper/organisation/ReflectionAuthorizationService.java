@@ -40,7 +40,7 @@ public abstract class ReflectionAuthorizationService {
      */
     public abstract Object resolveCorrectEntity(Object entity);
 
-    public void assertAuthorized(String requiredRole, Collection<Object> entities) {
+    public void assertAuthorized(String requiredRole, Collection<?> entities) {
 
         final boolean allowed = isAuthorized(requiredRole, entities);
         if (!allowed) {
@@ -49,7 +49,7 @@ public abstract class ReflectionAuthorizationService {
     }
 
 
-    public boolean isAuthorized(String requiredRole, Collection<Object> entities) {
+    public boolean isAuthorized(String requiredRole, Collection<?> entities) {
         if (!authorizationEnabled) {
             return true;
         }
