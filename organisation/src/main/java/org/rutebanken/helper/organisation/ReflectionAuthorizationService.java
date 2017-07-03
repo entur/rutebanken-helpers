@@ -31,7 +31,7 @@ public abstract class ReflectionAuthorizationService {
 
     public abstract boolean entityMatchesAdministrativeZone(RoleAssignment roleAssignment, Object entity);
 
-    public abstract boolean entityMatchesOrganizationRef(RoleAssignment roleAssignment, Object entity);
+    public abstract boolean entityMatchesOrganisationRef(RoleAssignment roleAssignment, Object entity);
 
     public void assertAuthorized(String requiredRole, Collection<? extends Object> entities) {
 
@@ -97,7 +97,7 @@ public abstract class ReflectionAuthorizationService {
             return false;
         }
 
-        if(!entityMatchesOrganizationRef(roleAssignment, entity)) {
+        if(!entityMatchesOrganisationRef(roleAssignment, entity)) {
             logger.debug("Entity does not match organization ref. RoleAssignment: {}, Entity: {}", roleAssignment, entity);
             return false;
         }
