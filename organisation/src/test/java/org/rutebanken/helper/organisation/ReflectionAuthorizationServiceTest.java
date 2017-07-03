@@ -1,6 +1,7 @@
 package org.rutebanken.helper.organisation;
 
 import org.junit.Test;
+import org.springframework.security.core.Authentication;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,7 +37,19 @@ import static org.rutebanken.helper.organisation.AuthorizationConstants.ENTITY_T
 public class ReflectionAuthorizationServiceTest {
 
 
-    private ReflectionAuthorizationService reflectionAuthorizationService = new ReflectionAuthorizationService() {
+    private RoleAssignmentExtractor roleAssignmentExtractor = new RoleAssignmentExtractor() {
+        @Override
+        public List<RoleAssignment> getRoleAssignmentsForUser() {
+            return null;
+        }
+
+        @Override
+        public List<RoleAssignment> getRoleAssignmentsForUser(Authentication authentication) {
+            return null;
+        }
+    };
+
+    private ReflectionAuthorizationService reflectionAuthorizationService = new ReflectionAuthorizationService(roleAssignmentExtractor, true) {
         @Override
         public boolean entityMatchesAdministrativeZone(RoleAssignment roleAssignment, Object entity) {
             return true;

@@ -2,8 +2,6 @@ package org.rutebanken.helper.organisation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -20,14 +18,14 @@ public abstract class ReflectionAuthorizationService {
 
     private static final Logger logger = LoggerFactory.getLogger(ReflectionAuthorizationService.class);
 
-    @Autowired
-    private RoleAssignmentExtractor roleAssignmentExtractor;
+    private final RoleAssignmentExtractor roleAssignmentExtractor;
 
-    @Value("${authorization.enabled:true}")
-    protected boolean authorizationEnabled;
+    private final boolean authorizationEnabled;
 
-    @Value("${administrative.zone.id.prefix:KVE:TopographicPlace:}")
-    protected String administrativeZoneIdPrefix;
+    public ReflectionAuthorizationService(RoleAssignmentExtractor roleAssignmentExtractor, boolean authorizationEnabled) {
+        this.roleAssignmentExtractor = roleAssignmentExtractor;
+        this.authorizationEnabled = authorizationEnabled;
+    }
 
     public abstract boolean entityMatchesAdministrativeZone(RoleAssignment roleAssignment, Object entity);
 
@@ -44,7 +42,6 @@ public abstract class ReflectionAuthorizationService {
     public void assertAuthorized(String requiredRole, Object... entities) {
         assertAuthorized(requiredRole, Arrays.asList(entities));
     }
-
 
     public boolean isAuthorized(String requiredRole, Object... entities) {
         return isAuthorized(requiredRole, Arrays.asList(entities));
