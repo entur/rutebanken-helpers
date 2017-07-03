@@ -162,14 +162,13 @@ public abstract class ReflectionAuthorizationService {
 
         Object value = optionalValue.get();
 
-        boolean anyMatch = classificationsForEntityType.stream()
-                .anyMatch(classification -> classificationMatchesObjectValue(classification, value));
 
-
-        if(!anyMatch) {
-            logger.debug("Classification does not match on object value. Not authorized." +
-                    " EntityType: {}. Entity: {}", entityType, entity);
-            return false;
+        for(String classifier : classificationsForEntityType) {
+            boolean authorizedForClassification = authorizedForClassification(classifier, value);
+            if(!authorizedForClassification) {
+                logger.warn("Not authorized for classification: {} for type {}, entity: {}", classifier, entityType, entity);
+                return false;
+            }
         }
         return true;
     }
@@ -190,17 +189,21 @@ public abstract class ReflectionAuthorizationService {
     }
 
 
-    private boolean classificationMatchesObjectValue(String classification, Object value) {
+    private boolean authorizedForClassification(String classification, Object value) {
         boolean negate = classification.startsWith("!");
 
         if (negate) {
             classification = classification.substring(1);
         }
 
-        if (value.toString().equalsIgnoreCase(classification)) {
-            return !negate;
+        // Support enum values with underscore.
+        String stringValue = value.toString().replaceAll("_", "");
+        classification = classification.replaceAll("_", "");
+
+        if (stringValue.equalsIgnoreCase(classification) && negate) {
+            return false;
         }
-        return negate;
+        return true;
     }
 
     public boolean checkAdministrativeZone(RoleAssignment roleAssignment, Object entity) {

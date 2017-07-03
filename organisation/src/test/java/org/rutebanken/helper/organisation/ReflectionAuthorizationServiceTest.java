@@ -79,6 +79,8 @@ public class ReflectionAuthorizationServiceTest {
         assertThat(authorized, is(true));
     }
 
+
+
     @Test
     public void authorizedForLegalSubmodeTypesWhenStarValue() {
         RoleAssignment roleAssignment = RoleAssignment.builder()
@@ -197,6 +199,61 @@ public class ReflectionAuthorizationServiceTest {
 
         StopPlace stopPlace = new StopPlace();
         stopPlace.stopPlaceType = StopPlace.StopPlaceType.AIRPORT;
+
+        boolean authorized = reflectionAuthorizationService.authorized(roleAssignment, stopPlace, roleAssignment.r);
+        assertThat(authorized, is(false));
+    }
+
+    /**
+     * Onstreet bus does does contain underscore.
+     */
+    @Test
+    public void notAuthorizedToEditOnstreetBus() {
+        RoleAssignment roleAssignment = RoleAssignment.builder()
+                .withRole("editStops")
+                .withAdministrativeZone("01")
+                .withOrganisation("OST")
+                .withEntityClassification(ENTITY_TYPE, "StopPlace")
+                .withEntityClassification("StopPlaceType", "!onstreetBus")
+                .build();
+
+        StopPlace stopPlace = new StopPlace();
+        stopPlace.stopPlaceType = StopPlace.StopPlaceType.ONSTREET_BUS;
+
+        boolean authorized = reflectionAuthorizationService.authorized(roleAssignment, stopPlace, roleAssignment.r);
+        assertThat(authorized, is(false));
+    }
+
+    @Test
+    public void notAuthorizedToEditWhenOneBlacklisted() {
+        RoleAssignment roleAssignment = RoleAssignment.builder()
+                .withRole("editStops")
+                .withAdministrativeZone("01")
+                .withOrganisation("OST")
+                .withEntityClassification(ENTITY_TYPE, "StopPlace")
+                .withEntityClassification("StopPlaceType", "!airport")
+                .withEntityClassification("StopPlaceType", "!onstreetBus")
+                .build();
+
+        StopPlace stopPlace = new StopPlace();
+        stopPlace.stopPlaceType = StopPlace.StopPlaceType.ONSTREET_BUS;
+
+        boolean authorized = reflectionAuthorizationService.authorized(roleAssignment, stopPlace, roleAssignment.r);
+        assertThat(authorized, is(false));
+    }
+
+    @Test
+    public void notAuthorizedToEditWhenEnumValueContainsUnderscore() {
+        RoleAssignment roleAssignment = RoleAssignment.builder()
+                .withRole("editStops")
+                .withAdministrativeZone("01")
+                .withOrganisation("OST")
+                .withEntityClassification(ENTITY_TYPE, "StopPlace")
+                .withEntityClassification("StopPlaceType", "!onstreet_Bus")
+                .build();
+
+        StopPlace stopPlace = new StopPlace();
+        stopPlace.stopPlaceType = StopPlace.StopPlaceType.ONSTREET_BUS;
 
         boolean authorized = reflectionAuthorizationService.authorized(roleAssignment, stopPlace, roleAssignment.r);
         assertThat(authorized, is(false));
