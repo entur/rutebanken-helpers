@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 import static org.rutebanken.helper.organisation.AuthorizationConstants.*;
 
 @Service
-public class ReflectionAuthorizationService {
+public abstract class ReflectionAuthorizationService {
 
     private static final Logger logger = LoggerFactory.getLogger(ReflectionAuthorizationService.class);
 
@@ -149,10 +149,7 @@ public class ReflectionAuthorizationService {
         return entityAllowedInAdministrativeZone(roleAssignment, entity);
     }
 
-    // Todo override by relevant module
-    public boolean entityAllowedInAdministrativeZone(RoleAssignment roleAssignment, Object entity) {
-        return true;
-    }
+    abstract boolean entityAllowedInAdministrativeZone(RoleAssignment roleAssignment, Object entity);
 
     private boolean containsEntityTypeOrAll(RoleAssignment roleAssignment, String entityTypeName) {
 
