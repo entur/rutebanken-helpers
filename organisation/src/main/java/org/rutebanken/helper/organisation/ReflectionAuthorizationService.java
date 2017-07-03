@@ -220,7 +220,14 @@ public abstract class ReflectionAuthorizationService {
 
     private boolean containsEntityTypeOrAll(RoleAssignment roleAssignment, String entityTypeName) {
 
-        for (String entityType : roleAssignment.getEntityClassifications().get(ENTITY_TYPE)) {
+        List<String> classifiers = roleAssignment.getEntityClassifications().get(ENTITY_TYPE);
+
+        if(classifiers == null || classifiers.isEmpty()) {
+            logger.warn("Classifiers is empty for {}", ENTITY_TYPE);
+            return false;
+        }
+
+        for (String entityType : classifiers) {
             if (entityType.equalsIgnoreCase(entityTypeName)) {
                 return true;
             }
