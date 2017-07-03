@@ -31,7 +31,7 @@ public abstract class ReflectionAuthorizationService {
 
     public abstract boolean entityMatchesOrganisationRef(RoleAssignment roleAssignment, Object entity);
 
-    public void assertAuthorized(String requiredRole, Collection<? extends Object> entities) {
+    public void assertAuthorized(String requiredRole, Collection<Object> entities) {
 
         final boolean allowed = isAuthorized(requiredRole, entities);
         if (!allowed) {
@@ -39,18 +39,13 @@ public abstract class ReflectionAuthorizationService {
         }
     }
 
-    public void assertAuthorized(String requiredRole, Object... entities) {
-        assertAuthorized(requiredRole, Arrays.asList(entities));
-    }
-
-    public boolean isAuthorized(String requiredRole, Object... entities) {
-        return isAuthorized(requiredRole, Arrays.asList(entities));
-    }
 
     public boolean isAuthorized(String requiredRole, Collection<Object> entities) {
         if (!authorizationEnabled) {
             return true;
         }
+
+        logger.info("Checking if authorized for entities: {}", entities);
 
         List<RoleAssignment> relevantRoles = roleAssignmentExtractor.getRoleAssignmentsForUser()
                 .stream()
@@ -65,8 +60,8 @@ public abstract class ReflectionAuthorizationService {
                             .anyMatch(roleAssignment -> authorized(roleAssignment, entity, requiredRole));
             if(!allowed) {
                 // No need to loop further, if not authorized with required role for one of the entities in collection.
-                logger.info("User is not authorized for entity: {} with role: {}", entity, relevantRoles);
-                break;
+                logger.info("User is not authorized for entity with role: {}. Relevant roles: {}. Entity: {}", requiredRole, relevantRoles, entity);
+                return false;
             }
 
         }
