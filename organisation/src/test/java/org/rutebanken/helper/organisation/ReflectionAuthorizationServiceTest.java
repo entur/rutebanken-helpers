@@ -4,7 +4,6 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -39,7 +38,12 @@ public class ReflectionAuthorizationServiceTest {
 
     private ReflectionAuthorizationService reflectionAuthorizationService = new ReflectionAuthorizationService() {
         @Override
-        boolean entityAllowedInAdministrativeZone(RoleAssignment roleAssignment, Object entity) {
+        public boolean entityMatchesAdministrativeZone(RoleAssignment roleAssignment, Object entity) {
+            return true;
+        }
+
+        @Override
+        public boolean entityMatchesOrganizationRef(RoleAssignment roleAssignment, Object entity) {
             return true;
         }
     };

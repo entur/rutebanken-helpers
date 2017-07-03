@@ -2,13 +2,17 @@ package org.rutebanken.helper.organisation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.toList;
 import static org.rutebanken.helper.organisation.AuthorizationConstants.*;
 
 @Service
@@ -16,9 +20,72 @@ public abstract class ReflectionAuthorizationService {
 
     private static final Logger logger = LoggerFactory.getLogger(ReflectionAuthorizationService.class);
 
+    @Autowired
+    private RoleAssignmentExtractor roleAssignmentExtractor;
+
+    @Value("${authorization.enabled:true}")
+    protected boolean authorizationEnabled;
+
+    @Value("${administrative.zone.id.prefix:KVE:TopographicPlace:}")
+    protected String administrativeZoneIdPrefix;
+
+    public abstract boolean entityMatchesAdministrativeZone(RoleAssignment roleAssignment, Object entity);
+
+    public abstract boolean entityMatchesOrganizationRef(RoleAssignment roleAssignment, Object entity);
+
+    public void assertAuthorized(String requiredRole, Collection<? extends Object> entities) {
+
+        final boolean allowed = isAuthorized(requiredRole, entities);
+        if (!allowed) {
+            throw new AccessDeniedException("Insufficient privileges for operation");
+        }
+    }
+
+    public void assertAuthorized(String requiredRole, Object... entities) {
+        assertAuthorized(requiredRole, Arrays.asList(entities));
+    }
+
+
+    public boolean isAuthorized(String requiredRole, Object... entities) {
+        return isAuthorized(requiredRole, Arrays.asList(entities));
+    }
+
+    public boolean isAuthorized(String requiredRole, Collection<Object> entities) {
+        if (!authorizationEnabled) {
+            return true;
+        }
+
+        List<RoleAssignment> relevantRoles = roleAssignmentExtractor.getRoleAssignmentsForUser()
+                .stream()
+                .filter(roleAssignment -> requiredRole.equals(roleAssignment.r))
+                .collect(toList());
+
+        for (Object entity : entities) {
+            boolean allowed = entity == null ||
+                    relevantRoles
+                            .stream()
+                            // Only one of the role assignments needs to match for the given entity and required role
+                            .anyMatch(roleAssignment -> authorized(roleAssignment, entity, requiredRole));
+            if(!allowed) {
+                // No need to loop further, if not authorized with required role for one of the entities in collection.
+                logger.info("User is not authorized for entity: {} with role: {}", entity, relevantRoles);
+                break;
+            }
+
+        }
+        return true;
+    }
+
+    public Set<String> getRelevantRolesForEntity(Object entity) {
+        return roleAssignmentExtractor.getRoleAssignmentsForUser().stream()
+                .filter(roleAssignment -> roleAssignment.getEntityClassifications().get(ENTITY_TYPE).stream()
+                        .anyMatch(entityTypeString -> entityTypeString.toLowerCase().equals(entity.getClass().getSimpleName().toLowerCase())
+                                || entityTypeString.contains(ENTITY_CLASSIFIER_ALL_TYPES)))
+                .map(roleAssignment -> roleAssignment.getRole())
+                .collect(Collectors.toSet());
+    }
 
     public boolean authorized(RoleAssignment roleAssignment, Object entity, String requiredRole) {
-
 
         if (roleAssignment.getEntityClassifications() == null) {
             logger.warn("Role assignment entity classifications cannot be null: {}", roleAssignment);
@@ -30,7 +97,10 @@ public abstract class ReflectionAuthorizationService {
             return false;
         }
 
-        // Organization check ?
+        if(!entityMatchesOrganizationRef(roleAssignment, entity)) {
+            logger.debug("Entity does not match organization ref. RoleAssignment: {}, Entity: {}", roleAssignment, entity);
+            return false;
+        }
 
         String entityTypename = entity.getClass().getSimpleName();
 
@@ -127,6 +197,7 @@ public abstract class ReflectionAuthorizationService {
         }
     }
 
+
     private boolean classificationMatchesObjectValue(String classification, Object value) {
         boolean negate = classification.startsWith("!");
 
@@ -140,15 +211,12 @@ public abstract class ReflectionAuthorizationService {
         return negate;
     }
 
-
     public boolean checkAdministrativeZone(RoleAssignment roleAssignment, Object entity) {
         return roleAssignment.getAdministrativeZone() == null
                 || roleAssignment.getAdministrativeZone().isEmpty()
-                || entityAllowedInAdministrativeZone(roleAssignment, entity);
+                || entityMatchesAdministrativeZone(roleAssignment, entity);
 
     }
-
-    abstract boolean entityAllowedInAdministrativeZone(RoleAssignment roleAssignment, Object entity);
 
     private boolean containsEntityTypeOrAll(RoleAssignment roleAssignment, String entityTypeName) {
 
