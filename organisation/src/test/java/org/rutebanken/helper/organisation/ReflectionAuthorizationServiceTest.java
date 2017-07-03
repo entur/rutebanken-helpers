@@ -37,7 +37,12 @@ import static org.rutebanken.helper.organisation.AuthorizationConstants.ENTITY_T
 public class ReflectionAuthorizationServiceTest {
 
 
-    private ReflectionAuthorizationService reflectionAuthorizationService = new ReflectionAuthorizationService();
+    private ReflectionAuthorizationService reflectionAuthorizationService = new ReflectionAuthorizationService() {
+        @Override
+        boolean entityAllowedInAdministrativeZone(RoleAssignment roleAssignment, Object entity) {
+            return true;
+        }
+    };
 
     @Test
     public void authorizedForLegalStopPlaceTypesWhenOthersBlacklisted() {
