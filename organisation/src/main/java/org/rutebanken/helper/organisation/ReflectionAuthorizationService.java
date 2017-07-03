@@ -31,6 +31,15 @@ public abstract class ReflectionAuthorizationService {
 
     public abstract boolean entityMatchesOrganisationRef(RoleAssignment roleAssignment, Object entity);
 
+    /**
+     * If entity itself cannot be checked for authorization, but the owning entity can.
+     * For instance, if a Quay belongs to StopPlace, the Quay cannot be checked, but the StopPlace can.
+     *
+     * @param entity child entity
+     * @return the parent entity to check for authorization
+     */
+    public abstract Object resolveCorrectEntity(Object entity);
+
     public void assertAuthorized(String requiredRole, Collection<Object> entities) {
 
         final boolean allowed = isAuthorized(requiredRole, entities);
@@ -78,6 +87,8 @@ public abstract class ReflectionAuthorizationService {
     }
 
     public boolean authorized(RoleAssignment roleAssignment, Object entity, String requiredRole) {
+
+        entity = resolveCorrectEntity(entity);
 
         if (roleAssignment.getEntityClassifications() == null) {
             logger.warn("Role assignment entity classifications cannot be null: {}", roleAssignment);

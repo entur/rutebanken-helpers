@@ -59,6 +59,11 @@ public class ReflectionAuthorizationServiceTest {
         public boolean entityMatchesOrganisationRef(RoleAssignment roleAssignment, Object entity) {
             return true;
         }
+
+        @Override
+        public Object resolveCorrectEntity(Object entity) {
+            return entity;
+        }
     };
 
     @Test
