@@ -45,7 +45,7 @@ public abstract class ReflectionAuthorizationService {
             return true;
         }
 
-        logger.info("Checking if authorized for entities: {}", entities);
+        logger.debug("Checking if authorized for entities: {}", entities);
 
         List<RoleAssignment> relevantRoles = roleAssignmentExtractor.getRoleAssignmentsForUser()
                 .stream()
