@@ -3,6 +3,7 @@ package org.rutebanken.helper.organisation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.google.common.base.MoreObjects;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,6 +54,16 @@ public class RoleAssignment {
     @JsonIgnore
     public Map<String, List<String>> getEntityClassifications() {
         return e;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("r", r)
+                .add("o", o)
+                .add("z", z)
+                .add("e", e)
+                .toString();
     }
 
     public static Builder builder() {
