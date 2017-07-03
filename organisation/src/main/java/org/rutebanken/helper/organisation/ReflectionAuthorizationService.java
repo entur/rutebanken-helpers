@@ -142,11 +142,10 @@ public abstract class ReflectionAuthorizationService {
 
 
     public boolean checkAdministrativeZone(RoleAssignment roleAssignment, Object entity) {
-        if (roleAssignment.getAdministrativeZone() == null || roleAssignment.getAdministrativeZone().isEmpty()) {
-            return true;
-        }
+        return roleAssignment.getAdministrativeZone() == null
+                || roleAssignment.getAdministrativeZone().isEmpty()
+                || entityAllowedInAdministrativeZone(roleAssignment, entity);
 
-        return entityAllowedInAdministrativeZone(roleAssignment, entity);
     }
 
     abstract boolean entityAllowedInAdministrativeZone(RoleAssignment roleAssignment, Object entity);
