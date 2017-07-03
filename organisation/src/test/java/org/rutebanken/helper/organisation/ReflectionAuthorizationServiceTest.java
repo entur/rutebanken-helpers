@@ -248,6 +248,23 @@ public class ReflectionAuthorizationServiceTest {
     }
 
     @Test
+    public void notAuthorizedToEditWhenNoNegation() {
+        RoleAssignment roleAssignment = RoleAssignment.builder()
+                .withRole("editStops")
+                .withAdministrativeZone("01")
+                .withOrganisation("OST")
+                .withEntityClassification(ENTITY_TYPE, "StopPlace")
+                .withEntityClassification("StopPlaceType", "airport")
+                .build();
+
+        StopPlace stopPlace = new StopPlace();
+        stopPlace.stopPlaceType = StopPlace.StopPlaceType.ONSTREET_BUS;
+
+        boolean authorized = reflectionAuthorizationService.authorized(roleAssignment, stopPlace, roleAssignment.r);
+        assertThat(authorized, is(false));
+    }
+
+    @Test
     public void notAuthorizedToEditWhenEnumValueContainsUnderscore() {
         RoleAssignment roleAssignment = RoleAssignment.builder()
                 .withRole("editStops")

@@ -172,16 +172,40 @@ public abstract class ReflectionAuthorizationService {
         }
 
         Object value = optionalValue.get();
+        String stringValue = removeUnderscore(value.toString());
 
+        boolean isBlacklist = classificationsForEntityType.stream().anyMatch(classifier -> classifier.startsWith("!"));
+        boolean isWhiteList = classificationsForEntityType.stream().noneMatch(classifier -> classifier.startsWith("!"));
 
-        for(String classifier : classificationsForEntityType) {
-            boolean authorizedForClassification = authorizedForClassification(classifier, value);
-            if(!authorizedForClassification) {
-                logger.warn("Not authorized for classification: {} for type {}, entity: {}", classifier, entityType, entity);
-                return false;
-            }
+        if(isBlacklist && isWhiteList) {
+            logger.warn("The list of classifiers contains values with both black list values (values prefixed with !) and white list values. This is not supported");
+            return false;
         }
-        return true;
+
+        boolean isAllowed;
+        if(isBlacklist) {
+
+            isAllowed = classificationsForEntityType.stream()
+                    .noneMatch(classification ->
+                            removeUnderscore(classification.substring(1))
+                                    .equalsIgnoreCase(stringValue));
+
+
+
+        } else {
+            isAllowed = classificationsForEntityType.stream()
+                    .anyMatch(classification ->
+                            removeUnderscore(classification)
+                                    .equalsIgnoreCase(stringValue));
+
+
+        }
+
+        if(isAllowed) {
+            logger.info("Not allowed for value {} for entity {}", value, entity);
+            return true;
+        }
+        return isAllowed;
     }
 
     private Optional<Field> findFieldFromClassifier(String classifier, Object entity) {
@@ -199,22 +223,8 @@ public abstract class ReflectionAuthorizationService {
         }
     }
 
-
-    private boolean authorizedForClassification(String classification, Object value) {
-        boolean negate = classification.startsWith("!");
-
-        if (negate) {
-            classification = classification.substring(1);
-        }
-
-        // Support enum values with underscore.
-        String stringValue = value.toString().replaceAll("_", "");
-        classification = classification.replaceAll("_", "");
-
-        if (stringValue.equalsIgnoreCase(classification) && negate) {
-            return false;
-        }
-        return true;
+    private String removeUnderscore(String string) {
+        return string.replaceAll("_", "");
     }
 
     public boolean checkAdministrativeZone(RoleAssignment roleAssignment, Object entity) {
