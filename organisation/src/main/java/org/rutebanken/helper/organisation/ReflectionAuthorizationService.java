@@ -28,6 +28,9 @@ public class ReflectionAuthorizationService {
 
     private final EntityResolver entityResolver;
 
+    /**
+     * TODO: Keys needs to be added lower case. Find a better solution to this.
+     */
     private final Map<String, List<String>> fieldMappings;
 
     public ReflectionAuthorizationService(RoleAssignmentExtractor roleAssignmentExtractor,
@@ -165,7 +168,7 @@ public class ReflectionAuthorizationService {
             return false;
         }
 
-        List<String> mappings = fieldMappings.get(entityType);
+        List<String> mappings = fieldMappings.get(entityType.toLowerCase());
         if(mappings != null) {
             logger.info("Found mapped value from {} to {}", entityType, mappings);
 
