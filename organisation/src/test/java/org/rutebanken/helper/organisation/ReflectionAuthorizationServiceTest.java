@@ -1,6 +1,7 @@
 package org.rutebanken.helper.organisation;
 
 import com.google.common.base.MoreObjects;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.security.core.Authentication;
 
@@ -355,7 +356,7 @@ public class ReflectionAuthorizationServiceTest {
         StopPlace stopPlace = new StopPlace();
 
         boolean authorized = reflectionAuthorizationService.authorized(roleAssignment, stopPlace, roleAssignment.r);
-        assertThat("stop place type is not set and should not be authorized", authorized, is(false));
+        assertThat("stop place type is not set, which means that it's not airport", authorized, is(true));
     }
 
     /**
@@ -514,6 +515,26 @@ public class ReflectionAuthorizationServiceTest {
                 }
             });
         }
+    }
+
+    @Test
+    public void authorizedWithSubmodeAndType() {
+        RoleAssignment roleAssignment = RoleAssignment.builder()
+                .withRole("editStops")
+                .withOrganisation("OST")
+                .withEntityClassification(ENTITY_TYPE, "StopPlace")
+                .withEntityClassification("StopPlaceType", "!airport")
+                .withEntityClassification("combinedfield", "!somevalue")
+                .build();
+
+        StopPlace stopPlace = new StopPlace();
+        stopPlace.someField1 = null;
+        stopPlace.someField2 = "somethingElse";
+
+        fieldMappings.put("combinedfield", Arrays.asList("someField1", "someField2"));
+
+        boolean authorized = reflectionAuthorizationService.authorized(roleAssignment, stopPlace, roleAssignment.r);
+        assertThat(authorized, is(true));
     }
 
     private static class StopPlace {
