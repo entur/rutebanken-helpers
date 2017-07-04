@@ -187,7 +187,7 @@ public class ReflectionAuthorizationService {
         Optional<Field> optionalField = findFieldFromClassifier(entityType, entity);
 
         if (!optionalField.isPresent()) {
-            logger.debug("Cannot fetch field for entity type {}. entity: {}", entityType, entity);
+            logger.warn("Cannot fetch field {}. entity: {}", entityType, entity);
             return true;
         }
 
@@ -200,7 +200,7 @@ public class ReflectionAuthorizationService {
 
         if (!optionalValue.isPresent()) {
             logger.debug("Cannot resolve value for {}, entity: {}", field, entity);
-            return true;
+            return false;
         }
 
         Object value = optionalValue.get();
@@ -225,11 +225,12 @@ public class ReflectionAuthorizationService {
 
         }
 
-        if(isAllowed) {
-            logger.info("Not allowed for value {} for entity {}", value, entity);
-            return true;
+        if(!isAllowed) {
+            logger.info("Not allowed value {}: {} for entity {}", entityType, value, entity);
+            return false;
         }
-        return false;
+        logger.info("Allowed value {}: {} for entity {}", entityType, value, entity);
+        return true;
     }
 
     private Optional<Field> findFieldFromClassifier(String classifier, Object entity) {
