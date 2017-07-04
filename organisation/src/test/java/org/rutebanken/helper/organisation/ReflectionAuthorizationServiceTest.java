@@ -1,5 +1,6 @@
 package org.rutebanken.helper.organisation;
 
+import com.google.common.base.MoreObjects;
 import org.junit.Test;
 import org.springframework.security.core.Authentication;
 
@@ -96,7 +97,7 @@ public class ReflectionAuthorizationServiceTest {
                 .withEntityClassification("combinedField", "!railReplacementBus")
                 .build();
 
-        fieldMappings.put("combinedField", Arrays.asList("someField1"));
+        fieldMappings.put("combinedfield", Arrays.asList("someField1"));
 
         boolean authorized = reflectionAuthorizationService.authorized(roleAssignment, stopPlace, roleAssignment.r);
         assertThat(authorized, is(true));
@@ -121,7 +122,7 @@ public class ReflectionAuthorizationServiceTest {
                 .withEntityClassification("combinedField", "!"+railReplacementBus)
                 .build();
 
-        fieldMappings.put("combinedField", Arrays.asList("someField1"));
+        fieldMappings.put("combinedfield", Arrays.asList("someField1"));
 
         boolean authorized = reflectionAuthorizationService.authorized(roleAssignment, stopPlace, roleAssignment.r);
         assertThat(railReplacementBus + " not allowed for combinedField", authorized, is(false));
@@ -144,7 +145,7 @@ public class ReflectionAuthorizationServiceTest {
                 .withEntityClassification("combinedField", "!railReplacementBus")
                 .build();
 
-        fieldMappings.put("combinedField", Arrays.asList("someField1"));
+        fieldMappings.put("combinedfield", Arrays.asList("someField1"));
 
         boolean authorized = reflectionAuthorizationService.authorized(roleAssignment, stopPlace, roleAssignment.r);
         assertThat("airport not allowed for stop place type", authorized, is(false));
@@ -168,7 +169,7 @@ public class ReflectionAuthorizationServiceTest {
                 .withEntityClassification("combinedField", "railReplacementBus")
                 .build();
 
-        fieldMappings.put("combinedField", Arrays.asList("someField1"));
+        fieldMappings.put("combinedfield", Arrays.asList("someField1"));
 
         boolean authorized = reflectionAuthorizationService.authorized(roleAssignment, stopPlace, roleAssignment.r);
         assertThat("railReplacementBus allowed, but not stop place type airport", authorized, is(false));
@@ -182,7 +183,7 @@ public class ReflectionAuthorizationServiceTest {
         stopPlace.someField2 = "someval2";
         // The entity has someField1 and someFieldf2 mapped by anotherProperty
 
-        fieldMappings.put("anotherProperty", Arrays.asList("someField1", "someField2"));
+        fieldMappings.put("anotherproperty", Arrays.asList("someField1", "someField2"));
 
         RoleAssignment roleAssignment = RoleAssignment.builder()
                 .withRole("editStops")
@@ -204,7 +205,7 @@ public class ReflectionAuthorizationServiceTest {
         stopPlace.someField1 = "someval1";
         stopPlace.someField2 = "someval2";
 
-        fieldMappings.put("anotherProperty", Arrays.asList("someField1", "someField2"));
+        fieldMappings.put("anotherproperty", Arrays.asList("someField1", "someField2"));
 
         RoleAssignment roleAssignment = RoleAssignment.builder()
                 .withRole("editStops")
@@ -532,6 +533,16 @@ public class ReflectionAuthorizationServiceTest {
 
         String someField1;
         String someField2;
+
+        @Override
+        public String toString() {
+            return MoreObjects.toStringHelper(this)
+                    .add("stopPlaceType", stopPlaceType)
+                    .add("submode", submode)
+                    .add("someField1", someField1)
+                    .add("someField2", someField2)
+                    .toString();
+        }
     }
 
 }
