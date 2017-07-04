@@ -14,7 +14,7 @@ import static java.util.stream.Collectors.toList;
 import static org.rutebanken.helper.organisation.AuthorizationConstants.*;
 
 @Service
-public abstract class ReflectionAuthorizationService {
+public class ReflectionAuthorizationService {
 
     private static final Logger logger = LoggerFactory.getLogger(ReflectionAuthorizationService.class);
 
@@ -22,23 +22,19 @@ public abstract class ReflectionAuthorizationService {
 
     private final boolean authorizationEnabled;
 
-    public ReflectionAuthorizationService(RoleAssignmentExtractor roleAssignmentExtractor, boolean authorizationEnabled) {
+    private final OrganisationChecker organisationChecker;
+
+    private final AdministrativeZoneChecker administrativeZoneChecker;
+
+    private final EntityResolver entityResolver;
+
+    public ReflectionAuthorizationService(RoleAssignmentExtractor roleAssignmentExtractor, boolean authorizationEnabled, OrganisationChecker organisationChecker, AdministrativeZoneChecker administrativeZoneChecker, EntityResolver entityResolver) {
         this.roleAssignmentExtractor = roleAssignmentExtractor;
         this.authorizationEnabled = authorizationEnabled;
+        this.organisationChecker = organisationChecker;
+        this.administrativeZoneChecker = administrativeZoneChecker;
+        this.entityResolver = entityResolver;
     }
-
-    public abstract boolean entityMatchesAdministrativeZone(RoleAssignment roleAssignment, Object entity);
-
-    public abstract boolean entityMatchesOrganisationRef(RoleAssignment roleAssignment, Object entity);
-
-    /**
-     * If entity itself cannot be checked for authorization, but the owning entity can.
-     * For instance, if a Quay belongs to StopPlace, the Quay cannot be checked, but the StopPlace can.
-     *
-     * @param entity child entity
-     * @return the parent entity to check for authorization
-     */
-    public abstract Object resolveCorrectEntity(Object entity);
 
     public void assertAuthorized(String requiredRole, Collection<?> entities) {
 
@@ -88,7 +84,7 @@ public abstract class ReflectionAuthorizationService {
 
     public boolean authorized(RoleAssignment roleAssignment, Object entity, String requiredRole) {
 
-        entity = resolveCorrectEntity(entity);
+        entity = entityResolver.resolveCorrectEntity(entity);
 
         if (roleAssignment.getEntityClassifications() == null) {
             logger.warn("Role assignment entity classifications cannot be null: {}", roleAssignment);
@@ -100,7 +96,7 @@ public abstract class ReflectionAuthorizationService {
             return false;
         }
 
-        if(!entityMatchesOrganisationRef(roleAssignment, entity)) {
+        if(!organisationChecker.entityMatchesOrganisationRef(roleAssignment, entity)) {
             logger.debug("Entity does not match organization ref. RoleAssignment: {}, Entity: {}", roleAssignment, entity);
             return false;
         }
@@ -230,8 +226,7 @@ public abstract class ReflectionAuthorizationService {
     public boolean checkAdministrativeZone(RoleAssignment roleAssignment, Object entity) {
         return roleAssignment.getAdministrativeZone() == null
                 || roleAssignment.getAdministrativeZone().isEmpty()
-                || entityMatchesAdministrativeZone(roleAssignment, entity);
-
+                || administrativeZoneChecker.entityMatchesAdministrativeZone(roleAssignment, entity);
     }
 
     private boolean containsEntityTypeOrAll(RoleAssignment roleAssignment, String entityTypeName) {

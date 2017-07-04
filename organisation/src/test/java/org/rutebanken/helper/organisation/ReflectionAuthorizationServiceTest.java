@@ -49,22 +49,11 @@ public class ReflectionAuthorizationServiceTest {
         }
     };
 
-    private ReflectionAuthorizationService reflectionAuthorizationService = new ReflectionAuthorizationService(roleAssignmentExtractor, true) {
-        @Override
-        public boolean entityMatchesAdministrativeZone(RoleAssignment roleAssignment, Object entity) {
-            return true;
-        }
+    private OrganisationChecker organisationChecker = (roleAssignment, entity) -> true;
+    private AdministrativeZoneChecker administrativeZoneChecker = (roleAssignment, entity) -> true;
+    private EntityResolver entityResolver = (entity -> entity);
 
-        @Override
-        public boolean entityMatchesOrganisationRef(RoleAssignment roleAssignment, Object entity) {
-            return true;
-        }
-
-        @Override
-        public Object resolveCorrectEntity(Object entity) {
-            return entity;
-        }
-    };
+    private ReflectionAuthorizationService reflectionAuthorizationService = new ReflectionAuthorizationService(roleAssignmentExtractor, true, organisationChecker, administrativeZoneChecker, entityResolver);
 
     @Test
     public void authorizedForLegalStopPlaceTypesWhenOthersBlacklisted() {
