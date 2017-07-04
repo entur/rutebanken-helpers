@@ -4,7 +4,9 @@ import org.junit.Test;
 import org.springframework.security.core.Authentication;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -52,8 +54,9 @@ public class ReflectionAuthorizationServiceTest {
     private OrganisationChecker organisationChecker = (roleAssignment, entity) -> true;
     private AdministrativeZoneChecker administrativeZoneChecker = (roleAssignment, entity) -> true;
     private EntityResolver entityResolver = (entity -> entity);
+    private Map<String, List<String>> fieldMappings = new HashMap<>();
 
-    private ReflectionAuthorizationService reflectionAuthorizationService = new ReflectionAuthorizationService(roleAssignmentExtractor, true, organisationChecker, administrativeZoneChecker, entityResolver);
+    private ReflectionAuthorizationService reflectionAuthorizationService = new ReflectionAuthorizationService(roleAssignmentExtractor, true, organisationChecker, administrativeZoneChecker, entityResolver, fieldMappings);
 
     @Test
     public void authorizedForLegalStopPlaceTypesWhenOthersBlacklisted() {
@@ -74,6 +77,49 @@ public class ReflectionAuthorizationServiceTest {
     }
 
 
+    @Test
+    public void handleMappedClassificationsNegation() {
+
+        StopPlace stopPlace = new StopPlace();
+        stopPlace.someField1 = "someval1";
+        stopPlace.someField2 = "someval2";
+        // The entity has someField1 and someFieldf2 mapped by anotherProperty
+
+        fieldMappings.put("anotherProperty", Arrays.asList("someField1", "someField2"));
+
+        RoleAssignment roleAssignment = RoleAssignment.builder()
+                .withRole("editStops")
+                .withOrganisation("OST")
+                .withAdministrativeZone("01")
+                .withEntityClassification(ENTITY_TYPE, "StopPlace")
+                // classification anotherProperty mapping should lead to someField1 and someField2
+                .withEntityClassification("anotherProperty", "!someval2")
+                .build();
+
+        boolean authorized = reflectionAuthorizationService.authorized(roleAssignment, stopPlace, roleAssignment.r);
+        assertThat(authorized, is(false));
+    }
+
+    @Test
+    public void handleMappedClassifications() {
+
+        StopPlace stopPlace = new StopPlace();
+        stopPlace.someField1 = "someval1";
+        stopPlace.someField2 = "someval2";
+
+        fieldMappings.put("anotherProperty", Arrays.asList("someField1", "someField2"));
+
+        RoleAssignment roleAssignment = RoleAssignment.builder()
+                .withRole("editStops")
+                .withOrganisation("OST")
+                .withAdministrativeZone("01")
+                .withEntityClassification(ENTITY_TYPE, "StopPlace")
+                .withEntityClassification("anotherProperty", "someval2")
+                .build();
+
+        boolean authorized = reflectionAuthorizationService.authorized(roleAssignment, stopPlace, roleAssignment.r);
+        assertThat("someval2 should be allowed for anotherProperty", authorized, is(true));
+    }
 
     @Test
     public void authorizedForLegalSubmodeTypesWhenStarValue() {
@@ -370,6 +416,9 @@ public class ReflectionAuthorizationServiceTest {
 
         StopPlaceType stopPlaceType;
         String submode;
+
+        String someField1;
+        String someField2;
     }
 
 }

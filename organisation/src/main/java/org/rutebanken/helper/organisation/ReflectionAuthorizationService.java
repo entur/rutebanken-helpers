@@ -28,12 +28,20 @@ public class ReflectionAuthorizationService {
 
     private final EntityResolver entityResolver;
 
-    public ReflectionAuthorizationService(RoleAssignmentExtractor roleAssignmentExtractor, boolean authorizationEnabled, OrganisationChecker organisationChecker, AdministrativeZoneChecker administrativeZoneChecker, EntityResolver entityResolver) {
+    private final Map<String, List<String>> fieldMappings;
+
+    public ReflectionAuthorizationService(RoleAssignmentExtractor roleAssignmentExtractor,
+                                          boolean authorizationEnabled,
+                                          OrganisationChecker organisationChecker,
+                                          AdministrativeZoneChecker administrativeZoneChecker,
+                                          EntityResolver entityResolver,
+                                          Map<String, List<String>> fieldMappings) {
         this.roleAssignmentExtractor = roleAssignmentExtractor;
         this.authorizationEnabled = authorizationEnabled;
         this.organisationChecker = organisationChecker;
         this.administrativeZoneChecker = administrativeZoneChecker;
         this.entityResolver = entityResolver;
+        this.fieldMappings = fieldMappings;
     }
 
     public void assertAuthorized(String requiredRole, Collection<?> entities) {
@@ -148,6 +156,34 @@ public class ReflectionAuthorizationService {
 
         }
 
+
+        boolean isBlacklist = classificationsForEntityType.stream().anyMatch(classifier -> classifier.startsWith("!"));
+        boolean isWhiteList = classificationsForEntityType.stream().noneMatch(classifier -> classifier.startsWith("!"));
+
+        if(isBlacklist && isWhiteList) {
+            logger.warn("The list of classifiers contains values with both black list values (values prefixed with !) and white list values. This is not supported");
+            return false;
+        }
+
+        List<String> mappings = fieldMappings.get(entityType);
+        if(mappings != null) {
+            logger.info("Found mapped value from {} to {}", entityType, mappings);
+
+            if(isBlacklist) {
+                // If the list is detected to be blacklist values, every mapped field must match.
+                return mappings.stream()
+                        .allMatch(mappedField -> isAllowedForFieldAndClassification(mappedField, entity, classificationsForEntityType, true));
+            } else {
+                // If the list is detected to be a white list, any match is enough.
+                return mappings.stream()
+                        .anyMatch(mappedField -> isAllowedForFieldAndClassification(mappedField, entity, classificationsForEntityType, false));
+            }
+        } else {
+            return isAllowedForFieldAndClassification(entityType, entity, classificationsForEntityType, isBlacklist);
+        }
+    }
+
+    private boolean isAllowedForFieldAndClassification(String entityType, Object entity, List<String> classificationsForEntityType, boolean isBlacklist) {
         Optional<Field> optionalField = findFieldFromClassifier(entityType, entity);
 
         if (!optionalField.isPresent()) {
@@ -169,14 +205,6 @@ public class ReflectionAuthorizationService {
 
         Object value = optionalValue.get();
         String stringValue = removeUnderscore(value.toString());
-
-        boolean isBlacklist = classificationsForEntityType.stream().anyMatch(classifier -> classifier.startsWith("!"));
-        boolean isWhiteList = classificationsForEntityType.stream().noneMatch(classifier -> classifier.startsWith("!"));
-
-        if(isBlacklist && isWhiteList) {
-            logger.warn("The list of classifiers contains values with both black list values (values prefixed with !) and white list values. This is not supported");
-            return false;
-        }
 
         boolean isAllowed;
         if(isBlacklist) {
@@ -201,7 +229,7 @@ public class ReflectionAuthorizationService {
             logger.info("Not allowed for value {} for entity {}", value, entity);
             return true;
         }
-        return isAllowed;
+        return false;
     }
 
     private Optional<Field> findFieldFromClassifier(String classifier, Object entity) {
