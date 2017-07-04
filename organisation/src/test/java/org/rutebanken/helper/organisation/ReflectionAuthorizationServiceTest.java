@@ -76,6 +76,103 @@ public class ReflectionAuthorizationServiceTest {
         assertThat(authorized, is(true));
     }
 
+    /**
+     * EntityType=StopPlace, StopPlaceType=!railStation,!airport, Submode=!railReplacementBus
+     */
+    @Test
+    public void authorizedWithCombinationOfTwoFields() {
+
+        StopPlace stopPlace = new StopPlace();
+        stopPlace.stopPlaceType = StopPlace.StopPlaceType.ONSTREET_BUS;
+        stopPlace.someField1 = "nationalPassengerFerry";
+
+        RoleAssignment roleAssignment = RoleAssignment.builder()
+                .withRole("editStops")
+                .withAdministrativeZone("01")
+                .withOrganisation("OST")
+                .withEntityClassification(ENTITY_TYPE, "StopPlace")
+                .withEntityClassification("StopPlaceType", "!railStation")
+                .withEntityClassification("StopPlaceType", "!airport")
+                .withEntityClassification("combinedField", "!railReplacementBus")
+                .build();
+
+        fieldMappings.put("combinedField", Arrays.asList("someField1"));
+
+        boolean authorized = reflectionAuthorizationService.authorized(roleAssignment, stopPlace, roleAssignment.r);
+        assertThat(authorized, is(true));
+    }
+
+    @Test
+    public void notAuthorizedWithCombinationOfNegatedTwoFields() {
+
+        String railReplacementBus = "railReplacementBus";
+
+        StopPlace stopPlace = new StopPlace();
+        stopPlace.stopPlaceType = StopPlace.StopPlaceType.ONSTREET_BUS;
+        stopPlace.someField1 = railReplacementBus;
+
+        RoleAssignment roleAssignment = RoleAssignment.builder()
+                .withRole("editStops")
+                .withAdministrativeZone("01")
+                .withOrganisation("OST")
+                .withEntityClassification(ENTITY_TYPE, "StopPlace")
+                .withEntityClassification("StopPlaceType", "!railStation")
+                .withEntityClassification("StopPlaceType", "!airport")
+                .withEntityClassification("combinedField", "!"+railReplacementBus)
+                .build();
+
+        fieldMappings.put("combinedField", Arrays.asList("someField1"));
+
+        boolean authorized = reflectionAuthorizationService.authorized(roleAssignment, stopPlace, roleAssignment.r);
+        assertThat(railReplacementBus + " not allowed for combinedField", authorized, is(false));
+    }
+
+    @Test
+    public void notAuthorizedWithCombinationOfNegatedTwoFields2() {
+
+        StopPlace stopPlace = new StopPlace();
+        stopPlace.stopPlaceType = StopPlace.StopPlaceType.AIRPORT;
+        stopPlace.someField1 = "localCarFerry";
+
+        RoleAssignment roleAssignment = RoleAssignment.builder()
+                .withRole("editStops")
+                .withAdministrativeZone("01")
+                .withOrganisation("OST")
+                .withEntityClassification(ENTITY_TYPE, "StopPlace")
+                .withEntityClassification("StopPlaceType", "!railStation")
+                .withEntityClassification("StopPlaceType", "!airport")
+                .withEntityClassification("combinedField", "!railReplacementBus")
+                .build();
+
+        fieldMappings.put("combinedField", Arrays.asList("someField1"));
+
+        boolean authorized = reflectionAuthorizationService.authorized(roleAssignment, stopPlace, roleAssignment.r);
+        assertThat("airport not allowed for stop place type", authorized, is(false));
+    }
+
+    @Test
+    public void notAuthorizedWithCombinationOfNegatedTwoFields3() {
+
+        StopPlace stopPlace = new StopPlace();
+        stopPlace.stopPlaceType = StopPlace.StopPlaceType.AIRPORT;
+        stopPlace.someField1 = "railReplacementBus";
+
+        RoleAssignment roleAssignment = RoleAssignment.builder()
+                .withRole("editStops")
+                .withAdministrativeZone("01")
+                .withOrganisation("OST")
+                .withEntityClassification(ENTITY_TYPE, "StopPlace")
+                .withEntityClassification("StopPlaceType", "!railStation")
+                .withEntityClassification("StopPlaceType", "!airport")
+                // railReplacementBus allowed
+                .withEntityClassification("combinedField", "railReplacementBus")
+                .build();
+
+        fieldMappings.put("combinedField", Arrays.asList("someField1"));
+
+        boolean authorized = reflectionAuthorizationService.authorized(roleAssignment, stopPlace, roleAssignment.r);
+        assertThat("railReplacementBus allowed, but not stop place type airport", authorized, is(false));
+    }
 
     @Test
     public void handleMappedClassificationsNegation() {
