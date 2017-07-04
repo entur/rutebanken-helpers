@@ -341,6 +341,22 @@ public class ReflectionAuthorizationServiceTest {
         assertThat(authorized, is(false));
     }
 
+    @Test
+    public void notAuthorizedWhenValueEmpty() {
+        RoleAssignment roleAssignment = RoleAssignment.builder()
+                .withRole("editStops")
+                .withAdministrativeZone("01")
+                .withOrganisation("OST")
+                .withEntityClassification(ENTITY_TYPE, "StopPlace")
+                .withEntityClassification("StopPlaceType", "!airport")
+                .build();
+
+        StopPlace stopPlace = new StopPlace();
+
+        boolean authorized = reflectionAuthorizationService.authorized(roleAssignment, stopPlace, roleAssignment.r);
+        assertThat("stop place type is not set and should not be authorized", authorized, is(false));
+    }
+
     /**
      * Onstreet bus does does contain underscore.
      */
