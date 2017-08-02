@@ -161,6 +161,34 @@ public class HazelCastService {
         return new ArrayList<>();
     }
 
+
+
+    /**
+     * If you want to provide a custom serializer, you can override this method.
+     * This list will be added to the Hazelcast configuration. See {@link com.hazelcast.config.SerializationConfig#addSerializerConfig(SerializerConfig)}
+     *
+     * See code example in Anshar: <a href="https://github.com/rutebanken/anshar/blob/master/src/main/java/org/rutebanken/anshar/messages/collections/ExtendedHazelcastService.java">ExtendedHazelcastService</a>
+     *
+     * See the below example below for how to configure one or more maps by overriding this method.
+     * <pre>
+     * {@code
+     *  @Override
+     *  public List<SerializerConfig> getSerializerConfigs() {
+     *     return Arrays.asList(
+     *       new SerializerConfig()
+     *         .setTypeClass(SpecialClass.class)
+     *         .setImplementation(new AwesomeSerializer()));
+     *
+     *  }
+     * }
+     * </pre>
+     *
+     * @return a list with serializers
+     */
+    public List<SerializerConfig> getSerializerConfigs() {
+        return new ArrayList<>();
+    }
+
     private HazelcastInstance runHazelcast(final List<String> nodes, String groupName, String password) {
         final int HC_PORT = 5701;
         if ( nodes.isEmpty() ) {
@@ -205,6 +233,8 @@ public class HazelCastService {
 
         getAdditionalMapConfigurations().forEach(cfg::addMapConfig);
 
+        getSerializerConfigs().forEach( cfg.getSerializationConfig()::addSerializerConfig);
+
         return Hazelcast.newHazelcastInstance(cfg);
     }
 
@@ -240,7 +270,9 @@ public class HazelCastService {
         MapConfig mapConfig = cfg.getMapConfig("default");
         updateDefaultMapConfig(mapConfig);
         getAdditionalMapConfigurations().forEach(cfg::addMapConfig);
-        
+
+        getSerializerConfigs().forEach( cfg.getSerializationConfig()::addSerializerConfig);
+
         addMgmtIfConfigured(cfg);
 
         return Hazelcast.newHazelcastInstance(cfg);
