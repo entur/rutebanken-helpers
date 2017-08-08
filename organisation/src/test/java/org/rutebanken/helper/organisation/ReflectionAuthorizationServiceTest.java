@@ -253,6 +253,22 @@ public class ReflectionAuthorizationServiceTest {
     }
 
     @Test
+    public void notAuthorizedForSubmodeTypesWhenExplicitWhiteListed() {
+        RoleAssignment roleAssignment = RoleAssignment.builder()
+                .withRole("editStops")
+                .withOrganisation("OST")
+                .withAdministrativeZone("01")
+                .withEntityClassification(ENTITY_TYPE, "StopPlace")
+                .withEntityClassification("Submode", "someValue")
+                .build();
+
+        StopPlace stopPlace = new StopPlace();
+        stopPlace.submode = "anotherValue";
+
+        assertThat(reflectionAuthorizationService.authorized(roleAssignment, stopPlace, "editStops"), is(false));
+    }
+
+    @Test
     public void authorizedWhenAllTypesEntityType() {
         RoleAssignment roleAssignment = RoleAssignment.builder()
                 .withRole("viewStops")
