@@ -1,7 +1,7 @@
 package org.rutebanken.helper.gcp;
 
 import com.google.auth.oauth2.ServiceAccountCredentials;
-import com.google.cloud.Page;
+import com.google.api.gax.paging.Page;
 import com.google.cloud.ReadChannel;
 import com.google.cloud.WriteChannel;
 import com.google.cloud.storage.*;
@@ -33,7 +33,7 @@ public class BlobStoreHelper {
     public static Iterator<Blob> listAllBlobsRecursively(Storage storage, String containerName, String prefix){
         logger.debug("Listing blobs in bucket " + containerName + " with prefix " + prefix + " recursively.");
         Page<Blob> blobs = storage.list(containerName, Storage.BlobListOption.prefix(prefix));
-        return blobs.iterateAll();
+        return blobs.iterateAll().iterator();
     }
 
     public static Blob uploadBlob(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic) {
@@ -60,7 +60,7 @@ public class BlobStoreHelper {
         BlobId blobId = BlobId.of(containerName, blobIdName);
         BlobInfo.Builder builder = BlobInfo.newBuilder(blobId).setContentType("application/octet-stream");
         if (makePublic) {
-            builder.acl(ImmutableList.of(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER)));
+            builder.setAcl(ImmutableList.of(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER)));
         }
         BlobInfo blobInfo = builder.build();
         if (Files.size(filePath) > FILE_SIZE_LIMIT) {
