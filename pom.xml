@@ -62,26 +62,27 @@
                 <version>${junit.jupiter.version}</version>
                 <scope>test</scope>
             </dependency>
-            <dependency>
-                <groupId>com.google.cloud.trace</groupId>
-                <artifactId>core</artifactId>
-                <version>0.1.0</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.cloud.trace</groupId>
-                <artifactId>java-timestamp</artifactId>
-                <version>0.1.0</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.cloud.trace</groupId>
-                <artifactId>v1</artifactId>
-                <version>0.1.0</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.cloud.trace</groupId>
-                <artifactId>grpc-sink</artifactId>
-                <version>0.1.0</version>
-            </dependency>
+            <!-- The following commented dependencies are not currently in use. -->
+            <!--<dependency>-->
+                <!--<groupId>com.google.cloud.trace</groupId>-->
+                <!--<artifactId>core</artifactId>-->
+                <!--<version>0.1.0</version>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+                <!--<groupId>com.google.cloud.trace</groupId>-->
+                <!--<artifactId>java-timestamp</artifactId>-->
+                <!--<version>0.1.0</version>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+                <!--<groupId>com.google.cloud.trace</groupId>-->
+                <!--<artifactId>v1</artifactId>-->
+                <!--<version>0.1.0</version>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+                <!--<groupId>com.google.cloud.trace</groupId>-->
+                <!--<artifactId>grpc-sink</artifactId>-->
+                <!--<version>0.1.0</version>-->
+            <!--</dependency>-->
 
 
             <!-- There exists a kubernetes-api project too. Not
