@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <groupId>org.rutebanken.superpom</groupId>
-        <artifactId>superpom</artifactId>
-        <version>0.0.6</version>
-    </parent>
-
     <modelVersion>4.0.0</modelVersion>
     <packaging>pom</packaging>
 
@@ -13,13 +7,40 @@
     <artifactId>helper</artifactId>
     <version>0.0.3-SNAPSHOT</version>
 
-    <name>helper</name>
+    <name>rutebanken-helper</name>
+    <description>Library artifacts collected and to be used as tools in other projects.</description>
+    <url>https://github.com/rutebanken/rutebanken-helpers</url>
+
+    <licenses>
+        <license>
+            <name>EUPL-1.2 with modifications</name>
+            <url>https://joinup.ec.europa.eu/software/page/eupl</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
     <scm>
         <connection>scm:git:ssh://git@github.com/rutebanken/rutebanken-helpers.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/rutebanken/rutebanken-helpers.git</developerConnection>
-      <tag>HEAD</tag>
-  </scm>
+    </scm>
+
+    <prerequisites>
+        <maven>3.2.3</maven>
+    </prerequisites>
+    <organization>
+        <name>Entur</name>
+        <url>http://www.entur.org/</url>
+    </organization>
+
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>Nexus</id>
+            <url>https://nexus.rutebanken.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Marduk is using gcp-storage as dependency, and builds OTP graphs.
@@ -134,19 +155,54 @@
     </dependencyManagement>
 
     <build>
+        <extensions>
+            <!-- maven3 will need wagon-ssh extension in order to be able to release,
+            Using external variant in order to retain keys, etc -->
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh-external</artifactId>
+                <version>2.10</version>
+            </extension>
+        </extensions>
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.5.1</version>
+                    <configuration>
+                        <source>1.8</source>
+                        <target>1.8</target>
+                        <encoding>UTF-8</encoding>
+                        <compilerArgs>
+                            <!--arg>-Werror</arg-->
+                            <arg>-Xlint:all</arg>
+                        </compilerArgs>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.codehaus.plexus</groupId>
+                            <artifactId>plexus-compiler-javac</artifactId>
+                            <version>2.7</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>2.5.3</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.apache.maven.scm</groupId>
+                            <artifactId>maven-scm-provider-gitexe</artifactId>
+                            <version>1.9.2</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+                <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.19.1</version>
-              <!--  <configuration>
-                    <includes>
-                        <include>**/Test*.java</include>
-                        <include>**/*Test.java</include>
-                        <include>**/*Tests.java</include>
-                        <include>**/*TestCase.java</include>
-                    </includes>
-                </configuration>-->
                 <dependencies>
                     <dependency>
                         <groupId>org.junit.platform</groupId>
@@ -158,15 +214,27 @@
                         <artifactId>junit-jupiter-engine</artifactId>
                         <version>${junit.jupiter.version}</version>
                     </dependency>
-                 <!--   <dependency>
-                        <groupId>org.junit.vintage</groupId>
-                        <artifactId>junit-vintage-engine</artifactId>
-                        <version>${junit.vintage.version}</version>
-                    </dependency> -->
                 </dependencies>
                 </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals><goal>jar</goal></goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
     <modules>
