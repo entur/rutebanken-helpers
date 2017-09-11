@@ -5,7 +5,7 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <groupId>org.rutebanken.helpers</groupId>
+        <groupId>org.entur.helpers</groupId>
         <artifactId>helper</artifactId>
         <version>0.0.3-SNAPSHOT</version>
         <relativePath>..</relativePath>
@@ -41,11 +41,6 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
     </dependencies>
 
     <build>
-        <!-- <plugins>
-             <plugin>
-                 <artifactId>maven-surefire-plugin</artifactId>
-             </plugin>
-         </plugins>-->
     </build>
 
 </project>
