@@ -10,7 +10,7 @@
     <name>rutebanken-helper</name>
     <description>Library artifacts collected and to be used as tools in other projects.</description>
     <url>https://github.com/rutebanken/rutebanken-helpers</url>
-
+    <inceptionYear>2016</inceptionYear>
     <licenses>
         <license>
             <name>EUPL-1.2 with modifications</name>
