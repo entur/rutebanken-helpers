@@ -12,7 +12,7 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
     </parent>
 
     <properties>
-        <!--<junit.platform.version>1.0.0-M2</junit.platform.version>-->
+        <license.licenseResolver>${project.baseUri}/../src/license</license.licenseResolver>
     </properties>
 
     <modelVersion>4.0.0</modelVersion>
@@ -41,11 +41,6 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
     </dependencies>
 
     <build>
-        <!-- <plugins>
-             <plugin>
-                 <artifactId>maven-surefire-plugin</artifactId>
-             </plugin>
-         </plugins>-->
     </build>
 
 </project>

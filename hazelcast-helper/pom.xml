@@ -11,7 +11,7 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
     </parent>
 
     <properties>
-
+        <license.licenseResolver>${project.baseUri}/../src/license</license.licenseResolver>
     </properties>
 
     <modelVersion>4.0.0</modelVersion>
