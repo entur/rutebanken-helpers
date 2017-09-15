@@ -91,6 +91,7 @@ public class HazelCastService {
 
     /**
      * Method to be used as part of liveness test for a k8s service
+     * @return true if started up ok and has cluster members
      */
     public Boolean getStartupOk() {
         return startupOk && numberOfClusterMembers() > 0;
@@ -130,7 +131,6 @@ public class HazelCastService {
      * See the example below for overriding:
      *
      * <pre>
-     * {@code
      *  @Override
      *  public void updateDefaultMapConfig(MapConfig mapConfig) {
      *     mapConfig
@@ -140,7 +140,6 @@ public class HazelCastService {
      *         new MaxSizeConfig(70, MaxSizeConfig.MaxSizePolicy.USED_HEAP_PERCENTAGE));
      *     logger.info("Map config: {}", mapConfig);
      *  }
-     * }
      * </pre>
      *
      * @param defaultMapConfig The map config with name "default" to make updates on.
