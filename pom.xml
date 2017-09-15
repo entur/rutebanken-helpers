@@ -284,7 +284,7 @@
             mvn -Psign verify -Dgpg.passphrase=$GPG_PASSPHRASE
             mvn -Psign,noPublicDeploy -Dgpg.passphrase=$GPG_PASSPHRASE clean deploy
             # Release prepare.
-            mvn -Dgpg.passphrase=$GPG_PASSPHRASE -Darguments=-Dgpg.passphrase=$GPG_PASSPHRASE release:clean release:prepare
+            mvn -Dgpg.passphrase=$GPG_PASSPHRASE -Darguments=-Dgpg.passphrase=$GPG_PASSPHRASE release:prepare
             # Perform
             mvn -Dgpg.passphrase=$GPG_PASSPHRASE -Darguments=-Dgpg.passphrase=$GPG_PASSPHRASE release:perform
             -->
