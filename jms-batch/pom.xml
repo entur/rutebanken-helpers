@@ -38,16 +38,6 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
 
     <name>jms-batch</name>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.apache.activemq</groupId>
-                <artifactId>activemq-camel</artifactId>
-                <version>${activemq.version}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
         <!-- NOTICE that you put the versions in the parent dependency
         management section, and artifacts without version here. -->
