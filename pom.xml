@@ -36,8 +36,8 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:ssh://git@github.com/rutebanken/rutebanken-helpers.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/rutebanken/rutebanken-helpers.git</developerConnection>
+        <connection>scm:git:ssh://git@github.com/entur/rutebanken-helpers.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/entur/rutebanken-helpers.git</developerConnection>
     </scm>
 
     <prerequisites>
