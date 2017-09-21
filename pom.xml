@@ -35,14 +35,22 @@
         </license>
     </licenses>
 
+
+    <developers>
+        <developer>
+            <name>Erlend Nossum</name>
+            <email>erlend.nossum@entur.org</email>
+            <organization>Entur</organization>
+            <organizationUrl>http://www.entur.org</organizationUrl>
+        </developer>
+    </developers>
+
     <scm>
         <connection>scm:git:ssh://git@github.com/entur/rutebanken-helpers.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/entur/rutebanken-helpers.git</developerConnection>
+        <url>https://github.com/entur/rutebanken-helpers/tree/master</url>
     </scm>
 
-    <prerequisites>
-        <maven>3.2.3</maven>
-    </prerequisites>
     <organization>
         <name>Entur AS</name>
         <url>http://www.entur.org/</url>
@@ -285,15 +293,6 @@
             <activation>
                 <activeByDefault>false</activeByDefault>
             </activation>
-            <!--
-            Did not manage to set key in settings.xml, and therefore need to use:
-            mvn -Psign verify -Dgpg.passphrase=$GPG_PASSPHRASE
-            mvn -Psign,noPublicDeploy -Dgpg.passphrase=$GPG_PASSPHRASE clean deploy
-            # Release prepare.
-            mvn -Dgpg.passphrase=$GPG_PASSPHRASE -Darguments=-Dgpg.passphrase=$GPG_PASSPHRASE release:prepare
-            # Perform
-            mvn -Dgpg.passphrase=$GPG_PASSPHRASE -Darguments=-Dgpg.passphrase=$GPG_PASSPHRASE release:perform
-            -->
             <build>
                 <plugins>
                     <plugin>
