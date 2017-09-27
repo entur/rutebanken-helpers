@@ -18,6 +18,7 @@ package org.rutebanken.helper.organisation;
 
 public class AuthorizationConstants {
 
+    public static final String ROLE_DELETE_STOPS = "deleteStops";
     public static final String ROLE_EDIT_STOPS = "editStops";
 
     public static final String ROLE_ORGANISATION_EDIT = "editOrganisation";
