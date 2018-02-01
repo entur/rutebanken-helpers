@@ -25,7 +25,7 @@ public class HubotPostService {
     private final String hubotEndpoint;
 
     @Autowired
-    public HubotPostService(@Value("helper.hubot.endpoint:http://hubot/hubot/say/") String hubotEndpoint) {
+    public HubotPostService(@Value("${helper.hubot.endpoint:http://hubot/hubot/say/}") String hubotEndpoint) {
         this.hubotEndpoint = hubotEndpoint;
     }
 
@@ -58,24 +58,24 @@ public class HubotPostService {
 
     public static class HubotMessage {
 
-        private final String contents;
+        private final String message;
         private final String source;
         private final String icon;
 
-        public HubotMessage(String contents, String source) {
-            this.contents = contents;
+        public HubotMessage(String message, String source) {
+            this.message= message;
             this.source = source;
             this.icon = "";
         }
 
-        public HubotMessage(String contents, String source, String icon) {
-            this.contents = contents;
+        public HubotMessage(String message, String source, String icon) {
+            this.message = message;
             this.source = source;
             this.icon = icon;
         }
 
-        public String getContents() {
-            return contents;
+        public String getMessage() {
+            return message;
         }
 
         public String getIcon() {
