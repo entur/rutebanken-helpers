@@ -29,20 +29,23 @@ public class HubotPostService {
         this.hubotEndpoint = hubotEndpoint;
     }
 
-    public boolean publish( String message ) {
-        HubotMessage msg = new HubotMessage(message, "MESSAGE", "OK", new Date().toString());
+    public boolean publish(String messageText, String source) {
+        HubotMessage message = new HubotMessage(messageText, source);
+        return publish(message);
+    }
 
+    public boolean publish(HubotMessage hubotMessage) {
         try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
-            String json = new ObjectMapper().writeValueAsString(msg);
-            log.debug("Will try to send the following to hubot: "+json);
+            String json = new ObjectMapper().writeValueAsString(hubotMessage);
+            log.debug("Will try to send the following to hubot: " + json);
 
             HttpPost httpPost = new HttpPost(hubotEndpoint);
             httpPost.setEntity(new StringEntity(json));
             httpPost.addHeader("Content-Type", "application/json");
 
-            try ( CloseableHttpResponse response = httpclient.execute(httpPost) ) {
+            try (CloseableHttpResponse response = httpclient.execute(httpPost)) {
                 HttpEntity entity = response.getEntity();
-                log.info("Entity as response from hubot: "+EntityUtils.toString(entity));
+                log.info("Entity as response from hubot: " + EntityUtils.toString(entity));
                 EntityUtils.consume(entity);
             }
 
@@ -54,32 +57,33 @@ public class HubotPostService {
     }
 
     public static class HubotMessage {
-        private final String contents;
-        private final String action;
-        private final String status;
-        private final String date;
 
-        public HubotMessage(String contents, String action, String status, String date) {
+        private final String contents;
+        private final String source;
+        private final String icon;
+
+        public HubotMessage(String contents, String source) {
             this.contents = contents;
-            this.action = action;
-            this.status = status;
-            this.date = date;
+            this.source = source;
+            this.icon = "";
+        }
+
+        public HubotMessage(String contents, String source, String icon) {
+            this.contents = contents;
+            this.source = source;
+            this.icon = icon;
         }
 
         public String getContents() {
             return contents;
         }
 
-        public String getAction() {
-            return action;
+        public String getIcon() {
+            return icon;
         }
 
-        public String getStatus() {
-            return status;
-        }
-
-        public String getDate() {
-            return date;
+        public String getSource() {
+            return source;
         }
     }
 }
