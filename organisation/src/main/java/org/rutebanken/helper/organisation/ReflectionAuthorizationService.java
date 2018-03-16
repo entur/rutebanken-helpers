@@ -186,7 +186,7 @@ public class ReflectionAuthorizationService {
 
         List<String> mappings = fieldMappings.get(entityType.toLowerCase());
         if(mappings != null) {
-            logger.info("Found mapped value from {} to {}", entityType, mappings);
+            logger.debug("Found mapped value from {} to {}", entityType, mappings);
 
             if(isBlacklist) {
                 // If the list is detected to be blacklist values, every mapped field must match.
@@ -248,7 +248,7 @@ public class ReflectionAuthorizationService {
             logger.info("Not allowed value {}: {} for entity {}", entityType, value, entity);
             return false;
         }
-        logger.info("Allowed value {}: {} for entity {}", entityType, value, entity);
+        logger.debug("Allowed value {}: {} for entity {}", entityType, value, entity);
         return true;
     }
 
