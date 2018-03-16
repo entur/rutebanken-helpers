@@ -218,7 +218,7 @@ public class ReflectionAuthorizationService {
         Optional<Object> optionalValue = getFieldValue(field, entity);
 
         if (!optionalValue.isPresent()) {
-            logger.info("Cannot resolve value for {}, entity: {}. This is probably ok, as the value can be null", field, entity);
+            logger.trace("Cannot resolve value for {}. This is ok, as the value can be null. entity: {}.", field, entity);
             return isBlacklist;
         }
 
