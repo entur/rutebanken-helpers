@@ -90,7 +90,7 @@ public class ReflectionAuthorizationService {
                             .stream()
                             // Only one of the role assignments needs to match for the given entity and required role
                             .anyMatch(roleAssignment -> authorized(roleAssignment, entity, requiredRole));
-            if(!allowed) {
+            if (!allowed) {
                 // No need to loop further, if not authorized with required role for one of the entities in collection.
                 logger.info("User is not authorized for entity with role: {}. Relevant roles: {}. Entity: {}", requiredRole, relevantRoles, entity);
                 return false;
@@ -123,7 +123,7 @@ public class ReflectionAuthorizationService {
             return false;
         }
 
-        if(!organisationChecker.entityMatchesOrganisationRef(roleAssignment, entity)) {
+        if (!organisationChecker.entityMatchesOrganisationRef(roleAssignment, entity)) {
             logger.debug("Entity does not match organization ref. RoleAssignment: {}, Entity: {}", roleAssignment, entity);
             return false;
         }
@@ -155,7 +155,7 @@ public class ReflectionAuthorizationService {
             boolean authorized = checkEntityClassification(entityType, entity, roleAssignment.getEntityClassifications().get(entityType));
 
             if (!authorized) {
-                logger.info ("Not authorized for entity {} and role assignment {}", entity, roleAssignment);
+                logger.info("Not authorized for entity {} and role assignment {}", entity, roleAssignment);
                 return false;
             }
 
@@ -179,16 +179,16 @@ public class ReflectionAuthorizationService {
         boolean isBlacklist = classificationsForEntityType.stream().anyMatch(classifier -> classifier.startsWith("!"));
         boolean isWhiteList = classificationsForEntityType.stream().noneMatch(classifier -> classifier.startsWith("!"));
 
-        if(isBlacklist && isWhiteList) {
+        if (isBlacklist && isWhiteList) {
             logger.warn("The list of classifiers contains values with both black list values (values prefixed with !) and white list values. This is not supported");
             return false;
         }
 
         List<String> mappings = fieldMappings.get(entityType.toLowerCase());
-        if(mappings != null) {
+        if (mappings != null) {
             logger.debug("Found mapped value from {} to {}", entityType, mappings);
 
-            if(isBlacklist) {
+            if (isBlacklist) {
                 // If the list is detected to be blacklist values, every mapped field must match.
                 return mappings.stream()
                         .allMatch(mappedField -> isAllowedForFieldAndClassification(mappedField, entity, classificationsForEntityType, true));
@@ -226,13 +226,12 @@ public class ReflectionAuthorizationService {
         String stringValue = removeUnderscore(value.toString());
 
         boolean isAllowed;
-        if(isBlacklist) {
+        if (isBlacklist) {
 
             isAllowed = classificationsForEntityType.stream()
                     .noneMatch(classification ->
                             removeUnderscore(classification.substring(1))
                                     .equalsIgnoreCase(stringValue));
-
 
 
         } else {
@@ -244,7 +243,7 @@ public class ReflectionAuthorizationService {
 
         }
 
-        if(!isAllowed) {
+        if (!isAllowed) {
             logger.info("Not allowed value {}: {} for entity {}", entityType, value, entity);
             return false;
         }
@@ -281,7 +280,7 @@ public class ReflectionAuthorizationService {
 
         List<String> classifiers = roleAssignment.getEntityClassifications().get(ENTITY_TYPE);
 
-        if(classifiers == null || classifiers.isEmpty()) {
+        if (classifiers == null || classifiers.isEmpty()) {
             logger.warn("Classifiers is empty for {}", ENTITY_TYPE);
             return false;
         }
