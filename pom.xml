@@ -73,7 +73,7 @@
         <junit.jupiter.version>5.0.0-M2</junit.jupiter.version>
         <junit.vintage.version>${junit.version}.0-M2</junit.vintage.version>
         <junit.platform.version>1.0.0-M2</junit.platform.version>
-        <jackson.version>2.8.10</jackson.version>
+        <jackson.version>2.8.11.1</jackson.version>
         <keycloak.version>3.0.0.Final</keycloak.version>
     </properties>
 
