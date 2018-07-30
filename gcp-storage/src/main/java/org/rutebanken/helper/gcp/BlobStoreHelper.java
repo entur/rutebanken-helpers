@@ -52,10 +52,18 @@ public class BlobStoreHelper {
         return blobs.iterateAll().iterator();
     }
 
+    /**
+     * Deprecated as underlying API method is deprecated. Use byte[] content version.
+     */
+    @Deprecated
     public static Blob uploadBlob(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic) {
         return uploadBlob(storage, containerName, name, inputStream, makePublic, "application/octet-stream");
     }
 
+    /**
+     * Deprecated as underlying API method is deprecated. Use byte[] content version.
+     */
+    @Deprecated
     public static Blob uploadBlob(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic, String contentType) {
         logger.debug("Uploading blob " + name + " to bucket " + containerName);
         BlobId blobId = BlobId.of(containerName, name);
@@ -65,6 +73,23 @@ public class BlobStoreHelper {
         }
         BlobInfo blobInfo = builder.build();
         Blob blob = storage.create(blobInfo, inputStream);
+        logger.debug("Stored blob with name '" + blob.getName() + "' and size '" + blob.getSize() + "' in bucket '" + blob.getBucket() + "'");
+        return blob;
+    }
+
+    public static Blob uploadBlob(Storage storage, String containerName, String name, byte[] content, boolean makePublic) {
+        return uploadBlob(storage, containerName, name, content, makePublic, "application/octet-stream");
+    }
+
+    public static Blob uploadBlob(Storage storage, String containerName, String name, byte[] content, boolean makePublic, String contentType) {
+        logger.debug("Uploading blob " + name + " to bucket " + containerName);
+        BlobId blobId = BlobId.of(containerName, name);
+        BlobInfo.Builder builder = BlobInfo.newBuilder(blobId).setContentType(contentType);
+        if (makePublic) {
+            builder.setAcl(ImmutableList.of(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER)));
+        }
+        BlobInfo blobInfo = builder.build();
+        Blob blob = storage.create(blobInfo, content);
         logger.debug("Stored blob with name '" + blob.getName() + "' and size '" + blob.getSize() + "' in bucket '" + blob.getBucket() + "'");
         return blob;
     }
