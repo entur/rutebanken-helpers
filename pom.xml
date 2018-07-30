@@ -65,7 +65,7 @@
              It should be equal to or lower than the version used by OTP
              Be careful when updating the google cloud storage core version, as the version 1.4.0 requires guava > 20
         -->
-        <google.cloud.storage.version>1.2.0</google.cloud.storage.version>
+        <google.cloud.storage.version>1.37.1</google.cloud.storage.version>
         <google.cloud.trace.version>0.1.0</google.cloud.trace.version>
         <slf4j.version>1.7.22</slf4j.version>
         <guava.version>21.0</guava.version>
