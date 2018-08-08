@@ -21,7 +21,7 @@
 
     <groupId>org.entur.helpers</groupId>
     <artifactId>helper</artifactId>
-    <version>0.0.3-SNAPSHOT</version>
+    <version>0.0.4-SNAPSHOT</version>
 
     <name>rutebanken-helper</name>
     <description>Library artifacts collected and to be used as tools in other projects.</description>
@@ -65,16 +65,18 @@
              It should be equal to or lower than the version used by OTP
              Be careful when updating the google cloud storage core version, as the version 1.4.0 requires guava > 20
         -->
-        <google.cloud.storage.version>1.37.1</google.cloud.storage.version>
+        <google.cloud.storage.version>1.38.0</google.cloud.storage.version>
         <google.cloud.trace.version>0.1.0</google.cloud.trace.version>
         <slf4j.version>1.7.22</slf4j.version>
-        <guava.version>21.0</guava.version>
+        <guava.version>26.0-jre</guava.version>
         <junit.version>4.12</junit.version>
         <junit.jupiter.version>5.0.0-M2</junit.jupiter.version>
         <junit.vintage.version>${junit.version}.0-M2</junit.vintage.version>
         <junit.platform.version>1.0.0-M2</junit.platform.version>
         <jackson.version>2.8.10</jackson.version>
-        <keycloak.version>3.0.0.Final</keycloak.version>
+        <keycloak.version>4.2.1.Final</keycloak.version>
+        <spring.version>5.0.7.RELEASE</spring.version>
+        <hazelcast.version>3.9.4</hazelcast.version>
     </properties>
 
     <dependencyManagement>
@@ -144,13 +146,18 @@
             <dependency>
                 <groupId>com.hazelcast</groupId>
                 <artifactId>hazelcast-client</artifactId>
-                <version>3.7.6</version>
+                <version>${hazelcast.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>
-                <version>4.3.5.RELEASE</version>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-core</artifactId>
+                <version>${spring.version}</version>
             </dependency>
 
             <dependency>
