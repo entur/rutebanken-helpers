@@ -32,6 +32,7 @@ import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -41,6 +42,12 @@ public class BlobStoreHelper {
 
     private static final long FILE_SIZE_LIMIT = 1_000_000;
     private static final int BUFFER_CHUNK_SIZE = 1024;
+
+    private static final int BUFFER_CHUNK_SIZE_RETRY_UPLOAD = 1024 * 1024;
+
+    private static final List<Integer> RETRY_BACKOFF_SECONDS = Arrays.asList(0, 5, 30);
+
+
 
     private BlobStoreHelper(){
 
@@ -53,7 +60,7 @@ public class BlobStoreHelper {
     }
 
     /**
-     * Deprecated as underlying API method is deprecated. Use byte[] content version.
+     * Deprecated as underlying API method is deprecated. Use byte[] content version or uploadWithRetry.
      */
     @Deprecated
     public static Blob uploadBlob(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic) {
@@ -61,7 +68,7 @@ public class BlobStoreHelper {
     }
 
     /**
-     * Deprecated as underlying API method is deprecated. Use byte[] content version.
+     * Deprecated as underlying API method is deprecated. Use byte[] content version or uploadWithRetry.
      */
     @Deprecated
     public static Blob uploadBlob(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic, String contentType) {
@@ -93,6 +100,64 @@ public class BlobStoreHelper {
         logger.debug("Stored blob with name '" + blob.getName() + "' and size '" + blob.getSize() + "' in bucket '" + blob.getBucket() + "'");
         return blob;
     }
+
+    public static Blob uploadBlobWithRetry(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic) {
+        return uploadBlobWithRetry(storage, containerName, name, inputStream, makePublic, "application/octet-stream");
+    }
+
+    public static Blob uploadBlobWithRetry(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic, String contentType) {
+        logger.debug("Uploading blob " + name + " to bucket " + containerName);
+        BlobId blobId = BlobId.of(containerName, name);
+        BlobInfo.Builder builder = BlobInfo.newBuilder(blobId).setContentType(contentType);
+        if (makePublic) {
+            builder.setAcl(ImmutableList.of(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER)));
+        }
+        BlobInfo blobInfo = builder.build();
+
+        byte[] buffer = new byte[BUFFER_CHUNK_SIZE_RETRY_UPLOAD];
+
+        try (WriteChannel orgChannel = storage.writer(blobInfo)) {
+            WriteChannel writer = orgChannel;
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) > 0) {
+                writer = writeWithRetry(blobId, ByteBuffer.wrap(buffer, 0, bytesRead), writer);
+            }
+        } catch (IOException ioE) {
+            throw new RuntimeException("Blob upload of blob with name '" + blobId.getName() + "' failed: " + ioE.getMessage(), ioE);
+        }
+        Blob blob = storage.get(blobId);
+        logger.debug("Stored blob with name '" + blob.getName() + "' and size '" + blob.getSize() + "' in bucket '" + blob.getBucket() + "'");
+        return blob;
+    }
+
+    private static WriteChannel writeWithRetry(BlobId blobId, ByteBuffer buffer, WriteChannel writer) throws IOException {
+        Iterator<Integer> backOffSecItr = RETRY_BACKOFF_SECONDS.iterator();
+        boolean doTry = true;
+        writer.setChunkSize(buffer.limit());
+        while (doTry) {
+
+            try {
+                writer.write(buffer);
+                doTry = false;
+            } catch (Exception e) {
+                if (backOffSecItr.hasNext()) {
+                    Integer backOffSec = backOffSecItr.next();
+                    logger.info("Blob upload of blob with name '" + blobId.getName() + "' failed  for chunk. Attempting retry in: " + backOffSec + " seconds. Error: " + e.getMessage());
+                    try {
+                        Thread.sleep(backOffSec * 1000);
+                    } catch (InterruptedException ie) {
+                        throw new RuntimeException("Interrupted while waiting to retry upload of blob with name '" + blobId.getName() + "' ", ie);
+                    }
+                } else {
+                    throw new RuntimeException("Blob upload of blob with name '" + blobId.getName() + "' failed. No more retries available. Error: " + e.getMessage());
+                }
+
+            }
+        }
+        return writer;
+
+    }
+
 
     @Deprecated
     public static void uploadBlob(Storage storage, String containerName, String blobPath, Path filePath, boolean makePublic) throws Exception {
