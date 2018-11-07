@@ -29,7 +29,7 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
 
     <properties>
         <license.licenseResolver>${project.baseUri}/../src/license</license.licenseResolver>
-        <activemq.version>5.15.7</activemq.version>
+        <activemq.version>5.13.2</activemq.version>
     </properties>
 
     <modelVersion>4.0.0</modelVersion>
