@@ -17,7 +17,6 @@
 package org.rutebanken.helper.organisation;
 
 import com.google.common.base.MoreObjects;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.security.core.Authentication;
 
@@ -78,7 +77,7 @@ public class ReflectionAuthorizationServiceTest {
 
     @Test
     public void authorizedForLegalStopPlaceTypesWhenOthersBlacklisted() {
-        RoleAssignment roleAssignment = RoleAssignment.builder()
+        var roleAssignment = RoleAssignment.builder()
                 .withRole("editStops")
                 .withAdministrativeZone("01")
                 .withOrganisation("OST")
@@ -100,11 +99,11 @@ public class ReflectionAuthorizationServiceTest {
     @Test
     public void authorizedWithCombinationOfTwoFields() {
 
-        StopPlace stopPlace = new StopPlace();
+        var stopPlace = new StopPlace();
         stopPlace.stopPlaceType = StopPlace.StopPlaceType.ONSTREET_BUS;
         stopPlace.someField1 = "nationalPassengerFerry";
 
-        RoleAssignment roleAssignment = RoleAssignment.builder()
+        var roleAssignment = RoleAssignment.builder()
                 .withRole("editStops")
                 .withAdministrativeZone("01")
                 .withOrganisation("OST")

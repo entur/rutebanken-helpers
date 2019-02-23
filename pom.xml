@@ -21,7 +21,7 @@
 
     <groupId>org.entur.helpers</groupId>
     <artifactId>helper</artifactId>
-    <version>0.0.4-SNAPSHOT</version>
+    <version>0.0.5-SNAPSHOT</version>
 
     <name>rutebanken-helper</name>
     <description>Library artifacts collected and to be used as tools in other projects.</description>
@@ -106,28 +106,6 @@
                 <version>${junit.jupiter.version}</version>
                 <scope>test</scope>
             </dependency>
-            <!-- The following commented dependencies are not currently in use. -->
-            <!--<dependency>-->
-                <!--<groupId>com.google.cloud.trace</groupId>-->
-                <!--<artifactId>core</artifactId>-->
-                <!--<version>0.1.0</version>-->
-            <!--</dependency>-->
-            <!--<dependency>-->
-                <!--<groupId>com.google.cloud.trace</groupId>-->
-                <!--<artifactId>java-timestamp</artifactId>-->
-                <!--<version>0.1.0</version>-->
-            <!--</dependency>-->
-            <!--<dependency>-->
-                <!--<groupId>com.google.cloud.trace</groupId>-->
-                <!--<artifactId>v1</artifactId>-->
-                <!--<version>0.1.0</version>-->
-            <!--</dependency>-->
-            <!--<dependency>-->
-                <!--<groupId>com.google.cloud.trace</groupId>-->
-                <!--<artifactId>grpc-sink</artifactId>-->
-                <!--<version>0.1.0</version>-->
-            <!--</dependency>-->
-
 
             <!-- There exists a kubernetes-api project too. Not
                 sure about the exact differences between these two -->
@@ -204,10 +182,10 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.5.1</version>
+                    <version>3.8.0</version>
                     <configuration>
-                        <source>1.8</source>
-                        <target>1.8</target>
+                        <source>11</source>
+                        <target>11</target>
                         <encoding>UTF-8</encoding>
                         <compilerArgs>
                             <!--arg>-Werror</arg-->
@@ -263,6 +241,18 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <version>5.0.0-M1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
