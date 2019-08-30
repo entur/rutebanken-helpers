@@ -66,11 +66,17 @@
         <junit.jupiter.version>5.0.0-M2</junit.jupiter.version>
         <junit.vintage.version>${junit.version}.0-M2</junit.vintage.version>
         <junit.platform.version>1.0.0-M2</junit.platform.version>
-        <jackson.version>2.9.8</jackson.version>
+        <jackson.version>2.9.9</jackson.version>
         <keycloak.version>4.8.3.Final</keycloak.version>
-        <spring.version>5.0.7.RELEASE</spring.version>
+        <spring.version>5.1.9.RELEASE</spring.version>
+        <spring.security.version>5.1.6.RELEASE</spring.security.version>
+        <spring-boot.version>2.1.7.RELEASE</spring-boot.version>
+        <spring-cloud-gcp.version>1.1.2.RELEASE</spring-cloud-gcp.version>
         <hazelcast.version>3.9.4</hazelcast.version>
-        <activemq.version>5.15.8</activemq.version>
+        <activemq.version>5.15.9</activemq.version>
+        <camel-version>2.24.1</camel-version>
+
+
     </properties>
 
     <dependencyManagement>
@@ -129,7 +135,7 @@
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-core</artifactId>
-                <version>${spring.version}</version>
+                <version>${spring.security.version}</version>
             </dependency>
 
             <dependency>
@@ -161,7 +167,34 @@
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
-                <version>4.5.5</version>
+                <version>4.5.9</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-core</artifactId>
+                <version>${camel-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-gcp-starter-pubsub</artifactId>
+                <version>${spring-cloud-gcp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-gcp-dependencies</artifactId>
+                <version>${spring-cloud-gcp.version}</version>
+                <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-loader-tools</artifactId>
+                <version>${spring-boot.version}</version>
             </dependency>
 
         </dependencies>
@@ -370,5 +403,6 @@
         <module>organisation</module>
         <module>jms-batch</module>
         <module>hubot</module>
+        <module>camel-entur-google-pubsub</module>
     </modules>
 </project>
