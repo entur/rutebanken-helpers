@@ -58,8 +58,7 @@
         <license.licenseName>eupl-1.2</license.licenseName>
         <license.licenseResolver>${project.baseUri}/src/license</license.licenseResolver>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <google.cloud.storage.version>1.82.0</google.cloud.storage.version>
-        <google.cloud.trace.version>0.1.0</google.cloud.trace.version>
+        <google.cloud.version>1.78.0</google.cloud.version>
         <slf4j.version>1.7.22</slf4j.version>
         <guava.version>26.0-jre</guava.version>
         <junit.version>4.12</junit.version>
@@ -93,8 +92,18 @@
             </dependency>
             <dependency>
                 <groupId>com.google.cloud</groupId>
+                <artifactId>google-cloud-core</artifactId>
+                <version>${google.cloud.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.cloud</groupId>
                 <artifactId>google-cloud-storage</artifactId>
-                <version>${google.cloud.storage.version}</version>
+                <version>${google.cloud.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.cloud</groupId>
+                <artifactId>google-cloud-pubsub</artifactId>
+                <version>${google.cloud.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
