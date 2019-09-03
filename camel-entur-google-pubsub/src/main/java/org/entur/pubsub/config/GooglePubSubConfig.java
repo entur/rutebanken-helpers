@@ -24,7 +24,7 @@ public class GooglePubSubConfig {
     /**
      * Number of threads performing ack deadline extension.
      */
-    @Value("${marduk.pubsub.subscriber.system-threads}")
+    @Value("${entur.pubsub.subscriber.system-threads:5}")
     private Integer subscriberSystemThreads;
 
     @Bean("pubsubSystemThreadPool")
