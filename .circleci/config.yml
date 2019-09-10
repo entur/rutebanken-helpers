@@ -13,7 +13,7 @@ jobs:
     - restore_cache:
         key: dep-cache-{{ checksum "pom.xml" }}
     # Use forked version of the dependency plugin to handle correctly inter-module dependencies (https://issues.apache.org/jira/browse/MDEP-568)
-    - run: mvn com.offbytwo.maven.plugins:maven-dependency-plugin:3.1.1.MDEP568:go-offline -DexcludeGroupIds=org.entur -s ./.circleci/settings.xml
+    - run: mvn com.offbytwo.maven.plugins:maven-dependency-plugin:3.1.1.MDEP568:go-offline -DexcludeGroupIds=org.entur.helpers -s ./.circleci/settings.xml
     - save_cache:
         paths:
         - ~/.m2
