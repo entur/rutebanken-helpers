@@ -65,15 +65,17 @@
         <junit.jupiter.version>5.0.0-M2</junit.jupiter.version>
         <junit.vintage.version>${junit.version}.0-M2</junit.vintage.version>
         <junit.platform.version>1.0.0-M2</junit.platform.version>
-        <jackson.version>2.9.9</jackson.version>
+        <jackson.version>2.9.9.20190807</jackson.version>
         <keycloak.version>4.8.3.Final</keycloak.version>
         <spring.version>5.1.9.RELEASE</spring.version>
         <spring.security.version>5.1.6.RELEASE</spring.security.version>
-        <spring-boot.version>2.1.7.RELEASE</spring-boot.version>
+        <spring-boot.version>2.1.8.RELEASE</spring-boot.version>
         <spring-cloud-gcp.version>1.1.2.RELEASE</spring-cloud-gcp.version>
         <hazelcast.version>3.9.4</hazelcast.version>
-        <activemq.version>5.15.9</activemq.version>
+        <activemq.version>5.15.10</activemq.version>
         <camel-version>2.24.1</camel-version>
+
+        <owasp-dependency-check.version>5.2.1</owasp-dependency-check.version>
 
 
     </properties>
@@ -86,33 +88,21 @@
                 <artifactId>entur-google-pubsub</artifactId>
                 <version>0.0.6-SNAPSHOT</version>
             </dependency>
-
             <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-databind</artifactId>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
                 <version>${jackson.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-annotations</artifactId>
-                <version>${jackson.version}</version>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-gcp-dependencies</artifactId>
+                <version>${spring-cloud-gcp.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
-            <dependency>
-                <groupId>com.google.cloud</groupId>
-                <artifactId>google-cloud-core</artifactId>
-                <version>${google.cloud.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.cloud</groupId>
-                <artifactId>google-cloud-storage</artifactId>
-                <version>${google.cloud.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.cloud</groupId>
-                <artifactId>google-cloud-pubsub</artifactId>
-                <version>${google.cloud.version}</version>
-            </dependency>
-            <dependency>
+             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>${slf4j.version}</version>
@@ -191,17 +181,7 @@
                 <artifactId>camel-core</artifactId>
                 <version>${camel-version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-gcp-starter-pubsub</artifactId>
-                <version>${spring-cloud-gcp.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-gcp-dependencies</artifactId>
-                <version>${spring-cloud-gcp.version}</version>
-                <type>pom</type>
-            </dependency>
+
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot</artifactId>
@@ -294,7 +274,7 @@
             <plugin>
                 <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
-                <version>5.0.0-M1</version>
+                <version>${owasp-dependency-check.version}</version>
                 <executions>
                     <execution>
                         <goals>
