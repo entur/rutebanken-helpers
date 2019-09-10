@@ -83,6 +83,14 @@
     <dependencyManagement>
         <dependencies>
 
+            <!-- security-related dependency management -->
+            <!-- for spring-boot-loader-tools -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>1.19</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.entur.helpers</groupId>
                 <artifactId>entur-google-pubsub</artifactId>
