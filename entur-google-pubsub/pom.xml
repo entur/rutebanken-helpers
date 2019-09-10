@@ -32,24 +32,30 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
 
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>camel-entur-google-pubsub</artifactId>
+    <artifactId>entur-google-pubsub</artifactId>
 
-    <name>camel-entur-google-pubsub</name>
+    <name>entur-google-pubsub</name>
     <description>
-        Base configuration for Google PubSub clients, to be used for Camel clients.
-        Non-Camel clients should use entur-google-pubsub instead.
+        Base configuration for Google PubSub clients, to be used for non-Camel clients.
+        Camel-based clients should use camel-entur-google-pubsub instead.
     </description>
 
     <dependencies>
         <!-- NOTICE that you put the versions in the parent dependency
         management section, and artifacts without version here. -->
         <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-core</artifactId>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-gcp-starter-pubsub</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.entur.helpers</groupId>
-            <artifactId>entur-google-pubsub</artifactId>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-gcp-dependencies</artifactId>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-loader-tools</artifactId>
         </dependency>
     </dependencies>
 

@@ -1,4 +1,4 @@
-package org.entur.pubsub;
+package org.entur.pubsub.camel;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.spi.Synchronization;

@@ -1,15 +1,18 @@
-package org.entur.pubsub.config;
+package org.entur.pubsub.camel.config;
 
-import org.entur.pubsub.EnturGooglePubSubComponent;
 import org.apache.camel.CamelContext;
+import org.entur.pubsub.base.config.GooglePubSubConfig;
+import org.entur.pubsub.camel.EnturGooglePubSubComponent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 /**
  * Register the Camel PubSub component.
  */
 @Configuration
+@Import(GooglePubSubConfig.class)
 public class GooglePubSubCamelComponentConfig {
 
 

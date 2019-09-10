@@ -1,7 +1,10 @@
-package org.entur.pubsub;
+package org.entur.pubsub.camel;
 
-import com.google.api.gax.rpc.AlreadyExistsException;
-import org.apache.camel.*;
+import org.apache.camel.Component;
+import org.apache.camel.Consumer;
+import org.apache.camel.ExchangePattern;
+import org.apache.camel.Processor;
+import org.apache.camel.Producer;
 import org.apache.camel.impl.DefaultEndpoint;
 import org.apache.camel.spi.Metadata;
 import org.apache.camel.spi.UriEndpoint;
@@ -9,7 +12,6 @@ import org.apache.camel.spi.UriParam;
 import org.apache.camel.spi.UriPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cloud.gcp.pubsub.PubSubAdmin;
 import org.springframework.cloud.gcp.pubsub.core.PubSubTemplate;
 
 @UriEndpoint(firstVersion = "0.1", scheme = "entur-google-pubsub", title = "Entur Google Pubsub",
@@ -31,15 +33,13 @@ public class EnturGooglePubSubEndpoint extends DefaultEndpoint {
 
     private String projectId;
     private PubSubTemplate pubSubTemplate;
-    private PubSubAdmin pubSubAdmin;
 
-    public EnturGooglePubSubEndpoint(String uri, Component component, String remaining, PubSubTemplate pubSubTemplate, PubSubAdmin pubSubAdmin) {
+    public EnturGooglePubSubEndpoint(String uri, Component component, PubSubTemplate pubSubTemplate) {
         super(uri, component);
         if (!(component instanceof EnturGooglePubSubComponent)) {
             throw new IllegalArgumentException("The component provided is not EnturGooglePubSubComponent : " + component.getClass().getName());
         }
         this.pubSubTemplate = pubSubTemplate;
-        this.pubSubAdmin = pubSubAdmin;
         setExchangePattern(ExchangePattern.InOnly);
     }
 
@@ -52,24 +52,6 @@ public class EnturGooglePubSubEndpoint extends DefaultEndpoint {
     @Override
     public Producer createProducer() {
         return new EnturGooglePubSubProducer(this, pubSubTemplate);
-    }
-
-    public void createSubscriptionIfMissing() {
-
-        try {
-            pubSubAdmin.createTopic(getDestinationName());
-            logger.debug("Created topic: " + getDestinationName());
-        } catch (AlreadyExistsException e) {
-            logger.trace("Did not create topic: " + getDestinationName() + " ,as it already exists");
-        }
-
-        try {
-            pubSubAdmin.createSubscription(getDestinationName(), getDestinationName());
-            logger.debug("Created subscription: " + getDestinationName());
-        } catch (AlreadyExistsException e) {
-            logger.trace("Did not create subscription: " + getDestinationName() + " ,as it already exists");
-        }
-
     }
 
     public String getDestinationName() {
