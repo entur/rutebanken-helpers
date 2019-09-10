@@ -1,11 +1,10 @@
-package org.entur.pubsub;
+package org.entur.pubsub.camel;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Endpoint;
 import org.apache.camel.impl.DefaultComponent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.gcp.pubsub.PubSubAdmin;
 import org.springframework.cloud.gcp.pubsub.core.PubSubTemplate;
 
 import java.util.Map;
@@ -17,9 +16,6 @@ public class EnturGooglePubSubComponent extends DefaultComponent {
 
     @Autowired
     private PubSubTemplate pubSubTemplate;
-
-    @Autowired
-    private PubSubAdmin pubSubAdmin;
 
     public EnturGooglePubSubComponent() {
         super();
@@ -34,7 +30,7 @@ public class EnturGooglePubSubComponent extends DefaultComponent {
     protected Endpoint createEndpoint(String uri, String remaining, Map<String, Object> parameters) throws
             Exception {
 
-        EnturGooglePubSubEndpoint pubsubEndpoint = new EnturGooglePubSubEndpoint(uri, this, remaining, pubSubTemplate, pubSubAdmin);
+        EnturGooglePubSubEndpoint pubsubEndpoint = new EnturGooglePubSubEndpoint(uri, this, pubSubTemplate);
         pubsubEndpoint.setDestinationName(remaining);
         pubsubEndpoint.setProjectId(projectId);
 

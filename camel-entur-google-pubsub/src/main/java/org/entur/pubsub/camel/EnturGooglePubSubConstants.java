@@ -1,4 +1,4 @@
-package org.entur.pubsub;
+package org.entur.pubsub.camel;
 
 public class EnturGooglePubSubConstants {
 

@@ -1,4 +1,4 @@
-package org.entur.pubsub.config;
+package org.entur.pubsub.base.config;
 
 import com.google.api.gax.core.ExecutorProvider;
 import com.google.api.gax.core.FixedExecutorProvider;
@@ -9,7 +9,6 @@ import org.springframework.cloud.gcp.autoconfigure.pubsub.GcpPubSubAutoConfigura
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 /**
@@ -17,7 +16,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
  */
 @Configuration
 @AutoConfigureBefore(GcpPubSubAutoConfiguration.class)
-@Import(GooglePubSubCamelComponentConfig.class)
 @ComponentScan("org.entur.pubsub")
 public class GooglePubSubConfig {
 

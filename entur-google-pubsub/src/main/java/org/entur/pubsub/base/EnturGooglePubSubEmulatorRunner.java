@@ -1,4 +1,4 @@
-package org.entur.pubsub;
+package org.entur.pubsub.base;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,8 +20,11 @@ public class EnturGooglePubSubEmulatorRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(EnturGooglePubSubEmulatorRunner.class);
 
-    @Value("${marduk.pubsub.emulator.path:target/pubsub-emulator/pubsub-emulator-0.1-SNAPSHOT.jar}")
+    @Value("${entur.pubsub.emulator.path:target/pubsub-emulator/pubsub-emulator-0.1-SNAPSHOT.jar}")
     private String pathToEmulator;
+
+    @Value("${spring.cloud.gcp.pubsub.emulatorHost:localhost:8089}")
+    private String emulatorHostAndPort;
 
 
     private final RunProcess pubsubEmulatorProcess;
@@ -41,7 +44,13 @@ public class EnturGooglePubSubEmulatorRunner {
             if(!emulatorExecutable.exists()) {
                 throw new IllegalStateException("Google PubSub Emulator not found at " + pathToEmulator + ".\n The emulator can be installed with the following command:\n gcloud -q components install pubsub-emulator ");
             }
-            pubsubEmulatorProcess.run(false, "-jar", pathToEmulator, "--port=8089");
+
+            String[] splitEmulatorHostAndPort = emulatorHostAndPort.split(":");
+            if(splitEmulatorHostAndPort.length != 2) {
+                throw new IllegalStateException("The property 'spring.cloud.gcp.pubsub.emulatorHost' should follow the pattern 'host:port'");
+            }
+            String emulatorPort = splitEmulatorHostAndPort[1];
+            pubsubEmulatorProcess.run(false, "-jar", pathToEmulator, "--port=" + emulatorPort);
             // wait for the emulator to start up
             Thread.sleep(2000);
             logger.info("Started Google PubSub Emulator");

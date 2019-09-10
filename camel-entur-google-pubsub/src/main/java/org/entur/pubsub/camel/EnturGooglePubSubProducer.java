@@ -1,4 +1,4 @@
-package org.entur.pubsub;
+package org.entur.pubsub.camel;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultProducer;
@@ -7,9 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gcp.pubsub.core.PubSubTemplate;
 
 import java.util.*;
-
-import static org.entur.pubsub.EnturGooglePubSubConstants.GOOGLE_PUB_SUB_HEADER_PREFIX;
-import static org.entur.pubsub.EnturGooglePubSubConstants.GOOGLE_PUB_SUB_MAX_ATTR_LENGTH;
 
 public class EnturGooglePubSubProducer extends DefaultProducer {
 
@@ -69,8 +66,8 @@ public class EnturGooglePubSubProducer extends DefaultProducer {
             Map<String, String> pubSubAttributes = new HashMap<>();
 
             exchange.getIn().getHeaders().entrySet().stream()
-                    .filter(entry -> !entry.getKey().startsWith(GOOGLE_PUB_SUB_HEADER_PREFIX))
-                    .filter(entry -> Objects.toString(entry.getValue(), "").length() <= GOOGLE_PUB_SUB_MAX_ATTR_LENGTH)
+                    .filter(entry -> !entry.getKey().startsWith(EnturGooglePubSubConstants.GOOGLE_PUB_SUB_HEADER_PREFIX))
+                    .filter(entry -> Objects.toString(entry.getValue(), "").length() <= EnturGooglePubSubConstants.GOOGLE_PUB_SUB_MAX_ATTR_LENGTH)
                     .forEach(entry -> pubSubAttributes.put(entry.getKey(), Objects.toString(entry.getValue())));
             pubSubTemplate.publish(endpoint.getDestinationName(), body, pubSubAttributes);
         }

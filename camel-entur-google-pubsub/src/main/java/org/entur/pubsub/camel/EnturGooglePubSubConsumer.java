@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.entur.pubsub;
+package org.entur.pubsub.camel;
 
 import com.google.cloud.pubsub.v1.Subscriber;
 import com.google.pubsub.v1.PubsubMessage;
@@ -31,8 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-
-import static org.entur.pubsub.EnturGooglePubSubConstants.GOOGLE_PUB_SUB_HEADER_PREFIX;
 
 public class EnturGooglePubSubConsumer extends DefaultConsumer {
 
@@ -81,7 +79,7 @@ public class EnturGooglePubSubConsumer extends DefaultConsumer {
                 Map<String, String> pubSubAttributes = pubsubMessage.getAttributesMap();
                 if (pubSubAttributes != null) {
                     pubSubAttributes.entrySet()
-                            .stream().filter(entry -> !entry.getKey().startsWith(GOOGLE_PUB_SUB_HEADER_PREFIX))
+                            .stream().filter(entry -> !entry.getKey().startsWith(EnturGooglePubSubConstants.GOOGLE_PUB_SUB_HEADER_PREFIX))
                             .forEach(entry -> exchange.getIn().setHeader(entry.getKey(), entry.getValue()));
                 }
 
