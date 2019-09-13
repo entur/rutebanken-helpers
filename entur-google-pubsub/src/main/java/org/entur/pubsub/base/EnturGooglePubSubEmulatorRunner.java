@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -37,6 +38,7 @@ public class EnturGooglePubSubEmulatorRunner {
     }
 
     @EventListener
+    @Order(50)
     public void handleContextRefreshed(ContextRefreshedEvent contextRefreshedEvent) throws InterruptedException {
         try {
             logger.info("Starting Google PubSub Emulator");
@@ -60,6 +62,7 @@ public class EnturGooglePubSubEmulatorRunner {
     }
 
     @EventListener
+    @Order(150)
     public void handleContextClosedEvent(ContextClosedEvent contextClosedEvent) {
         if (pubsubEmulatorProcess != null) {
             logger.info("Stopping Google PubSub Emulator");
