@@ -9,11 +9,20 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
 
+
+/**
+ * Start a PubSub emulator in a separate process. Used for automated testing.
+ * The emulator is started as early as possible after the Spring context initialization is complete,
+ * and stopped as late as possible on context shutdown.
+ *
+ */
 @Profile("google-pubsub-emulator")
 @Component
 public class EnturGooglePubSubEmulatorRunner {
@@ -37,6 +46,7 @@ public class EnturGooglePubSubEmulatorRunner {
     }
 
     @EventListener
+    @Order(Ordered.HIGHEST_PRECEDENCE)
     public void handleContextRefreshed(ContextRefreshedEvent contextRefreshedEvent) throws InterruptedException {
         try {
             logger.info("Starting Google PubSub Emulator");
