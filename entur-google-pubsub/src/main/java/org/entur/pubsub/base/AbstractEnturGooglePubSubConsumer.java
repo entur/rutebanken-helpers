@@ -10,6 +10,7 @@ import org.springframework.cloud.gcp.pubsub.support.BasicAcknowledgeablePubsubMe
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
 import java.util.ArrayList;
@@ -17,6 +18,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+
+/**
+ * Base class for PubSub message consumers.
+ * Consumers are started as late as possible after the Spring context initialization is complete,
+ * and stopped as early as possible on context shutdown.
+ */
 public abstract class AbstractEnturGooglePubSubConsumer {
 
     @Autowired
@@ -37,7 +44,6 @@ public abstract class AbstractEnturGooglePubSubConsumer {
     protected abstract void onMessage(byte[] content, Map<String, String> headers);
 
     @EventListener
-    @Order(100)
     public void handleContextRefreshed(ContextRefreshedEvent contextRefreshedEvent) throws InterruptedException {
 
 
@@ -66,7 +72,7 @@ public abstract class AbstractEnturGooglePubSubConsumer {
     }
 
     @EventListener
-    @Order(100)
+    @Order(Ordered.HIGHEST_PRECEDENCE)
     public void handleContextClosedEvent(ContextClosedEvent contextClosedEvent) {
         logger.info("Stopping Google PubSub consumer for subscription {}", getDestinationName());
         for (Subscriber subscriber : subscribers) {
