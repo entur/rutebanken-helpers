@@ -59,7 +59,13 @@ public abstract class AbstractEnturGooglePubSubConsumer {
                 if (logger.isTraceEnabled()) {
                     logger.trace("Received message ID : {}", pubsubMessage.getMessageId());
                 }
-                onMessage(pubsubMessage.getData().toByteArray(), pubsubMessage.getAttributesMap());
+                try {
+                    onMessage(pubsubMessage.getData().toByteArray(), pubsubMessage.getAttributesMap());
+                    basicAcknowledgeablePubsubMessage.ack();
+                } catch (Exception e) {
+                    basicAcknowledgeablePubsubMessage.nack();
+                    logger.error("Event processing failed", e);
+                }
             }
         };
         for (int i = 0; i < getConcurrentConsumers(); i++) {
