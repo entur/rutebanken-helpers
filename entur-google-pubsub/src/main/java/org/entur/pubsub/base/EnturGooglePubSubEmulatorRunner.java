@@ -2,9 +2,11 @@ package org.entur.pubsub.base;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.loader.tools.JavaExecutable;
 import org.springframework.boot.loader.tools.RunProcess;
+import org.springframework.cloud.gcp.pubsub.PubSubAdmin;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -35,6 +37,9 @@ public class EnturGooglePubSubEmulatorRunner {
     @Value("${spring.cloud.gcp.pubsub.emulatorHost:localhost:8089}")
     private String emulatorHostAndPort;
 
+    @Autowired
+    private PubSubAdmin pubSubAdmin;
+
 
     private final RunProcess pubsubEmulatorProcess;
 
@@ -62,7 +67,16 @@ public class EnturGooglePubSubEmulatorRunner {
             String emulatorPort = splitEmulatorHostAndPort[1];
             pubsubEmulatorProcess.run(false, "-jar", pathToEmulator, "--port=" + emulatorPort);
             // wait for the emulator to start up
-            Thread.sleep(2000);
+            boolean ready = false;
+            do {
+                try {
+                    pubSubAdmin.listTopics();
+                    ready = true;
+                } catch (Exception e) {
+                    logger.info("Google PubSub Emulator initialization in progress...");
+                    Thread.sleep(2000);
+                }
+            } while (!ready);
             logger.info("Started Google PubSub Emulator");
         } catch (IOException e) {
             throw new RuntimeException(e);

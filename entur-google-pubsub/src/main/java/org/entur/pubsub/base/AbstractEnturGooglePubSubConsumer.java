@@ -24,7 +24,7 @@ import java.util.function.Consumer;
  * Consumers are started as late as possible after the Spring context initialization is complete,
  * and stopped as early as possible on context shutdown.
  */
-public abstract class AbstractEnturGooglePubSubConsumer {
+public abstract class AbstractEnturGooglePubSubConsumer implements EnturGooglePubSubConsumer {
 
     @Autowired
     private EnturGooglePubSubAdmin enturGooglePubSubAdmin;
@@ -40,8 +40,6 @@ public abstract class AbstractEnturGooglePubSubConsumer {
     protected int getConcurrentConsumers() {
         return 1;
     }
-
-    protected abstract void onMessage(byte[] content, Map<String, String> headers);
 
     @EventListener
     public void handleContextRefreshed(ContextRefreshedEvent contextRefreshedEvent) throws InterruptedException {

@@ -51,9 +51,54 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-loader-tools</artifactId>
         </dependency>
+
+        <!-- Testing -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-pubsub-emulator</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <artifactItems>
+                        <artifactItem>
+                            <groupId>com.google.cloud</groupId>
+                            <artifactId>pubsub-emulator</artifactId>
+                            <version>0.1-SNAPSHOT</version>
+                            <type>jar</type>
+                            <overWrite>true</overWrite>
+                            <outputDirectory>${project.build.directory}/pubsub-emulator</outputDirectory>
+                        </artifactItem>
+                    </artifactItems>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 
 </project>
