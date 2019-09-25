@@ -70,9 +70,15 @@ public class EnturGooglePubSubEndpoint extends DefaultEndpoint {
         this.projectId = projectId;
     }
 
+
     public EnturGooglePubSubConstants.AckMode getAckMode() {
         return ackMode;
     }
+
+    public void setAckMode(EnturGooglePubSubConstants.AckMode ackMode) {
+        this.ackMode = ackMode;
+    }
+
 
     public Integer getConcurrentConsumers() {
         return concurrentConsumers;
