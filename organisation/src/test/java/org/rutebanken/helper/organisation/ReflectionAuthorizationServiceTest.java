@@ -77,7 +77,7 @@ public class ReflectionAuthorizationServiceTest {
 
     @Test
     public void authorizedForLegalStopPlaceTypesWhenOthersBlacklisted() {
-        var roleAssignment = RoleAssignment.builder()
+        RoleAssignment roleAssignment = RoleAssignment.builder()
                 .withRole("editStops")
                 .withAdministrativeZone("01")
                 .withOrganisation("OST")
@@ -99,11 +99,11 @@ public class ReflectionAuthorizationServiceTest {
     @Test
     public void authorizedWithCombinationOfTwoFields() {
 
-        var stopPlace = new StopPlace();
+        StopPlace stopPlace = new StopPlace();
         stopPlace.stopPlaceType = StopPlace.StopPlaceType.ONSTREET_BUS;
         stopPlace.someField1 = "nationalPassengerFerry";
 
-        var roleAssignment = RoleAssignment.builder()
+        RoleAssignment roleAssignment = RoleAssignment.builder()
                 .withRole("editStops")
                 .withAdministrativeZone("01")
                 .withOrganisation("OST")
