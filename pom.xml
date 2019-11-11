@@ -160,17 +160,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
             </plugin>
-            <plugin>
-                <groupId>org.owasp</groupId>
-                <artifactId>dependency-check-maven</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
     <profiles>
@@ -273,6 +262,7 @@
         <module>organisation</module>
         <module>jms-batch</module>
         <module>hubot</module>
+        <module>slack</module>
         <module>entur-google-pubsub</module>
         <module>camel-entur-google-pubsub</module>
     </modules>
