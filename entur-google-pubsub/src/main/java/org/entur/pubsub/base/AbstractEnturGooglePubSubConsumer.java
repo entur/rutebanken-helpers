@@ -5,6 +5,7 @@ import com.google.pubsub.v1.PubsubMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gcp.pubsub.core.PubSubTemplate;
 import org.springframework.cloud.gcp.pubsub.support.BasicAcknowledgeablePubsubMessage;
 import org.springframework.context.event.ContextClosedEvent;
@@ -31,6 +32,9 @@ public abstract class AbstractEnturGooglePubSubConsumer implements EnturGooglePu
 
     @Autowired
     private PubSubTemplate pubSubTemplate;
+
+    @Value("${entur.pubsub.consumer.retry.delay:15000}")
+    private long retryDelay;
 
     private List<Subscriber> subscribers = new ArrayList<>();
     private Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -62,7 +66,8 @@ public abstract class AbstractEnturGooglePubSubConsumer implements EnturGooglePu
                     basicAcknowledgeablePubsubMessage.ack();
                 } catch (Exception e) {
                     basicAcknowledgeablePubsubMessage.nack();
-                    logger.error("Event processing failed", e);
+                    logger.error("Message processing failed, retrying in " + retryDelay + " milliseconds", e);
+                    delay(retryDelay);
                 }
             }
         };
@@ -73,6 +78,19 @@ public abstract class AbstractEnturGooglePubSubConsumer implements EnturGooglePu
 
         logger.info("Initialized PubSub consumers for destination {}", getDestinationName());
 
+    }
+
+    /**
+     * Wait for the number of specified milliseconds.
+     * @param delay delay in milliseconds
+     */
+    private void delay(long delay) {
+        try {
+            Thread.sleep(delay);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        }
     }
 
     @EventListener
