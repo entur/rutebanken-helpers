@@ -66,6 +66,8 @@ public class EnturGooglePubSubProducer extends DefaultProducer {
             Map<String, String> pubSubAttributes = new HashMap<>();
 
             exchange.getIn().getHeaders().entrySet().stream()
+                    // filter headers with null value (same behaviour as Camel ActiveMQ component)
+                    .filter(entry -> entry.getValue() != null)
                     .filter(entry -> !entry.getKey().startsWith(EnturGooglePubSubConstants.GOOGLE_PUB_SUB_HEADER_PREFIX))
                     .filter(entry -> Objects.toString(entry.getValue(), "").length() <= EnturGooglePubSubConstants.GOOGLE_PUB_SUB_MAX_ATTR_LENGTH)
                     .forEach(entry -> pubSubAttributes.put(entry.getKey(), Objects.toString(entry.getValue())));
