@@ -54,6 +54,11 @@
     </organization>
 
     <distributionManagement>
+        <repository>
+            <id>central</id>
+            <name>entur2-releases</name>
+            <url>https://entur2.jfrog.io/entur2/libs-release-local</url>
+        </repository>
         <snapshotRepository>
             <id>snapshots</id>
             <name>entur2-snapshots</name>
