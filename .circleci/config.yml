@@ -59,6 +59,6 @@ workflows:
         context: org-carbon
         requires:
         - test
-        #filters:
-        #  branches:
-        #    only: master
+        filters:
+          branches:
+            only: master
