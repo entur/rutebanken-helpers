@@ -31,7 +31,7 @@ public class EnturGooglePubSubEmulatorRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(EnturGooglePubSubEmulatorRunner.class);
 
-    @Value("${entur.pubsub.emulator.path:target/pubsub-emulator/pubsub-emulator-0.1-SNAPSHOT.jar}")
+    @Value("${entur.pubsub.emulator.path:target/pubsub-emulator/pubsub-emulator.jar}")
     private String pathToEmulator;
 
     @Value("${spring.cloud.gcp.pubsub.emulatorHost:localhost:8089}")
