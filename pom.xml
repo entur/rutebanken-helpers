@@ -28,7 +28,7 @@
 
     <groupId>org.entur.helpers</groupId>
     <artifactId>helper</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.3</version>
 
     <name>rutebanken-helper</name>
     <description>Library artifacts collected and to be used as tools in other projects.</description>
@@ -46,7 +46,7 @@
         <connection>scm:git:ssh://git@github.com/entur/rutebanken-helpers.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/entur/rutebanken-helpers.git</developerConnection>
         <url>https://github.com/entur/rutebanken-helpers/tree/master</url>
-      <tag>HEAD</tag>
+      <tag>helper-1.0.3</tag>
   </scm>
 
     <organization>
