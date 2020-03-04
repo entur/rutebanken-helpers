@@ -140,20 +140,17 @@
             <plugins>
 
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-release-plugin</artifactId>
+                    <groupId>com.amashchenko.maven.plugin</groupId>
+                    <artifactId>gitflow-maven-plugin</artifactId>
+                    <version>1.14.0</version>
                     <configuration>
-                        <autoVersionSubmodules>true</autoVersionSubmodules>
-                        <!-- Tests are already run in the first stage of the CI pipeline-->
-                        <arguments>-DskipTests</arguments>
+                        <allowSnapshots>false</allowSnapshots>
+                        <gitFlowConfig>
+                            <productionBranch>add_git_tag_during_release</productionBranch>
+                            <developmentBranch>add_git_tag_during_release</developmentBranch>
+                        </gitFlowConfig>
                     </configuration>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.apache.maven.scm</groupId>
-                            <artifactId>maven-scm-provider-gitexe</artifactId>
-                            <version>1.9.2</version>
-                        </dependency>
-                    </dependencies>
+
                 </plugin>
             </plugins>
         </pluginManagement>
