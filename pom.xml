@@ -79,9 +79,6 @@
         <spring-cloud-gcp.version>1.2.1.RELEASE</spring-cloud-gcp.version>
         <camel.version>2.25.0</camel.version>
 
-        <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
-        <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
-
     </properties>
 
     <dependencyManagement>
