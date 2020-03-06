@@ -133,10 +133,16 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
+                <groupId>com.amashchenko.maven.plugin</groupId>
+                <artifactId>gitflow-maven-plugin</artifactId>
+                <version>1.14.0</version>
                 <configuration>
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <allowSnapshots>false</allowSnapshots>
+                    <fetchRemote>false</fetchRemote>
+                    <gitFlowConfig>
+                        <productionBranch>add_git_tag_during_release</productionBranch>
+                        <developmentBranch>add_git_tag_during_release</developmentBranch>
+                    </gitFlowConfig>
                 </configuration>
             </plugin>
         </plugins>
