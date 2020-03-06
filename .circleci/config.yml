@@ -49,7 +49,8 @@ jobs:
         paths:
         - ~/.m2
         key: dep-cache-{{ checksum "pom.xml" }}
-    - run: mvn gitflow:release-start gitflow:release-finish -DpostReleaseGoals=deploy -B -s /tools/m2/settings.xml
+    - run: mvn release:prepare -B -s /tools/m2/settings.xml -Darguments='-s /tools/m2/settings.xml'
+    - run: mvn release:perform -B -s /tools/m2/settings.xml -Darguments='-s /tools/m2/settings.xml'
 workflows:
   version: 2
   build_test_deploy:
