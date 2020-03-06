@@ -13,13 +13,13 @@ jobs:
     - restore_cache:
         key: dep-cache-{{ checksum "pom.xml" }}
     # Use forked version of the dependency plugin to handle correctly inter-module dependencies (https://issues.apache.org/jira/browse/MDEP-568)
-    - run: mvn com.offbytwo.maven.plugins:maven-dependency-plugin:3.1.1.MDEP568:go-offline -DexcludeGroupIds=org.entur.helpers -s ./.circleci/settings.xml
+    - run: mvn com.offbytwo.maven.plugins:maven-dependency-plugin:3.1.1.MDEP568:go-offline -DexcludeGroupIds=org.entur.helpers -s /tools/m2/settings.xml
     - save_cache:
         paths:
         - ~/.m2
         key: dep-cache-{{ checksum "pom.xml" }}
     # Cannot use -o because of snapshot dependencies.
-    - run: mvn test -s ./.circleci/settings.xml
+    - run: mvn test -s /tools/m2/settings.xml
     - run:
         name: Save test results
         command: |
@@ -30,7 +30,7 @@ jobs:
         path: ~/junit
     - store_artifacts:
         path: ~/junit
-  deploy-nexus:
+  deploy-artifactory:
     docker:
     - image: eu.gcr.io/entur-system-1287/circleci-toolbox-image-java11
       auth:
@@ -39,6 +39,8 @@ jobs:
     environment:
       MAVEN_OPTS: -Xmx3G
     steps:
+    - run: git config --global user.email "circleci@entur.no"
+    - run: git config --global user.name "circleci"
     - checkout
     - restore_cache:
         key: dep-cache-{{ checksum "pom.xml" }}
@@ -47,15 +49,14 @@ jobs:
         paths:
         - ~/.m2
         key: dep-cache-{{ checksum "pom.xml" }}
-    # Cannot use -o because of snapshot dependencies.
-    - run: mvn deploy -s ./.circleci/settings.xml -DskipTests
+    - run: mvn gitflow:release -B -s /tools/m2/settings.xml -DargLine='-s /tools/m2/settings.xml' -DpostReleaseGoals=deploy -DskipTestProject=true
 workflows:
   version: 2
   build_test_deploy:
     jobs:
     - test:
         context: org-carbon
-    - deploy-nexus:
+    - deploy-artifactory:
         context: org-carbon
         requires:
         - test
