@@ -49,7 +49,7 @@ jobs:
         paths:
         - ~/.m2
         key: dep-cache-{{ checksum "pom.xml" }}
-    - run: mvn gitflow:release -B -s /tools/m2/settings.xml -DargLine='-s /tools/m2/settings.xml' -DpostReleaseGoals=deploy
+    - run: mvn gitflow:release -B -s /tools/m2/settings.xml -DargLine='-s /tools/m2/settings.xml' -DpostReleaseGoals=deploy -DskipTestProject=true
 workflows:
   version: 2
   build_test_deploy:
@@ -60,6 +60,6 @@ workflows:
         context: org-carbon
         requires:
         - test
-        #filters:
-        #  branches:
-        #    only: master
+        filters:
+          branches:
+            only: master

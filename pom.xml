@@ -140,8 +140,8 @@
                     <allowSnapshots>false</allowSnapshots>
                     <fetchRemote>false</fetchRemote>
                     <gitFlowConfig>
-                        <productionBranch>add_git_tag_during_release</productionBranch>
-                        <developmentBranch>add_git_tag_during_release</developmentBranch>
+                        <productionBranch>master</productionBranch>
+                        <developmentBranch>master</developmentBranch>
                     </gitFlowConfig>
                 </configuration>
             </plugin>
