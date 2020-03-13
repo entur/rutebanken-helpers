@@ -143,6 +143,10 @@
                         <productionBranch>master</productionBranch>
                         <developmentBranch>master</developmentBranch>
                     </gitFlowConfig>
+                    <commitMessages>
+                        <releaseFinishMessage>Update for next development version [ci skip]</releaseFinishMessage>
+                        <releaseVersionUpdateMessage>Update for next development version [ci skip]</releaseVersionUpdateMessage>
+                    </commitMessages>
                 </configuration>
             </plugin>
         </plugins>
