@@ -24,7 +24,7 @@ public class EnturGooglePubSubProducer extends DefaultProducer {
     public void process(Exchange exchange) {
         List<Exchange> entryList = prepareExchangeList(exchange);
 
-        if (entryList == null || entryList.size() == 0) {
+        if (entryList == null || entryList.isEmpty()) {
             logger.warn("The incoming message is either null or empty. Triggered by an aggregation timeout?");
             return;
         }

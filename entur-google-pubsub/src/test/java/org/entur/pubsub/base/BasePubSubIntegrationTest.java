@@ -8,7 +8,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = AppTest.class)
+@SpringBootTest(classes = TestApp.class)
 @ActiveProfiles({"google-pubsub-emulator"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public abstract class BasePubSubIntegrationTest {

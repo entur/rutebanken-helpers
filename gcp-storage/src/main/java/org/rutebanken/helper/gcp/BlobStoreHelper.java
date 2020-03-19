@@ -130,7 +130,7 @@ public class BlobStoreHelper {
         return blob;
     }
 
-    private static WriteChannel writeWithRetry(BlobId blobId, ByteBuffer buffer, WriteChannel writer) throws IOException {
+    private static WriteChannel writeWithRetry(BlobId blobId, ByteBuffer buffer, WriteChannel writer) {
         Iterator<Integer> backOffSecItr = RETRY_BACKOFF_SECONDS.iterator();
         boolean doTry = true;
         writer.setChunkSize(buffer.limit());

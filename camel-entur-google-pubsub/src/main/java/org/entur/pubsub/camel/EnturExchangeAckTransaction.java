@@ -17,7 +17,7 @@ public class EnturExchangeAckTransaction implements Synchronization {
      */
     @Override
     public void onComplete(Exchange exchange) {
-        logger.debug("Acknowledging message after successful processing for Exchange " + exchange.getExchangeId());
+        logger.debug("Acknowledging message after successful processing for Exchange {}", exchange.getExchangeId());
         getAck(exchange).ack();
     }
 
@@ -28,7 +28,7 @@ public class EnturExchangeAckTransaction implements Synchronization {
      */
     @Override
     public void onFailure(Exchange exchange) {
-        logger.debug("Acknowledging message after failed processing for Exchange " + exchange.getExchangeId());
+        logger.debug("Acknowledging message after failed processing for Exchang {}", exchange.getExchangeId());
         getAck(exchange).nack();
     }
 

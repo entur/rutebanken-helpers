@@ -24,16 +24,16 @@ public class EnturGooglePubSubAdmin {
         if (autocreate) {
             try {
                 pubSubAdmin.createTopic(destinationName);
-                logger.debug("Created topic: " + destinationName);
+                logger.debug("Created topic: {}", destinationName);
             } catch (AlreadyExistsException e) {
-                logger.trace("Did not create topic: " + destinationName + " ,as it already exists");
+                logger.trace("Did not create topic: {}, as it already exists", destinationName);
             }
 
             try {
                 pubSubAdmin.createSubscription(destinationName, destinationName);
-                logger.debug("Created subscription: " + destinationName);
+                logger.debug("Created subscription: {}", destinationName);
             } catch (AlreadyExistsException e) {
-                logger.trace("Did not create subscription: " + destinationName + " ,as it already exists");
+                logger.trace("Did not create subscription: {}, as it already exists", destinationName);
             }
         }
     }
