@@ -16,21 +16,28 @@
 
 package org.rutebanken.helper.gcp;
 
-import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.api.gax.paging.Page;
+import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.cloud.ReadChannel;
 import com.google.cloud.WriteChannel;
-import com.google.cloud.storage.*;
+import com.google.cloud.storage.Acl;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import com.google.common.collect.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -38,50 +45,18 @@ import java.util.List;
 
 public class BlobStoreHelper {
 
-    private static Logger logger = LoggerFactory.getLogger(BlobStoreHelper.class);
-
-    private static final long FILE_SIZE_LIMIT = 1_000_000;
-    private static final int BUFFER_CHUNK_SIZE = 1024;
+    private static final Logger LOGGER = LoggerFactory.getLogger(BlobStoreHelper.class);
 
     private static final int BUFFER_CHUNK_SIZE_RETRY_UPLOAD = 1024 * 1024;
-
     private static final List<Integer> RETRY_BACKOFF_SECONDS = Arrays.asList(0, 5, 30);
 
-
-
-    private BlobStoreHelper(){
-
+    private BlobStoreHelper() {
     }
 
-    public static Iterator<Blob> listAllBlobsRecursively(Storage storage, String containerName, String prefix){
-        logger.debug("Listing blobs in bucket " + containerName + " with prefix " + prefix + " recursively.");
+    public static Iterator<Blob> listAllBlobsRecursively(Storage storage, String containerName, String prefix) {
+        LOGGER.debug("Listing blobs in bucket {} with prefix {} recursively.", containerName, prefix);
         Page<Blob> blobs = storage.list(containerName, Storage.BlobListOption.prefix(prefix));
         return blobs.iterateAll().iterator();
-    }
-
-    /**
-     * Deprecated as underlying API method is deprecated. Use byte[] content version or uploadWithRetry.
-     */
-    @Deprecated
-    public static Blob uploadBlob(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic) {
-        return uploadBlob(storage, containerName, name, inputStream, makePublic, "application/octet-stream");
-    }
-
-    /**
-     * Deprecated as underlying API method is deprecated. Use byte[] content version or uploadWithRetry.
-     */
-    @Deprecated
-    public static Blob uploadBlob(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic, String contentType) {
-        logger.debug("Uploading blob " + name + " to bucket " + containerName);
-        BlobId blobId = BlobId.of(containerName, name);
-        BlobInfo.Builder builder = BlobInfo.newBuilder(blobId).setContentType(contentType);
-        if (makePublic) {
-            builder.setAcl(ImmutableList.of(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER)));
-        }
-        BlobInfo blobInfo = builder.build();
-        Blob blob = storage.create(blobInfo, inputStream);
-        logger.debug("Stored blob with name '" + blob.getName() + "' and size '" + blob.getSize() + "' in bucket '" + blob.getBucket() + "'");
-        return blob;
     }
 
     public static Blob uploadBlob(Storage storage, String containerName, String name, byte[] content, boolean makePublic) {
@@ -89,7 +64,7 @@ public class BlobStoreHelper {
     }
 
     public static Blob uploadBlob(Storage storage, String containerName, String name, byte[] content, boolean makePublic, String contentType) {
-        logger.debug("Uploading blob " + name + " to bucket " + containerName);
+        LOGGER.debug("Uploading blob {} to bucket {}", name, containerName);
         BlobId blobId = BlobId.of(containerName, name);
         BlobInfo.Builder builder = BlobInfo.newBuilder(blobId).setContentType(contentType);
         if (makePublic) {
@@ -97,7 +72,7 @@ public class BlobStoreHelper {
         }
         BlobInfo blobInfo = builder.build();
         Blob blob = storage.create(blobInfo, content);
-        logger.debug("Stored blob with name '" + blob.getName() + "' and size '" + blob.getSize() + "' in bucket '" + blob.getBucket() + "'");
+        LOGGER.debug("Stored blob with name '{}' and size '{}' in bucket '{}'", blob.getName(), blob.getSize(), blob.getBucket());
         return blob;
     }
 
@@ -106,7 +81,7 @@ public class BlobStoreHelper {
     }
 
     public static Blob uploadBlobWithRetry(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic, String contentType) {
-        logger.debug("Uploading blob " + name + " to bucket " + containerName);
+        LOGGER.debug("Uploading blob {} to bucket {}", name, containerName);
         BlobId blobId = BlobId.of(containerName, name);
         BlobInfo.Builder builder = BlobInfo.newBuilder(blobId).setContentType(contentType);
         if (makePublic) {
@@ -117,84 +92,53 @@ public class BlobStoreHelper {
         byte[] buffer = new byte[BUFFER_CHUNK_SIZE_RETRY_UPLOAD];
 
         try (WriteChannel orgChannel = storage.writer(blobInfo)) {
-            WriteChannel writer = orgChannel;
             int bytesRead;
             while ((bytesRead = inputStream.read(buffer)) > 0) {
-                writer = writeWithRetry(blobId, ByteBuffer.wrap(buffer, 0, bytesRead), writer);
+                writeWithRetry(blobId, ByteBuffer.wrap(buffer, 0, bytesRead), orgChannel);
             }
         } catch (IOException ioE) {
-            throw new RuntimeException("Blob upload of blob with name '" + blobId.getName() + "' failed: " + ioE.getMessage(), ioE);
+            throw new BlobStoreException("Blob upload of blob with name '" + blobId.getName() + "' failed: " + ioE.getMessage(), ioE);
         }
         Blob blob = storage.get(blobId);
-        logger.debug("Stored blob with name '" + blob.getName() + "' and size '" + blob.getSize() + "' in bucket '" + blob.getBucket() + "'");
+        LOGGER.debug("Stored blob with name '{}' and size '{}' in bucket '{}'", blob.getName(), blob.getSize(), blob.getBucket());
         return blob;
     }
 
-    private static WriteChannel writeWithRetry(BlobId blobId, ByteBuffer buffer, WriteChannel writer) throws IOException {
+    private static void writeWithRetry(BlobId blobId, ByteBuffer buffer, WriteChannel writer) {
         Iterator<Integer> backOffSecItr = RETRY_BACKOFF_SECONDS.iterator();
         boolean doTry = true;
         writer.setChunkSize(buffer.limit());
         while (doTry) {
-
             try {
                 writer.write(buffer);
                 doTry = false;
             } catch (Exception e) {
                 if (backOffSecItr.hasNext()) {
                     Integer backOffSec = backOffSecItr.next();
-                    logger.info("Blob upload of blob with name '" + blobId.getName() + "' failed  for chunk. Attempting retry in: " + backOffSec + " seconds. Error: " + e.getMessage());
+                    LOGGER.info("Blob upload of blob with name '{}' failed  for chunk. Attempting retry in {} seconds. Error: {}", blobId.getName(), backOffSec, e.getMessage());
                     try {
-                        Thread.sleep(backOffSec * 1000);
+                        Thread.sleep(backOffSec * 1000L);
                     } catch (InterruptedException ie) {
-                        throw new RuntimeException("Interrupted while waiting to retry upload of blob with name '" + blobId.getName() + "' ", ie);
+                        Thread.currentThread().interrupt();
+                        throw new BlobStoreException("Interrupted while waiting to retry upload of blob with name '" + blobId.getName() + "' ", ie);
                     }
                 } else {
-                    throw new RuntimeException("Blob upload of blob with name '" + blobId.getName() + "' failed. No more retries available. Error: " + e.getMessage());
+                    throw new BlobStoreException("Blob upload of blob with name '" + blobId.getName() + "' failed. No more retries available. Error: " + e.getMessage());
                 }
 
             }
         }
-        return writer;
-
-    }
-
-
-    @Deprecated
-    public static void uploadBlob(Storage storage, String containerName, String blobPath, Path filePath, boolean makePublic) throws Exception {
-        logger.debug("Uploading blob " + filePath.getFileName().toString() + " to bucket " + containerName);
-        String blobIdName = blobPath + filePath.getFileName().toString();
-        BlobId blobId = BlobId.of(containerName, blobIdName);
-        BlobInfo.Builder builder = BlobInfo.newBuilder(blobId).setContentType("application/octet-stream");
-        if (makePublic) {
-            builder.setAcl(ImmutableList.of(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER)));
-        }
-        BlobInfo blobInfo = builder.build();
-        if (Files.size(filePath) > FILE_SIZE_LIMIT) {
-            try (WriteChannel writer = storage.writer(blobInfo)) {
-                byte[] buffer = new byte[BUFFER_CHUNK_SIZE];
-                try (InputStream inputStream = Files.newInputStream(filePath)) {
-                    int limit;
-                    while ((limit = inputStream.read(buffer)) >= 0) {
-                        writer.write(ByteBuffer.wrap(buffer, 0, limit));
-                    }
-                }
-            }
-        } else {
-            byte[] bytes = Files.readAllBytes(filePath);
-            storage.create(blobInfo, bytes);
-        }
-        logger.debug("Stored blob with name '" + blobInfo.getName() + "' and size '" + blobInfo.getSize() + "' in bucket '" + blobInfo.getBucket() + "'");
     }
 
     public static InputStream getBlob(Storage storage, String containerName, String name) {
-        logger.debug("Fetching blob " + name + " from bucket " + containerName);
+        LOGGER.debug("Fetching blob {} from bucket {}", name, containerName);
         BlobId blobId = BlobId.of(containerName, name);
         Blob blob = storage.get(blobId);
         InputStream result = null;
         if (blob != null) {
-            try (ReadChannel reader = blob.reader()) {
-                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                WritableByteChannel channel = Channels.newChannel(outputStream);
+            try (ReadChannel reader = blob.reader();
+                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                 WritableByteChannel channel = Channels.newChannel(outputStream)) {
                 ByteBuffer bytes = ByteBuffer.allocate(64 * 1024);
                 while (reader.read(bytes) > 0) {
                     bytes.flip();
@@ -202,12 +146,12 @@ public class BlobStoreHelper {
                     bytes.clear();
                 }
                 result = new ByteArrayInputStream(outputStream.toByteArray());
-                logger.debug("Retrieved blob with name '" + blob.getName() + "' and size '" + blob.getSize() + "' from bucket '" + blob.getBucket() + "'");
-            } catch (IOException e){
-                throw new RuntimeException(e);
+                LOGGER.debug("Retrieved blob with name '{}' and size '{}' from bucket '{}'", blob.getName(), blob.getSize(), blob.getBucket());
+            } catch (IOException e) {
+                throw new BlobStoreException(e);
             }
         } else {
-            logger.warn("Could not find '" + blobId.getName() + "' in bucket '" + blobId.getBucket() + "'");
+            LOGGER.info("File '{}' in bucket '{}' does not exist", blobId.getName(), blobId.getBucket());
         }
         return result;
     }
@@ -222,19 +166,17 @@ public class BlobStoreHelper {
         if (blobIdList.isEmpty()) {
             return false;
         }
-
-
         return storage.delete(blobIdList).stream().allMatch(ret -> ret);
     }
 
     public static Storage getStorage(String credentialPath, String projectId) {
         try {
-              return StorageOptions.newBuilder()
+            return StorageOptions.newBuilder()
                     .setCredentials(ServiceAccountCredentials.fromStream(new FileInputStream(credentialPath)))
                     .setProjectId(projectId)
                     .build().getService();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new BlobStoreException(e);
         }
     }
 

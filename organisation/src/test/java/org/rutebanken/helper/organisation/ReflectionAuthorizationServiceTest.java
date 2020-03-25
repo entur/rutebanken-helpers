@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.springframework.security.core.Authentication;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -113,7 +114,7 @@ public class ReflectionAuthorizationServiceTest {
                 .withEntityClassification("combinedField", "!railReplacementBus")
                 .build();
 
-        fieldMappings.put("combinedfield", Arrays.asList("someField1"));
+        fieldMappings.put("combinedfield", Collections.singletonList("someField1"));
 
         boolean authorized = reflectionAuthorizationService.authorized(roleAssignment, stopPlace, roleAssignment.r);
         assertThat(authorized, is(true));
@@ -138,7 +139,7 @@ public class ReflectionAuthorizationServiceTest {
                 .withEntityClassification("combinedField", "!"+railReplacementBus)
                 .build();
 
-        fieldMappings.put("combinedfield", Arrays.asList("someField1"));
+        fieldMappings.put("combinedfield", Collections.singletonList("someField1"));
 
         boolean authorized = reflectionAuthorizationService.authorized(roleAssignment, stopPlace, roleAssignment.r);
         assertThat(railReplacementBus + " not allowed for combinedField", authorized, is(false));
@@ -161,7 +162,7 @@ public class ReflectionAuthorizationServiceTest {
                 .withEntityClassification("combinedField", "!railReplacementBus")
                 .build();
 
-        fieldMappings.put("combinedfield", Arrays.asList("someField1"));
+        fieldMappings.put("combinedfield", Collections.singletonList("someField1"));
 
         boolean authorized = reflectionAuthorizationService.authorized(roleAssignment, stopPlace, roleAssignment.r);
         assertThat("airport not allowed for stop place type", authorized, is(false));
@@ -185,7 +186,7 @@ public class ReflectionAuthorizationServiceTest {
                 .withEntityClassification("combinedField", "railReplacementBus")
                 .build();
 
-        fieldMappings.put("combinedfield", Arrays.asList("someField1"));
+        fieldMappings.put("combinedfield", Collections.singletonList("someField1"));
 
         boolean authorized = reflectionAuthorizationService.authorized(roleAssignment, stopPlace, roleAssignment.r);
         assertThat("railReplacementBus allowed, but not stop place type airport", authorized, is(false));

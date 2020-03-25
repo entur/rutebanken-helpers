@@ -79,7 +79,7 @@ public class EnturGooglePubSubEmulatorRunner {
             } while (!ready);
             logger.info("Started Google PubSub Emulator");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new EnturGooglePubSubException(e);
         }
     }
 

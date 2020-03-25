@@ -36,56 +36,56 @@ import java.util.stream.Collectors;
 
 @Service
 public class KubernetesService {
-    private static final Logger log = LoggerFactory.getLogger(KubernetesService .class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KubernetesService.class);
 
     private final String kubernetesUrl;
 
     protected final String namespace;
 
-    private final boolean kuberentesEnabled;
+    private final boolean kubernetesEnabled;
 
     protected KubernetesClient kube;
 
-    public KubernetesService(String kubernetesUrl, String namespace, boolean kuberentesEnabled) {
+    public KubernetesService(String kubernetesUrl, String namespace, boolean kubernetesEnabled) {
         this.kubernetesUrl = kubernetesUrl;
         this.namespace = namespace;
-        this.kuberentesEnabled = kuberentesEnabled;
+        this.kubernetesEnabled = kubernetesEnabled;
     }
 
-    public KubernetesService(String namespace, boolean kuberentesEnabled) {
-        this( null, namespace, kuberentesEnabled );
+    public KubernetesService(String namespace, boolean kubernetesEnabled) {
+        this(null, namespace, kubernetesEnabled);
     }
 
     @PostConstruct
     public final void init() {
-        if ( !kuberentesEnabled ) {
-            log.warn("Disabling kubernetes connection as rutebanken.kubernetes.enabled="+kuberentesEnabled);
+        if (!kubernetesEnabled) {
+            LOGGER.warn("Disabling kubernetes connection as rutebanken.kubernetes.enabled={}", kubernetesEnabled);
             return;
         }
-        if ( kubernetesUrl != null && !"".equals( kubernetesUrl )) {
-            log.info("Connecting to "+kubernetesUrl );
+        if (kubernetesUrl != null && !"".equals(kubernetesUrl)) {
+            LOGGER.info("Connecting to {}", kubernetesUrl);
             kube = new DefaultKubernetesClient("http://localhost:8000/");
         } else {
-            log.info("Using default settings, as this should auto-configure correctly in the kubernetes cluster");
+            LOGGER.info("Using default settings, as this should auto-configure correctly in the kubernetes cluster");
             kube = new DefaultKubernetesClient();
         }
     }
 
     @PreDestroy
     public final void end() {
-        if ( kube != null ) {
+        if (kube != null) {
             kube.close();
         }
     }
 
-    public boolean isKuberentesEnabled() {
-        return kuberentesEnabled;
+    public boolean isKubernetesEnabled() {
+        return kubernetesEnabled;
     }
 
     public List<String> findEndpoints() {
         String serviceName = findDeploymentName();
-        log.info("Shall find endpoints for "+serviceName);
-        return findEndpoints( serviceName );
+        LOGGER.info("Shall find endpoints for {}", serviceName);
+        return findEndpoints(serviceName);
     }
 
     /**
@@ -94,35 +94,35 @@ public class KubernetesService {
      */
     public String findDeploymentName() {
         String hostname = System.getenv("HOSTNAME");
-        if ( hostname == null ) {
+        if (hostname == null) {
             hostname = "localhost";
         }
-        int dash = hostname.indexOf("-");
+        int dash = hostname.indexOf('-');
         return dash == -1
                 ? hostname
-                : hostname.substring(0, dash );
+                : hostname.substring(0, dash);
     }
 
     /**
      * @return Endpoints found for the given service name, both the ready and not ready endpoints
      */
     public List<String> findEndpoints(String serviceName) {
-        if ( kube == null ) {
+        if (kube == null) {
             return new ArrayList<>();
         }
         Endpoints eps = kube.endpoints().inNamespace(namespace).withName(serviceName).get();
-        List<String> ready    = addressesFrom( eps, EndpointSubset::getAddresses);
-        List<String> notready = addressesFrom( eps, EndpointSubset::getNotReadyAddresses);
-        log.info("Got " + ready.size() + " endpoints and " + notready.size() + " NOT ready endpoints");
+        List<String> ready = addressesFrom(eps, EndpointSubset::getAddresses);
+        List<String> notReady = addressesFrom(eps, EndpointSubset::getNotReadyAddresses);
+        LOGGER.info("Got {} endpoints and {} NOT ready endpoints", ready.size(), notReady.size());
 
         List<String> result = new ArrayList<>(ready);
-        result.addAll( notready );
-        log.info("Ended up with the the following endpoints for endpoint " + serviceName + " : " + result);
+        result.addAll(notReady);
+        LOGGER.info("Ended up with the the following endpoints for endpoint {} : {}", serviceName, result);
         return result;
     }
 
-    private List<String> addressesFrom(Endpoints endpoints, Function<EndpointSubset, List<EndpointAddress>> addressFunction ) {
-        if ( endpoints == null || endpoints.getSubsets() == null) {
+    private List<String> addressesFrom(Endpoints endpoints, Function<EndpointSubset, List<EndpointAddress>> addressFunction) {
+        if (endpoints == null || endpoints.getSubsets() == null) {
             return new ArrayList<>();
         }
 

@@ -24,8 +24,7 @@ public class GooglePubSubCamelComponentConfig {
 
     @Bean
     public EnturGooglePubSubComponent googlePubsubComponent() {
-        EnturGooglePubSubComponent component = new EnturGooglePubSubComponent();
-        return component;
+        return new EnturGooglePubSubComponent();
     }
 
 

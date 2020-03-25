@@ -112,11 +112,7 @@ public class RoleAssignment {
             if (roleAssignment.e == null) {
                 roleAssignment.e = new HashMap<>();
             }
-            List<String> classificationsForType = roleAssignment.e.get(entityType);
-            if (classificationsForType == null) {
-                classificationsForType = new ArrayList<>();
-                roleAssignment.e.put(entityType, classificationsForType);
-            }
+            List<String> classificationsForType = roleAssignment.e.computeIfAbsent(entityType, k -> new ArrayList<>());
             classificationsForType.add(entityClassification);
             return this;
         }

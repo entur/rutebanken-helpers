@@ -10,15 +10,11 @@ import org.apache.camel.spi.Metadata;
 import org.apache.camel.spi.UriEndpoint;
 import org.apache.camel.spi.UriParam;
 import org.apache.camel.spi.UriPath;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gcp.pubsub.core.PubSubTemplate;
 
 @UriEndpoint(firstVersion = "0.1", scheme = "entur-google-pubsub", title = "Entur Google Pubsub",
         syntax = "entur-google-pubsub:destinationName", label = "messaging")
 public class EnturGooglePubSubEndpoint extends DefaultEndpoint {
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @UriPath(description = "Destination Name")
     @Metadata(required = "true")

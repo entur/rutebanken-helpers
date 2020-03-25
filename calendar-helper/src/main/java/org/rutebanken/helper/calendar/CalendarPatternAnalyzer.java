@@ -122,7 +122,7 @@ public class CalendarPatternAnalyzer {
 			// Try to find patterns
 			List<WeekDayEntry> entries = new ArrayList<>(dayMap.values());
 
-			Collections.sort(entries, (o1, o2) -> (int) (o2.getPercentage() - o1.getPercentage()));
+			entries.sort((o1, o2) -> (int) (o2.getPercentage() - o1.getPercentage()));
 
 			// i = number of days attempted to merge together
 			for (int i = 1; i <= DAYS_PER_WEEK; i++) {
@@ -134,7 +134,7 @@ public class CalendarPatternAnalyzer {
 				for (int j = 0; j < i; j++) {
 					double percentage = entries.get(j).getPercentage();
 					if (percentage < minDayPercentage) {
-						allDaysAboveMinDayPercentage &= false;
+						allDaysAboveMinDayPercentage = false;
 					}
 					totalDayPercentage += percentage;
 				}
@@ -148,7 +148,7 @@ public class CalendarPatternAnalyzer {
 				}
 			}
 		} else {
-			log.debug("Too few days to extract pattern, expected at least " + MIN_DAYS_FOR_PATTERN + " but only got " + totalDaysIncluded);
+			log.debug("Too few days to extract pattern, expected at least {} but only got {}", MIN_DAYS_FOR_PATTERN, totalDaysIncluded);
 		}
 
 		return significantDays;
@@ -185,7 +185,7 @@ public class CalendarPatternAnalyzer {
 	}
 
 
-	private class WeekDayEntry {
+	private static class WeekDayEntry {
 
 		int count = 0;
 

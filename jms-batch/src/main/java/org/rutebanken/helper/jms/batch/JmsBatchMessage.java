@@ -26,7 +26,9 @@ import java.util.List;
 
 /**
  * ActiveMQObjectMessage wrapping a list of JMS messages.
+ * @deprecated Use Google PubSub instead.
  */
+@Deprecated
 public class JmsBatchMessage extends ActiveMQObjectMessage implements Serializable {
 
 	private List<ActiveMQMessage> messages;
@@ -43,7 +45,7 @@ public class JmsBatchMessage extends ActiveMQObjectMessage implements Serializab
 	}
 
 	@Override
-	public Serializable getObject() throws JMSException {
+	public Serializable getObject() {
 		return new ArrayList<>(messages);
 	}
 

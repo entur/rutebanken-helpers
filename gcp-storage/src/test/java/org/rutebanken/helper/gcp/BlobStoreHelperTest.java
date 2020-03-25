@@ -20,6 +20,7 @@ import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.Storage;
 import com.google.common.io.ByteStreams;
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -27,7 +28,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Iterator;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -44,7 +44,7 @@ public class BlobStoreHelperTest {
     private final String blobName = directory + fileName;
 
     @BeforeAll
-    public static void beforeAll() throws IOException {
+    public static void beforeAll() {
         storage = BlobStoreHelper.getStorage(credentialPath, "carbon-1287");
     }
 
@@ -56,38 +56,38 @@ public class BlobStoreHelperTest {
     }
 
     @Test
-    public void testUpload() {
-        Blob blob = BlobStoreHelper.uploadBlob(storage, BUCKET_NAME, blobName, this.getClass().getResourceAsStream(fileName), false);
+    public void testUpload() throws IOException {
+        Blob blob = BlobStoreHelper.uploadBlob(storage, BUCKET_NAME, blobName, IOUtils.toByteArray(this.getClass().getResourceAsStream(fileName)), false);
         assertNotNull(blob);
     }
 
     @Test
-    public void testList() {
-        BlobStoreHelper.uploadBlob(storage, BUCKET_NAME, blobName, this.getClass().getResourceAsStream(fileName), false);
+    public void testList() throws IOException {
+        BlobStoreHelper.uploadBlob(storage, BUCKET_NAME, blobName, IOUtils.toByteArray(this.getClass().getResourceAsStream(fileName)), false);
         Iterator<Blob> blobIterator = BlobStoreHelper.listAllBlobsRecursively(storage, BUCKET_NAME, directory);
-        assertEquals(true, blobIterator.hasNext());
+        assertTrue(blobIterator.hasNext());
         Blob result = blobIterator.next();
         System.out.println(result.getBlobId());
         assertEquals(blobName, result.getName());
-        assertEquals(false, blobIterator.hasNext());
+        assertFalse(blobIterator.hasNext());
     }
 
     @Test
     public void testDownload() throws IOException {
-        BlobStoreHelper.uploadBlob(storage, BUCKET_NAME, blobName, this.getClass().getResourceAsStream(fileName), false);
+        BlobStoreHelper.uploadBlob(storage, BUCKET_NAME, blobName, IOUtils.toByteArray(this.getClass().getResourceAsStream(fileName)), false);
         InputStream inputStream = BlobStoreHelper.getBlob(storage, BUCKET_NAME, blobName);
         byte[] result = ByteStreams.toByteArray(inputStream);
         byte[] expected = ByteStreams.toByteArray(this.getClass().getResourceAsStream(fileName));
         assertEquals(expected.length, result.length);
-        assertTrue(Arrays.equals(expected, result));
+        assertArrayEquals(expected, result);
     }
 
     @Test
     public void testDelete() throws IOException {
-        BlobStoreHelper.uploadBlob(storage, BUCKET_NAME, blobName, this.getClass().getResourceAsStream(fileName), false);
+        BlobStoreHelper.uploadBlob(storage, BUCKET_NAME, blobName, IOUtils.toByteArray(this.getClass().getResourceAsStream(fileName)), false);
         BlobStoreHelper.delete(storage, BlobId.of(BUCKET_NAME, blobName));
         Iterator<Blob> blobIterator = BlobStoreHelper.listAllBlobsRecursively(storage, BUCKET_NAME, directory);
-        assertEquals(false, blobIterator.hasNext());
+        assertFalse(blobIterator.hasNext());
     }
 
 }

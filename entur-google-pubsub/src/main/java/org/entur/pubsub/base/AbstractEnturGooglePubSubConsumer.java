@@ -16,7 +16,6 @@ import org.springframework.core.annotation.Order;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 
@@ -46,7 +45,7 @@ public abstract class AbstractEnturGooglePubSubConsumer implements EnturGooglePu
     }
 
     @EventListener
-    public void handleContextRefreshed(ContextRefreshedEvent contextRefreshedEvent) throws InterruptedException {
+    public void handleContextRefreshed(ContextRefreshedEvent contextRefreshedEvent) {
 
 
         logger.info("Initializing PubSub consumers for destination {}", getDestinationName());
@@ -89,7 +88,7 @@ public abstract class AbstractEnturGooglePubSubConsumer implements EnturGooglePu
             Thread.sleep(delay);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
+            throw new EnturGooglePubSubException(e);
         }
     }
 

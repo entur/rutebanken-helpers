@@ -79,6 +79,7 @@
         <spring-cloud-gcp.version>1.2.1.RELEASE</spring-cloud-gcp.version>
         <camel.version>2.25.0</camel.version>
         <kubernetes-client.version>4.9.0</kubernetes-client.version>
+        <commons-io.version>2.6</commons-io.version>
 
     </properties>
 
@@ -124,6 +125,12 @@
                 <scope>import</scope>
             </dependency>
 
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -159,7 +166,6 @@
         <module>calendar-helper</module>
         <module>organisation</module>
         <module>jms-batch</module>
-        <module>hubot</module>
         <module>slack</module>
         <module>entur-google-pubsub</module>
         <module>camel-entur-google-pubsub</module>
