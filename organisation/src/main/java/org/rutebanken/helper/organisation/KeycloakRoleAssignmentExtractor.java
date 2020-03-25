@@ -64,7 +64,7 @@ public class KeycloakRoleAssignmentExtractor implements RoleAssignmentExtractor 
                 throw new IllegalArgumentException("Unsupported 'roles' claim type: " + roleAssignments);
             }
 
-            return roleAssignmentList.stream().map(m -> parse(m)).collect(Collectors.toList());
+            return roleAssignmentList.stream().map(this::parse).collect(Collectors.toList());
         } else {
             throw new NotAuthenticatedException("Not authenticated with token");
         }
@@ -77,7 +77,7 @@ public class KeycloakRoleAssignmentExtractor implements RoleAssignmentExtractor 
         try {
             return mapper.readValue((String) roleAssignment, RoleAssignment.class);
         } catch (IOException ioE) {
-            throw new RuntimeException("Exception while parsing role assignments from JSON: " + ioE.getMessage(), ioE);
+            throw new OrganisationException("Exception while parsing role assignments from JSON: " + ioE.getMessage(), ioE);
         }
     }
 }

@@ -58,7 +58,7 @@ public class HazelCastService {
 
     @PostConstruct
     public final void init() {
-        if ( kubernetesService != null && kubernetesService.isKuberentesEnabled()) {
+        if ( kubernetesService != null && kubernetesService.isKubernetesEnabled()) {
             log.info("Configuring hazelcast");
             try {
                 String name = kubernetesService.findDeploymentName();
@@ -72,12 +72,7 @@ public class HazelCastService {
             log.warn("Using local hazelcast as we do not have kubernetes");
             hazelcast = initForLocalHazelCast();
         }
-        Runtime.getRuntime().addShutdownHook(new Thread(){
-            @Override
-            public void run() {
-                hazelcast.shutdown();
-            }
-        });
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> hazelcast.shutdown()));
     }
 
 
@@ -234,13 +229,13 @@ public class HazelCastService {
         MapConfig mapConfig = cfg.getMapConfig("default");
         updateDefaultMapConfig(mapConfig);
 
-        log.info("Old config: b_count "+mapConfig.getBackupCount()+" async_b_count "+mapConfig.getAsyncBackupCount()+" read_backup_data "+mapConfig.isReadBackupData());
+        log.info("Old config: b_count {} async_b_count {} read_backup_data {}", mapConfig.getBackupCount(), mapConfig.getAsyncBackupCount(), mapConfig.isReadBackupData());
         // http://docs.hazelcast.org/docs/3.7/manual/html-single/index.html#backing-up-maps
-        mapConfig.setBackupCount( 2 )
-                .setAsyncBackupCount( 0 )
-                .setReadBackupData( true );
+        mapConfig.setBackupCount(2)
+                .setAsyncBackupCount(0)
+                .setReadBackupData(true);
 
-        log.info("Updated config: b_count "+mapConfig.getBackupCount()+" async_b_count "+mapConfig.getAsyncBackupCount()+" read_backup_data "+mapConfig.isReadBackupData());
+        log.info("Updated config: b_count {} async_b_count {} read_backup_data {}", mapConfig.getBackupCount(), mapConfig.getAsyncBackupCount(), mapConfig.isReadBackupData());
 
         addMgmtIfConfigured(cfg);
 
@@ -261,7 +256,7 @@ public class HazelCastService {
             ManagementCenterConfig mcc = new ManagementCenterConfig(managementUrl, 3);
             mcc.setEnabled(true);
             cfg.setManagementCenterConfig(mcc);
-            log.info("Added management URL: "+managementUrl);
+            log.info("Added management URL: {} ", managementUrl);
         }
     }
 

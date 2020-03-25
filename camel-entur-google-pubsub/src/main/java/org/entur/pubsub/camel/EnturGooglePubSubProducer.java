@@ -29,13 +29,6 @@ public class EnturGooglePubSubProducer extends DefaultProducer {
             return;
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("uploader thread/id: "
-                    + Thread.currentThread().getId()
-                    + " / " + exchange.getExchangeId()
-                    + " . api call completed.");
-        }
-
         sendMessages(entryList);
     }
 

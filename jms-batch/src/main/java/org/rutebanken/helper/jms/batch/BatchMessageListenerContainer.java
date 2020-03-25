@@ -32,7 +32,9 @@ import java.util.List;
  * content of an object message before invoking the message consumer.
  *
  * NB! supports only ActiveMQ
+ * @deprecated Use Google PubSub instead.
  */
+@Deprecated
 public class BatchMessageListenerContainer extends DefaultMessageListenerContainer {
 	public static final int DEFAULT_BATCH_SIZE = 100;
 

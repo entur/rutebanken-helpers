@@ -148,7 +148,7 @@ public class CalendarPatternAnalyzer {
 				}
 			}
 		} else {
-			log.debug("Too few days to extract pattern, expected at least " + MIN_DAYS_FOR_PATTERN + " but only got " + totalDaysIncluded);
+			log.debug("Too few days to extract pattern, expected at least {} but only got {}", MIN_DAYS_FOR_PATTERN, totalDaysIncluded);
 		}
 
 		return significantDays;

@@ -88,7 +88,7 @@ public abstract class AbstractEnturGooglePubSubConsumer implements EnturGooglePu
             Thread.sleep(delay);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
+            throw new EnturGooglePubSubException(e);
         }
     }
 

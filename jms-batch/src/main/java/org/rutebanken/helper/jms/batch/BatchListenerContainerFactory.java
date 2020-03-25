@@ -22,7 +22,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.listener.AbstractMessageListenerContainer;
 import org.springframework.stereotype.Service;
 
-
+/**
+ * @deprecated Use Google PubSub instead.
+ */
+@Deprecated
 @Service
 public class BatchListenerContainerFactory implements MessageListenerContainerFactory {
 

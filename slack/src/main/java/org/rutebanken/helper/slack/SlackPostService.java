@@ -18,7 +18,7 @@ import java.io.IOException;
 
 @Service
 public class SlackPostService {
-    private static final Logger log = LoggerFactory.getLogger(SlackPostService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SlackPostService.class);
 
     private final String slackEndpoint;
 
@@ -35,7 +35,7 @@ public class SlackPostService {
     public boolean publish(SlackPayload payload) {
         try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
             String json = new ObjectMapper().writeValueAsString(payload);
-            log.debug("Will try to send the following to slack: " + json);
+            LOGGER.debug("Will try to send the following to slack: {}", json);
 
             HttpPost httpPost = new HttpPost(slackEndpoint);
             httpPost.setEntity(new StringEntity(json));
@@ -43,13 +43,15 @@ public class SlackPostService {
 
             try (CloseableHttpResponse response = httpclient.execute(httpPost)) {
                 HttpEntity entity = response.getEntity();
-                log.info("Entity as response from hubot: " + EntityUtils.toString(entity));
+                if(LOGGER.isInfoEnabled()) {
+                    LOGGER.info("Entity as response from hubot: {}", EntityUtils.toString(entity));
+                }
                 EntityUtils.consume(entity);
             }
 
             return true;
         } catch (IOException e) {
-            log.error("Could not parse object", e);
+            LOGGER.error("Could not parse object", e);
             return false;
         }
     }
