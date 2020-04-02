@@ -134,26 +134,13 @@ public class BlobStoreHelper {
         LOGGER.debug("Fetching blob {} from bucket {}", name, containerName);
         BlobId blobId = BlobId.of(containerName, name);
         Blob blob = storage.get(blobId);
-        InputStream result = null;
         if (blob != null) {
-            try (ReadChannel reader = blob.reader();
-                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                 WritableByteChannel channel = Channels.newChannel(outputStream)) {
-                ByteBuffer bytes = ByteBuffer.allocate(64 * 1024);
-                while (reader.read(bytes) > 0) {
-                    bytes.flip();
-                    channel.write(bytes);
-                    bytes.clear();
-                }
-                result = new ByteArrayInputStream(outputStream.toByteArray());
-                LOGGER.debug("Retrieved blob with name '{}' and size '{}' from bucket '{}'", blob.getName(), blob.getSize(), blob.getBucket());
-            } catch (IOException e) {
-                throw new BlobStoreException(e);
-            }
+            LOGGER.debug("Retrieved blob with name '{}' and size '{}' from bucket '{}'", blob.getName(), blob.getSize(), blob.getBucket());
+            return new ByteArrayInputStream((blob.getContent()));
         } else {
             LOGGER.info("File '{}' in bucket '{}' does not exist", blobId.getName(), blobId.getBucket());
+            return null;
         }
-        return result;
     }
 
     public static boolean delete(Storage storage, BlobId blobId) {
