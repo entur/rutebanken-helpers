@@ -18,7 +18,6 @@ package org.rutebanken.helper.gcp;
 
 import com.google.api.gax.paging.Page;
 import com.google.auth.oauth2.ServiceAccountCredentials;
-import com.google.cloud.ReadChannel;
 import com.google.cloud.WriteChannel;
 import com.google.cloud.storage.Acl;
 import com.google.cloud.storage.Blob;
@@ -31,15 +30,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.WritableByteChannel;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -47,8 +42,7 @@ public class BlobStoreHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BlobStoreHelper.class);
 
-    private static final int BUFFER_CHUNK_SIZE_RETRY_UPLOAD = 1024 * 1024;
-    private static final List<Integer> RETRY_BACKOFF_SECONDS = Arrays.asList(0, 5, 30);
+    private static final int DEFAULT_CHUNK_SIZE = 15 * 1024 * 1024;
 
     private BlobStoreHelper() {
     }
@@ -80,6 +74,12 @@ public class BlobStoreHelper {
         return uploadBlobWithRetry(storage, containerName, name, inputStream, makePublic, "application/octet-stream");
     }
 
+
+    /**
+     * Upload a blob using  a {@link Storage#writer(BlobInfo, Storage.BlobWriteOption...)} as it is recommended for bigger files.
+     * Retry/resumable logic is handled internally by the GCS client library.
+     * To be replaced with Blob.uploadFrom() when the method is available. See also  https://github.com/googleapis/java-storage/issues/40
+     */
     public static Blob uploadBlobWithRetry(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic, String contentType) {
         LOGGER.debug("Uploading blob {} to bucket {}", name, containerName);
         BlobId blobId = BlobId.of(containerName, name);
@@ -88,14 +88,8 @@ public class BlobStoreHelper {
             builder.setAcl(ImmutableList.of(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER)));
         }
         BlobInfo blobInfo = builder.build();
-
-        byte[] buffer = new byte[BUFFER_CHUNK_SIZE_RETRY_UPLOAD];
-
-        try (WriteChannel orgChannel = storage.writer(blobInfo)) {
-            int bytesRead;
-            while ((bytesRead = inputStream.read(buffer)) > 0) {
-                writeWithRetry(blobId, ByteBuffer.wrap(buffer, 0, bytesRead), orgChannel);
-            }
+        try {
+            writeWithRetry(storage, blobInfo, inputStream);
         } catch (IOException ioE) {
             throw new BlobStoreException("Blob upload of blob with name '" + blobId.getName() + "' failed: " + ioE.getMessage(), ioE);
         }
@@ -104,28 +98,15 @@ public class BlobStoreHelper {
         return blob;
     }
 
-    private static void writeWithRetry(BlobId blobId, ByteBuffer buffer, WriteChannel writer) {
-        Iterator<Integer> backOffSecItr = RETRY_BACKOFF_SECONDS.iterator();
-        boolean doTry = true;
-        writer.setChunkSize(buffer.limit());
-        while (doTry) {
-            try {
-                writer.write(buffer);
-                doTry = false;
-            } catch (Exception e) {
-                if (backOffSecItr.hasNext()) {
-                    Integer backOffSec = backOffSecItr.next();
-                    LOGGER.info("Blob upload of blob with name '{}' failed  for chunk. Attempting retry in {} seconds. Error: {}", blobId.getName(), backOffSec, e.getMessage());
-                    try {
-                        Thread.sleep(backOffSec * 1000L);
-                    } catch (InterruptedException ie) {
-                        Thread.currentThread().interrupt();
-                        throw new BlobStoreException("Interrupted while waiting to retry upload of blob with name '" + blobId.getName() + "' ", ie);
-                    }
-                } else {
-                    throw new BlobStoreException("Blob upload of blob with name '" + blobId.getName() + "' failed. No more retries available. Error: " + e.getMessage());
-                }
-
+    /**
+     * Write the blob in chunks. Chunks are  retried internally by the GCS client library.
+     */
+    private static void writeWithRetry(Storage storage, BlobInfo blobInfo, InputStream inputStream) throws IOException {
+        try (WriteChannel writer = storage.writer(blobInfo)) {
+            byte[] buffer = new byte[DEFAULT_CHUNK_SIZE];
+            int length;
+            while ((length = inputStream.read(buffer)) >= 0) {
+                writer.write(ByteBuffer.wrap(buffer, 0, length));
             }
         }
     }
