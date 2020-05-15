@@ -21,6 +21,7 @@ import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -40,6 +41,12 @@ public class HazelCastService {
     private KubernetesService kubernetesService;
 
     private final String managementUrl;
+
+    @Value("${entur.hazelcast.backup.count.sync:2}")
+    private int backupCount;
+
+    @Value("${entur.hazelcast.backup.count.async:0}")
+    private int backupCountAsync;
 
     /**
      * Create a networked hazelcast instance, or
@@ -126,7 +133,6 @@ public class HazelCastService {
      * See the example below for overriding:
      *
      * <pre>
-     *  @Override
      *  public void updateDefaultMapConfig(MapConfig mapConfig) {
      *     mapConfig
      *       .setEvictionPolicy(EvictionPolicy.LRU)
@@ -139,7 +145,9 @@ public class HazelCastService {
      *
      * @param defaultMapConfig The map config with name "default" to make updates on.
      */
-    public void updateDefaultMapConfig(MapConfig defaultMapConfig) {}
+    public void updateDefaultMapConfig(MapConfig defaultMapConfig) {
+        // Should be overridden when needed
+    }
 
 
     /**
@@ -231,8 +239,8 @@ public class HazelCastService {
 
         log.info("Old config: b_count {} async_b_count {} read_backup_data {}", mapConfig.getBackupCount(), mapConfig.getAsyncBackupCount(), mapConfig.isReadBackupData());
         // http://docs.hazelcast.org/docs/3.7/manual/html-single/index.html#backing-up-maps
-        mapConfig.setBackupCount(2)
-                .setAsyncBackupCount(0)
+        mapConfig.setBackupCount(backupCount)
+                .setAsyncBackupCount(backupCountAsync)
                 .setReadBackupData(true);
 
         log.info("Updated config: b_count {} async_b_count {} read_backup_data {}", mapConfig.getBackupCount(), mapConfig.getAsyncBackupCount(), mapConfig.isReadBackupData());
