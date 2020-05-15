@@ -19,9 +19,21 @@ public class EnturGooglePubSubAdmin {
     @Value("${entur.pubsub.subscriber.autocreate:true}")
     private boolean autocreate;
 
+    /**
+     * Creates a subscription to the given destinationName topic.
+     * SubscriptionName will be equal to destinationName
+     * @param destinationName This is the name of the topic to subscribe to, will also be used as subscriptionName
+     */
+
     public void createSubscriptionIfMissing(String destinationName) {
         createSubscriptionIfMissing(destinationName, destinationName);
     }
+
+    /**
+     * Creates a subscription with the given subscriptionName to the given destinationName topic.
+     * @param subscriptionName This is the name of the subscription that will be created/used
+     * @param destinationName This is the name of the topic to subscribe to
+     */
 
     public void createSubscriptionIfMissing(String destinationName, String subscriptionName) {
         if (autocreate) {
