@@ -20,7 +20,10 @@ public class EnturGooglePubSubAdmin {
     private boolean autocreate;
 
     public void createSubscriptionIfMissing(String destinationName) {
+        createSubscriptionIfMissing(destinationName, destinationName);
+    }
 
+    public void createSubscriptionIfMissing(String destinationName, String subscriptionName) {
         if (autocreate) {
             try {
                 pubSubAdmin.createTopic(destinationName);
@@ -30,7 +33,7 @@ public class EnturGooglePubSubAdmin {
             }
 
             try {
-                pubSubAdmin.createSubscription(destinationName, destinationName);
+                pubSubAdmin.createSubscription(subscriptionName, destinationName);
                 logger.debug("Created subscription: {}", destinationName);
             } catch (AlreadyExistsException e) {
                 logger.trace("Did not create subscription: {}, as it already exists", destinationName);
