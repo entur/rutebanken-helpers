@@ -79,7 +79,7 @@
 
         <guava.version>28.1-jre</guava.version>
         <keycloak.version>4.8.3.Final</keycloak.version>
-        <spring-cloud-gcp.version>1.2.2.RELEASE</spring-cloud-gcp.version>
+        <spring-cloud-gcp.version>1.2.1.RELEASE</spring-cloud-gcp.version>
         <camel.version>2.25.1</camel.version>
         <kubernetes-client.version>4.9.0</kubernetes-client.version>
         <commons-io.version>2.6</commons-io.version>
