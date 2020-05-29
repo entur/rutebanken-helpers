@@ -48,6 +48,9 @@ public class HazelCastService {
     @Value("${entur.hazelcast.backup.count.async:0}")
     private int backupCountAsync;
 
+    @Value("${entur.hazelcast.shutdownhook.enabled:true}")
+    private boolean shutDownHookEnabled;
+
     /**
      * Create a networked hazelcast instance, or
      * @param kubernetesService A networked hazelcast instance is only set up if
@@ -216,7 +219,13 @@ public class HazelCastService {
         final Config cfg = new Config()
                 .setInstanceName(UUID.randomUUID().toString())
                 .setGroupConfig(new GroupConfig(groupName, password))
-                .setProperty("hazelcast.phone.home.enabled","false");
+                .setProperty("hazelcast.phone.home.enabled","false")
+                // the shutdown hook should be disabled in a Spring environment to prevent Hazelcast from being stopped
+                // too early, leading to the exception "HazelcastInstanceNotActiveException" at shutdown time.
+                // Instead the shutdown should be managed by Spring at application context-closing time
+                // see HazelCastService.shutdown()
+                // TODO the shutdown hook should eventually be disabled by default
+                .setProperty("hazelcast.shutdownhook.enabled",Boolean.toString(shutDownHookEnabled));
 
         // tcp
         final TcpIpConfig tcpCfg = new TcpIpConfig();
