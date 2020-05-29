@@ -219,13 +219,16 @@ public class HazelCastService {
         final Config cfg = new Config()
                 .setInstanceName(UUID.randomUUID().toString())
                 .setGroupConfig(new GroupConfig(groupName, password))
-                .setProperty("hazelcast.phone.home.enabled","false")
-                // the shutdown hook should be disabled in a Spring environment to prevent Hazelcast from being stopped
-                // too early, leading to the exception "HazelcastInstanceNotActiveException" at shutdown time.
-                // Instead the shutdown should be managed by Spring at application context-closing time
-                // see HazelCastService.shutdown()
-                // TODO the shutdown hook should eventually be disabled by default
-                .setProperty("hazelcast.shutdownhook.enabled",Boolean.toString(shutDownHookEnabled));
+                .setProperty("hazelcast.phone.home.enabled", "false");
+        // the shutdown hook should be disabled in a Spring environment to prevent Hazelcast from being stopped
+        // too early, leading to the exception "HazelcastInstanceNotActiveException" at shutdown time.
+        // Instead the shutdown should be managed by Spring at application context-closing time
+        // see HazelCastService.shutdown()
+        // TODO the shutdown hook should eventually be disabled by default
+        if (!shutDownHookEnabled) {
+            cfg.setProperty("hazelcast.shutdownhook.enabled", "false");
+        }
+
 
         // tcp
         final TcpIpConfig tcpCfg = new TcpIpConfig();
