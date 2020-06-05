@@ -6,6 +6,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.impl.DefaultConsumer;
 import org.apache.camel.spi.Synchronization;
+import org.entur.pubsub.base.EnturGooglePubSubUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gcp.pubsub.core.PubSubTemplate;
@@ -88,12 +89,10 @@ public class EnturGooglePubSubConsumer extends DefaultConsumer {
     @Override
     protected void doStop() throws Exception {
         super.doStop();
-        logger.info("Stopping Google PubSub consumer for {}/{}", endpoint.getProjectId(), endpoint.getDestinationName());
-
+        logger.info("Stopping Google PubSub consumer for subscription {}/{}", endpoint.getProjectId(), endpoint.getDestinationName());
         for (Subscriber subscriber : subscribers) {
-            subscriber.stopAsync();
+            EnturGooglePubSubUtils.closeSubscriber(subscriber);
         }
-
+        logger.info("Stopped Google PubSub consumer for subscription {}/{}", endpoint.getProjectId(), endpoint.getDestinationName());
     }
-
 }

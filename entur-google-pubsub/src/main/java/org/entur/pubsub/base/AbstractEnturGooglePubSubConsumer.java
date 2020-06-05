@@ -97,7 +97,7 @@ public abstract class AbstractEnturGooglePubSubConsumer implements EnturGooglePu
     public void handleContextClosedEvent(ContextClosedEvent contextClosedEvent) {
         logger.info("Stopping Google PubSub consumer for subscription {}", getDestinationName());
         for (Subscriber subscriber : subscribers) {
-            subscriber.stopAsync();
+            EnturGooglePubSubUtils.closeSubscriber(subscriber);
         }
         logger.info("Stopped Google PubSub consumer for subscription {}", getDestinationName());
 
