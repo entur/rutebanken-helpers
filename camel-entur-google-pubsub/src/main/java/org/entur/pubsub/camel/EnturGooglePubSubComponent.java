@@ -6,9 +6,11 @@ import org.apache.camel.impl.DefaultComponent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gcp.pubsub.core.PubSubTemplate;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+@Component
 public class EnturGooglePubSubComponent extends DefaultComponent {
 
     @Value("${spring.cloud.gcp.pubsub.project-id}")

@@ -2,7 +2,6 @@ package org.entur.pubsub.camel;
 
 import org.apache.camel.Component;
 import org.apache.camel.Consumer;
-import org.apache.camel.ExchangePattern;
 import org.apache.camel.Processor;
 import org.apache.camel.Producer;
 import org.apache.camel.impl.DefaultEndpoint;
@@ -36,9 +35,7 @@ public class EnturGooglePubSubEndpoint extends DefaultEndpoint {
             throw new IllegalArgumentException("The component provided is not EnturGooglePubSubComponent : " + component.getClass().getName());
         }
         this.pubSubTemplate = pubSubTemplate;
-        setExchangePattern(ExchangePattern.InOnly);
     }
-
 
     @Override
     public Consumer createConsumer(Processor processor) {

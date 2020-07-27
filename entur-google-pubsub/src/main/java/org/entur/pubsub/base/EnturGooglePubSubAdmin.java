@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class EnturGooglePubSubAdmin {
 
-    private static final Logger logger = LoggerFactory.getLogger(EnturGooglePubSubAdmin.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EnturGooglePubSubAdmin.class);
 
     @Autowired
     private PubSubAdmin pubSubAdmin;
@@ -24,16 +24,16 @@ public class EnturGooglePubSubAdmin {
         if (autocreate) {
             try {
                 pubSubAdmin.createTopic(destinationName);
-                logger.debug("Created topic: {}", destinationName);
+                LOGGER.debug("Created topic: {}", destinationName);
             } catch (AlreadyExistsException e) {
-                logger.trace("Did not create topic: {}, as it already exists", destinationName);
+                LOGGER.trace("Did not create topic: {}, as it already exists", destinationName);
             }
 
             try {
                 pubSubAdmin.createSubscription(destinationName, destinationName);
-                logger.debug("Created subscription: {}", destinationName);
+                LOGGER.debug("Created subscription: {}", destinationName);
             } catch (AlreadyExistsException e) {
-                logger.trace("Did not create subscription: {}, as it already exists", destinationName);
+                LOGGER.trace("Did not create subscription: {}, as it already exists", destinationName);
             }
         }
     }
