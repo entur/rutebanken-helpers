@@ -6,14 +6,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gcp.pubsub.core.PubSubTemplate;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class EnturGooglePubSubProducer extends DefaultProducer {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(EnturGooglePubSubProducer.class);
 
     private PubSubTemplate pubSubTemplate;
-
 
     public EnturGooglePubSubProducer(EnturGooglePubSubEndpoint endpoint, PubSubTemplate pubSubTemplate) {
         super(endpoint);
@@ -25,7 +28,7 @@ public class EnturGooglePubSubProducer extends DefaultProducer {
         List<Exchange> entryList = prepareExchangeList(exchange);
 
         if (entryList == null || entryList.isEmpty()) {
-            logger.warn("The incoming message is either null or empty. Triggered by an aggregation timeout?");
+            LOGGER.warn("The incoming message is either null or empty. Triggered by an aggregation timeout?");
             return;
         }
 
@@ -40,7 +43,7 @@ public class EnturGooglePubSubProducer extends DefaultProducer {
             entryList = new ArrayList<>();
             entryList.add(exchange);
         } else {
-            entryList = (List<Exchange>) exchange.getProperty(Exchange.GROUPED_EXCHANGE, List.class);
+            entryList = exchange.getProperty(Exchange.GROUPED_EXCHANGE, List.class);
         }
 
         return entryList;

@@ -51,7 +51,7 @@ public class PubSubConsumerTest extends BasePubSubIntegrationTest {
     public void testMessageConsumer() throws InterruptedException, ExecutionException, TimeoutException {
 
         pubSubTemplate.publish(TEST_QUEUE, TEST_PAYLOAD);
-        Assert.assertEquals(TEST_PAYLOAD, messageContent.get(10, TimeUnit.SECONDS));
+        Assert.assertEquals("The consumer should have received the payload", TEST_PAYLOAD, messageContent.get(10, TimeUnit.SECONDS));
 
     }
 

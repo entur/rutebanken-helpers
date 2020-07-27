@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * Specific Spring configuration.
- * There is currently none defined, the class is kept for backward compatiblity.
+ * There is currently none defined, the class is kept for backward compatibility.
  */
 @Configuration
 @AutoConfigureBefore(GcpPubSubAutoConfiguration.class)

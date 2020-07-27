@@ -19,7 +19,7 @@ import java.util.function.Consumer;
 
 public class EnturGooglePubSubConsumer extends DefaultConsumer {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(EnturGooglePubSubConsumer.class);
 
     private final EnturGooglePubSubEndpoint endpoint;
     private final Processor processor;
@@ -39,7 +39,7 @@ public class EnturGooglePubSubConsumer extends DefaultConsumer {
     @Override
     protected void doStart() throws Exception {
         super.doStart();
-        logger.info("Starting Google PubSub consumer for {}/{}", endpoint.getProjectId(), endpoint.getDestinationName());
+        LOGGER.info("Starting Google PubSub consumer for {}/{}", endpoint.getProjectId(), endpoint.getDestinationName());
 
         Consumer<BasicAcknowledgeablePubsubMessage> messageConsumer = new Consumer<BasicAcknowledgeablePubsubMessage>() {
 
@@ -50,8 +50,8 @@ public class EnturGooglePubSubConsumer extends DefaultConsumer {
 
                 byte[] body = pubsubMessage.getData().toByteArray();
 
-                if (logger.isTraceEnabled()) {
-                    logger.trace("Received message ID : {}", pubsubMessage.getMessageId());
+                if (LOGGER.isTraceEnabled()) {
+                    LOGGER.trace("Received message ID : {}", pubsubMessage.getMessageId());
                 }
 
                 Exchange exchange = endpoint.createExchange();
@@ -89,10 +89,10 @@ public class EnturGooglePubSubConsumer extends DefaultConsumer {
     @Override
     protected void doStop() throws Exception {
         super.doStop();
-        logger.info("Stopping Google PubSub consumer for subscription {}/{}", endpoint.getProjectId(), endpoint.getDestinationName());
+        LOGGER.info("Stopping Google PubSub consumer for subscription {}/{}", endpoint.getProjectId(), endpoint.getDestinationName());
         for (Subscriber subscriber : subscribers) {
             EnturGooglePubSubUtils.closeSubscriber(subscriber);
         }
-        logger.info("Stopped Google PubSub consumer for subscription {}/{}", endpoint.getProjectId(), endpoint.getDestinationName());
+        LOGGER.info("Stopped Google PubSub consumer for subscription {}/{}", endpoint.getProjectId(), endpoint.getDestinationName());
     }
 }
