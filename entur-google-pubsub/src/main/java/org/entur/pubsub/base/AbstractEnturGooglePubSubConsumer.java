@@ -13,6 +13,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,7 @@ import java.util.function.Consumer;
  * Consumers are started as late as possible after the Spring context initialization is complete,
  * and stopped as early as possible on context shutdown.
  */
+@Component
 public abstract class AbstractEnturGooglePubSubConsumer implements EnturGooglePubSubConsumer {
 
     @Autowired
@@ -36,7 +38,7 @@ public abstract class AbstractEnturGooglePubSubConsumer implements EnturGooglePu
     private long retryDelay;
 
     private List<Subscriber> subscribers = new ArrayList<>();
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEnturGooglePubSubConsumer.class);
 
     protected abstract String getDestinationName();
 
@@ -48,7 +50,7 @@ public abstract class AbstractEnturGooglePubSubConsumer implements EnturGooglePu
     public void handleContextRefreshed(ContextRefreshedEvent contextRefreshedEvent) {
 
 
-        logger.info("Initializing PubSub consumers for destination {}", getDestinationName());
+        LOGGER.info("Initializing PubSub consumers for destination {}", getDestinationName());
 
         enturGooglePubSubAdmin.createSubscriptionIfMissing(getDestinationName());
 
@@ -57,15 +59,15 @@ public abstract class AbstractEnturGooglePubSubConsumer implements EnturGooglePu
             @Override
             public void accept(BasicAcknowledgeablePubsubMessage basicAcknowledgeablePubsubMessage) {
                 PubsubMessage pubsubMessage = basicAcknowledgeablePubsubMessage.getPubsubMessage();
-                if (logger.isTraceEnabled()) {
-                    logger.trace("Received message ID : {}", pubsubMessage.getMessageId());
+                if (LOGGER.isTraceEnabled()) {
+                    LOGGER.trace("Received message ID : {}", pubsubMessage.getMessageId());
                 }
                 try {
                     onMessage(pubsubMessage.getData().toByteArray(), pubsubMessage.getAttributesMap());
                     basicAcknowledgeablePubsubMessage.ack();
                 } catch (Exception e) {
                     basicAcknowledgeablePubsubMessage.nack();
-                    logger.error("Message processing failed, retrying in " + retryDelay + " milliseconds", e);
+                    LOGGER.error("Message processing failed, retrying in {} milliseconds", retryDelay, e);
                     delay(retryDelay);
                 }
             }
@@ -75,7 +77,7 @@ public abstract class AbstractEnturGooglePubSubConsumer implements EnturGooglePu
             subscribers.add(subscriber);
         }
 
-        logger.info("Initialized PubSub consumers for destination {}", getDestinationName());
+        LOGGER.info("Initialized PubSub consumers for destination {}", getDestinationName());
 
     }
 
@@ -83,7 +85,7 @@ public abstract class AbstractEnturGooglePubSubConsumer implements EnturGooglePu
      * Wait for the number of specified milliseconds.
      * @param delay delay in milliseconds
      */
-    private void delay(long delay) {
+    private static void delay(long delay) {
         try {
             Thread.sleep(delay);
         } catch (InterruptedException e) {
@@ -95,11 +97,11 @@ public abstract class AbstractEnturGooglePubSubConsumer implements EnturGooglePu
     @EventListener
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public void handleContextClosedEvent(ContextClosedEvent contextClosedEvent) {
-        logger.info("Stopping Google PubSub consumer for subscription {}", getDestinationName());
+        LOGGER.info("Stopping Google PubSub consumer for subscription {}", getDestinationName());
         for (Subscriber subscriber : subscribers) {
             EnturGooglePubSubUtils.closeSubscriber(subscriber);
         }
-        logger.info("Stopped Google PubSub consumer for subscription {}", getDestinationName());
+        LOGGER.info("Stopped Google PubSub consumer for subscription {}", getDestinationName());
 
     }
 

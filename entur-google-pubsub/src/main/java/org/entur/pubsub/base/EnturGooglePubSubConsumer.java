@@ -5,6 +5,7 @@ import java.util.Map;
 /**
  * Google PubSub message consumer.
  */
+@FunctionalInterface
 public interface EnturGooglePubSubConsumer {
 
     /**

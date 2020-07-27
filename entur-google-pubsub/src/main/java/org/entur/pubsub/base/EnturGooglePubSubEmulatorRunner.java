@@ -29,7 +29,7 @@ import java.io.IOException;
 @Component
 public class EnturGooglePubSubEmulatorRunner {
 
-    private static final Logger logger = LoggerFactory.getLogger(EnturGooglePubSubEmulatorRunner.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EnturGooglePubSubEmulatorRunner.class);
 
     @Value("${entur.pubsub.emulator.path:target/pubsub-emulator/pubsub-emulator.jar}")
     private String pathToEmulator;
@@ -54,7 +54,7 @@ public class EnturGooglePubSubEmulatorRunner {
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public void handleContextRefreshed(ContextRefreshedEvent contextRefreshedEvent) throws InterruptedException {
         try {
-            logger.info("Starting Google PubSub Emulator");
+            LOGGER.info("Starting Google PubSub Emulator");
             File emulatorExecutable = new File(pathToEmulator);
             if(!emulatorExecutable.exists()) {
                 throw new IllegalStateException("Google PubSub Emulator not found at " + pathToEmulator + ".\n The emulator can be installed with the following command:\n gcloud -q components install pubsub-emulator ");
@@ -73,11 +73,11 @@ public class EnturGooglePubSubEmulatorRunner {
                     pubSubAdmin.listTopics();
                     ready = true;
                 } catch (Exception e) {
-                    logger.info("Google PubSub Emulator initialization in progress...");
+                    LOGGER.info("Google PubSub Emulator initialization in progress...");
                     Thread.sleep(2000);
                 }
             } while (!ready);
-            logger.info("Started Google PubSub Emulator");
+            LOGGER.info("Started Google PubSub Emulator");
         } catch (IOException e) {
             throw new EnturGooglePubSubException(e);
         }
@@ -86,9 +86,9 @@ public class EnturGooglePubSubEmulatorRunner {
     @EventListener
     public void handleContextClosedEvent(ContextClosedEvent contextClosedEvent) {
         if (pubsubEmulatorProcess != null) {
-            logger.info("Stopping Google PubSub Emulator");
+            LOGGER.info("Stopping Google PubSub Emulator");
             pubsubEmulatorProcess.kill();
-            logger.info("Stopped Google PubSub Emulator");
+            LOGGER.info("Stopped Google PubSub Emulator");
 
         }
     }
@@ -104,9 +104,9 @@ public class EnturGooglePubSubEmulatorRunner {
 
         @Override
         public void run() {
-            logger.info("Stopping Google PubSub Emulator on VM shutdown");
+            LOGGER.info("Stopping Google PubSub Emulator on VM shutdown");
             this.runProcess.kill();
-            logger.info("Stopped Google PubSub Emulator on VM shutdown");
+            LOGGER.info("Stopped Google PubSub Emulator on VM shutdown");
         }
 
     }

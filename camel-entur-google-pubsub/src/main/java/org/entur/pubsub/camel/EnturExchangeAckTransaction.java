@@ -9,7 +9,7 @@ import org.springframework.cloud.gcp.pubsub.support.BasicAcknowledgeablePubsubMe
 
 public class EnturExchangeAckTransaction implements Synchronization {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(EnturExchangeAckTransaction.class);
 
     /**
      * Ack successful exchanges.
@@ -18,7 +18,7 @@ public class EnturExchangeAckTransaction implements Synchronization {
      */
     @Override
     public void onComplete(Exchange exchange) {
-        logger.debug("Acknowledging message after successful processing for Exchange {}", exchange.getExchangeId());
+        LOGGER.debug("Acknowledging message after successful processing for Exchange {}", exchange.getExchangeId());
         getAck(exchange).ack();
     }
 
@@ -29,11 +29,11 @@ public class EnturExchangeAckTransaction implements Synchronization {
      */
     @Override
     public void onFailure(Exchange exchange) {
-        logger.debug("Acknowledging message after failed processing for Exchange {}", exchange.getExchangeId());
+        LOGGER.debug("Acknowledging message after failed processing for Exchange {}", exchange.getExchangeId());
         getAck(exchange).nack();
     }
 
-    private BasicAcknowledgeablePubsubMessage getAck(Exchange exchange) {
+    private static BasicAcknowledgeablePubsubMessage getAck(Exchange exchange) {
         BasicAcknowledgeablePubsubMessage ack = (BasicAcknowledgeablePubsubMessage) exchange.getIn().getHeader(EnturGooglePubSubConstants.ACK_ID);
         if(ack == null) {
             String routeId = exchange.getFromRouteId();

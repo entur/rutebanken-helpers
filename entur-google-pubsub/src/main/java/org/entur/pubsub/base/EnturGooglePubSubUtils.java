@@ -10,19 +10,20 @@ import java.util.concurrent.TimeoutException;
 /**
  * Utility class for PubSub operations.
  */
-public abstract class EnturGooglePubSubUtils {
+public final class EnturGooglePubSubUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EnturGooglePubSubUtils.class);
 
+    private EnturGooglePubSubUtils() {
+    }
 
     /**
      * Close a subscriber and release the associated resources.
      * Wait (10s max) for the subscriber to shutdown before returning.
+     *
      * @param subscriber the subscriber to close.
      */
     public static void closeSubscriber(Subscriber subscriber) {
-
-       // subscriber.stopAsync();
 
         String destinationName = subscriber.getSubscriptionNameString();
         LOGGER.trace("Stopping subscriber for {}", destinationName);
@@ -30,9 +31,9 @@ public abstract class EnturGooglePubSubUtils {
             subscriber.stopAsync().awaitTerminated(10, TimeUnit.SECONDS);
             LOGGER.trace("Stopped subscriber for {}", destinationName);
         } catch (TimeoutException e) {
-            LOGGER.warn("Timeout while trying to stop subscriber for " + destinationName, e);
+            LOGGER.warn("Timeout while trying to stop subscriber for {}", destinationName, e);
         } catch (IllegalStateException e) {
-            LOGGER.warn("Failed to stop subscriber for " + destinationName, subscriber.failureCause());
+            LOGGER.warn("Failed to stop subscriber for {}", destinationName, subscriber.failureCause());
         }
     }
 

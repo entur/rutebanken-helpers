@@ -19,19 +19,12 @@
 Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.entur.helpers</groupId>
         <artifactId>helper</artifactId>
-        <version>1.0.22-SNAPSHOT</version>
-        <relativePath>..</relativePath>
+        <version>1.0.21-SNAPSHOT</version>
     </parent>
-
-    <properties>
-        <license.licenseResolver>${project.baseUri}/../src/license</license.licenseResolver>
-        <entur.google.pubsub.emulator.download.skip>false</entur.google.pubsub.emulator.download.skip>
-    </properties>
-
-    <modelVersion>4.0.0</modelVersion>
 
     <artifactId>entur-google-pubsub</artifactId>
 
@@ -40,6 +33,11 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
         Base configuration for Google PubSub clients, to be used for non-Camel clients.
         Camel-based clients should use camel-entur-google-pubsub instead.
     </description>
+
+    <properties>
+        <license.licenseResolver>${project.baseUri}/../src/license</license.licenseResolver>
+        <entur.google.pubsub.emulator.download.skip>false</entur.google.pubsub.emulator.download.skip>
+    </properties>
 
     <dependencies>
         <!-- NOTICE that you put the versions in the parent dependency

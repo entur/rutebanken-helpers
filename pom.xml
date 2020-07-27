@@ -15,25 +15,29 @@
   ~
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>org.rutebanken.superpom</groupId>
         <artifactId>superpom</artifactId>
-        <version>1.0.9</version>
+        <version>1.0.11</version>
     </parent>
-
-    <packaging>pom</packaging>
 
     <groupId>org.entur.helpers</groupId>
     <artifactId>helper</artifactId>
     <version>1.0.22-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
     <name>rutebanken-helper</name>
-    <description>Library artifacts collected and to be used as tools in other projects.</description>
-    <url>https://github.com/rutebanken/rutebanken-helpers</url>
+    <description>Shared libraries used in other route database/journey planning components</description>
+    <url>https://github.com/entur/rutebanken-helpers</url>
     <inceptionYear>2016</inceptionYear>
+    <organization>
+        <name>Entur AS</name>
+        <url>https://www.entur.org/</url>
+    </organization>
     <licenses>
         <license>
             <name>EUPL-1.2 with modifications</name>
@@ -42,17 +46,23 @@
         </license>
     </licenses>
 
+    <modules>
+        <module>gcp-storage</module>
+        <module>hazelcast-helper</module>
+        <module>calendar-helper</module>
+        <module>organisation</module>
+        <module>jms-batch</module>
+        <module>slack</module>
+        <module>entur-google-pubsub</module>
+        <module>camel-entur-google-pubsub</module>
+    </modules>
+
     <scm>
         <connection>scm:git:ssh://git@github.com/entur/rutebanken-helpers.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/entur/rutebanken-helpers.git</developerConnection>
         <url>https://github.com/entur/rutebanken-helpers/tree/master</url>
-      <tag>HEAD</tag>
-  </scm>
-
-    <organization>
-        <name>Entur AS</name>
-        <url>http://www.entur.org/</url>
-    </organization>
+        <tag>HEAD</tag>
+    </scm>
 
     <distributionManagement>
         <repository>
@@ -83,7 +93,6 @@
         <camel.version>2.25.1</camel.version>
         <kubernetes-client.version>4.9.0</kubernetes-client.version>
         <commons-io.version>2.6</commons-io.version>
-
     </properties>
 
     <dependencyManagement>
@@ -156,21 +165,12 @@
                     </gitFlowConfig>
                     <commitMessages>
                         <releaseFinishMessage>Update for next development version [ci skip]</releaseFinishMessage>
-                        <releaseVersionUpdateMessage>Update for next development version [ci skip]</releaseVersionUpdateMessage>
+                        <releaseVersionUpdateMessage>Update for next development version [ci skip]
+                        </releaseVersionUpdateMessage>
                     </commitMessages>
                 </configuration>
             </plugin>
         </plugins>
     </build>
 
-    <modules>
-        <module>gcp-storage</module>
-        <module>hazelcast-helper</module>
-        <module>calendar-helper</module>
-        <module>organisation</module>
-        <module>jms-batch</module>
-        <module>slack</module>
-        <module>entur-google-pubsub</module>
-        <module>camel-entur-google-pubsub</module>
-    </modules>
 </project>
