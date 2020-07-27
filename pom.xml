@@ -31,12 +31,12 @@
     <packaging>pom</packaging>
 
     <name>rutebanken-helper</name>
-    <description>Library artifacts collected and to be used as tools in other projects.</description>
+    <description>Shared libraries used in other route database/journey planning components</description>
     <url>https://github.com/entur/rutebanken-helpers</url>
     <inceptionYear>2016</inceptionYear>
     <organization>
         <name>Entur AS</name>
-        <url>http://www.entur.org/</url>
+        <url>https://www.entur.org/</url>
     </organization>
     <licenses>
         <license>
