@@ -76,6 +76,7 @@ public class BlobStoreHelperTest {
     public void testDownload() throws IOException {
         BlobStoreHelper.uploadBlob(storage, BUCKET_NAME, blobName, IOUtils.toByteArray(this.getClass().getResourceAsStream(fileName)), false);
         InputStream inputStream = BlobStoreHelper.getBlob(storage, BUCKET_NAME, blobName);
+        assertNotNull(inputStream);
         byte[] result = ByteStreams.toByteArray(inputStream);
         byte[] expected = ByteStreams.toByteArray(this.getClass().getResourceAsStream(fileName));
         assertEquals(expected.length, result.length);

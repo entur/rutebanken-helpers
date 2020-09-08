@@ -19,6 +19,7 @@ package org.rutebanken.helper.gcp;
 import com.google.api.gax.paging.Page;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.cloud.WriteChannel;
+import com.google.cloud.http.HttpTransportOptions;
 import com.google.cloud.storage.Acl;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
@@ -43,6 +44,7 @@ public class BlobStoreHelper {
     private static final Logger LOGGER = LoggerFactory.getLogger(BlobStoreHelper.class);
 
     private static final int DEFAULT_CHUNK_SIZE = 15 * 1024 * 1024;
+    private static final int CONNECT_AND_READ_TIMEOUT = 60000;
 
     private BlobStoreHelper() {
     }
@@ -81,7 +83,7 @@ public class BlobStoreHelper {
      * To be replaced with Blob.uploadFrom() when the method is available. See also  https://github.com/googleapis/java-storage/issues/40
      */
     public static Blob uploadBlobWithRetry(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic, String contentType) {
-        LOGGER.debug("Uploading blob {} to bucket {}", name, containerName);
+        LOGGER.debug("Uploading with retry blob {} to bucket {}", name, containerName);
         BlobId blobId = BlobId.of(containerName, name);
         BlobInfo.Builder builder = BlobInfo.newBuilder(blobId).setContentType(contentType);
         if (makePublic) {
@@ -139,9 +141,17 @@ public class BlobStoreHelper {
 
     public static Storage getStorage(String credentialPath, String projectId) {
         try {
+
+            // prevent copy operations from timing out when copying blobs across buckets
+            // see https://github.com/googleapis/google-cloud-java/issues/2243
+            HttpTransportOptions transportOptions = StorageOptions.getDefaultHttpTransportOptions();
+            transportOptions = transportOptions.toBuilder().setConnectTimeout(CONNECT_AND_READ_TIMEOUT).setReadTimeout(CONNECT_AND_READ_TIMEOUT)
+                    .build();
+
             return StorageOptions.newBuilder()
                     .setCredentials(ServiceAccountCredentials.fromStream(new FileInputStream(credentialPath)))
                     .setProjectId(projectId)
+                    .setTransportOptions(transportOptions)
                     .build().getService();
         } catch (IOException e) {
             throw new BlobStoreException(e);
