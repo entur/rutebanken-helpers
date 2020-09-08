@@ -92,6 +92,10 @@
         <camel.version>2.25.2</camel.version>
         <kubernetes-client.version>4.9.2</kubernetes-client.version>
         <commons-io.version>2.7</commons-io.version>
+
+        <!-- empty argLine property, the value is set up by Jacoco during unit tests execution -->
+        <argLine></argLine>
+
     </properties>
 
     <dependencyManagement>
@@ -150,6 +154,16 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>@{argLine} -Xms500m -Xmx500m -Xss256k</argLine>
+                    <systemPropertyVariables combine.children="override">
+                        <spring.output.ansi.enabled>ALWAYS</spring.output.ansi.enabled>
+                    </systemPropertyVariables>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>com.amashchenko.maven.plugin</groupId>
