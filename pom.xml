@@ -92,9 +92,6 @@
         <camel.version>2.25.2</camel.version>
         <kubernetes-client.version>4.9.2</kubernetes-client.version>
         <commons-io.version>2.7</commons-io.version>
-
-        <gitflow-maven-plugin.version>1.14.0</gitflow-maven-plugin.version>
-
     </properties>
 
     <dependencyManagement>
