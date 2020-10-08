@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Licensed under the EUPL, Version 1.2 or – as soon they will be approved by
+  ~ the European Commission - subsequent versions of the EUPL (the "Licence");
+  ~ You may not use this work except in compliance with the Licence.
+  ~ You may obtain a copy of the Licence at:
+  ~
+  ~   https://joinup.ec.europa.eu/software/page/eupl
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the Licence is distributed on an "AS IS" basis,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the Licence for the specific language governing permissions and
+  ~ limitations under the Licence.
+  ~
+  -->
+
+<!--
+Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.entur.helpers</groupId>
+        <artifactId>helper</artifactId>
+        <version>1.0.26-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>camel3-entur-google-pubsub</artifactId>
+
+    <name>camel3-entur-google-pubsub</name>
+    <description>
+        Base configuration for Google PubSub clients, to be used for Camel 3 clients.
+        Non-Camel clients should use entur-google-pubsub instead.
+    </description>
+
+    <properties>
+        <license.licenseResolver>${project.baseUri}/../src/license</license.licenseResolver>
+    </properties>
+
+<dependencyManagement>
+<dependencies>
+    <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-bom</artifactId>
+        <version>${camel3.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+    </dependency>
+</dependencies>
+</dependencyManagement>
+
+    <dependencies>
+        <!-- NOTICE that you put the versions in the parent dependency
+        management section, and artifacts without version here. -->
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-support</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.entur.helpers</groupId>
+            <artifactId>entur-google-pubsub</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+    </build>
+
+</project>
