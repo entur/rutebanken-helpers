@@ -70,7 +70,7 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
         <!--test-->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
+            <artifactId>junit-jupiter-engine</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
