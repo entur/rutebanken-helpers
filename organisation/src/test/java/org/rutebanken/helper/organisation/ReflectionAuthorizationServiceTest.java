@@ -17,7 +17,7 @@
 package org.rutebanken.helper.organisation;
 
 import com.google.common.base.MoreObjects;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.security.core.Authentication;
 
 import java.util.Arrays;
@@ -54,7 +54,7 @@ import static org.rutebanken.helper.organisation.AuthorizationConstants.ENTITY_T
  * }
  * ]
  */
-public class ReflectionAuthorizationServiceTest {
+class ReflectionAuthorizationServiceTest {
 
 
     private RoleAssignmentExtractor roleAssignmentExtractor = new RoleAssignmentExtractor() {
@@ -77,7 +77,7 @@ public class ReflectionAuthorizationServiceTest {
     private ReflectionAuthorizationService reflectionAuthorizationService = new ReflectionAuthorizationService(roleAssignmentExtractor, true, organisationChecker, administrativeZoneChecker, entityResolver, fieldMappings);
 
     @Test
-    public void authorizedForLegalStopPlaceTypesWhenOthersBlacklisted() {
+    void authorizedForLegalStopPlaceTypesWhenOthersBlacklisted() {
         RoleAssignment roleAssignment = RoleAssignment.builder()
                 .withRole("editStops")
                 .withAdministrativeZone("01")
@@ -98,7 +98,7 @@ public class ReflectionAuthorizationServiceTest {
      * EntityType=StopPlace, StopPlaceType=!railStation,!airport, Submode=!railReplacementBus
      */
     @Test
-    public void authorizedWithCombinationOfTwoFields() {
+    void authorizedWithCombinationOfTwoFields() {
 
         StopPlace stopPlace = new StopPlace();
         stopPlace.stopPlaceType = StopPlace.StopPlaceType.ONSTREET_BUS;
@@ -121,7 +121,7 @@ public class ReflectionAuthorizationServiceTest {
     }
 
     @Test
-    public void notAuthorizedWithCombinationOfNegatedTwoFields() {
+    void notAuthorizedWithCombinationOfNegatedTwoFields() {
 
         String railReplacementBus = "railReplacementBus";
 
@@ -146,7 +146,7 @@ public class ReflectionAuthorizationServiceTest {
     }
 
     @Test
-    public void notAuthorizedWithCombinationOfNegatedTwoFields2() {
+    void notAuthorizedWithCombinationOfNegatedTwoFields2() {
 
         StopPlace stopPlace = new StopPlace();
         stopPlace.stopPlaceType = StopPlace.StopPlaceType.AIRPORT;
@@ -169,7 +169,7 @@ public class ReflectionAuthorizationServiceTest {
     }
 
     @Test
-    public void notAuthorizedWithCombinationOfNegatedTwoFields3() {
+    void notAuthorizedWithCombinationOfNegatedTwoFields3() {
 
         StopPlace stopPlace = new StopPlace();
         stopPlace.stopPlaceType = StopPlace.StopPlaceType.AIRPORT;
@@ -193,7 +193,7 @@ public class ReflectionAuthorizationServiceTest {
     }
 
     @Test
-    public void handleMappedClassificationsNegation() {
+    void handleMappedClassificationsNegation() {
 
         StopPlace stopPlace = new StopPlace();
         stopPlace.someField1 = "someval1";
@@ -216,7 +216,7 @@ public class ReflectionAuthorizationServiceTest {
     }
 
     @Test
-    public void handleMappedClassifications() {
+    void handleMappedClassifications() {
 
         StopPlace stopPlace = new StopPlace();
         stopPlace.someField1 = "someval1";
@@ -237,7 +237,7 @@ public class ReflectionAuthorizationServiceTest {
     }
 
     @Test
-    public void authorizedForLegalSubmodeTypesWhenStarValue() {
+    void authorizedForLegalSubmodeTypesWhenStarValue() {
         RoleAssignment roleAssignment = RoleAssignment.builder()
                 .withRole("editStops")
                 .withOrganisation("OST")
@@ -253,7 +253,7 @@ public class ReflectionAuthorizationServiceTest {
     }
 
     @Test
-    public void shouldBeAuthorizedForSubmodeTypesWhenExplicitWhiteListed() {
+    void shouldBeAuthorizedForSubmodeTypesWhenExplicitWhiteListed() {
         RoleAssignment roleAssignment = RoleAssignment.builder()
                 .withRole("editStops")
                 .withOrganisation("OST")
@@ -269,7 +269,7 @@ public class ReflectionAuthorizationServiceTest {
     }
 
     @Test
-    public void notAuthorizedForSubmodeTypesWhenExplicitWhiteListed() {
+    void notAuthorizedForSubmodeTypesWhenExplicitWhiteListed() {
         RoleAssignment roleAssignment = RoleAssignment.builder()
                 .withRole("editStops")
                 .withOrganisation("OST")
@@ -285,7 +285,7 @@ public class ReflectionAuthorizationServiceTest {
     }
 
     @Test
-    public void authorizedWhenAllTypesEntityType() {
+    void authorizedWhenAllTypesEntityType() {
         RoleAssignment roleAssignment = RoleAssignment.builder()
                 .withRole("viewStops")
                 .withAdministrativeZone("01")
@@ -298,7 +298,7 @@ public class ReflectionAuthorizationServiceTest {
     }
 
     @Test
-    public void notAuthorizedWhenRolesMismatch() {
+    void notAuthorizedWhenRolesMismatch() {
         RoleAssignment roleAssignment = RoleAssignment.builder()
                 .withRole("viewStops")
                 .withAdministrativeZone("01")
@@ -311,7 +311,7 @@ public class ReflectionAuthorizationServiceTest {
     }
 
     @Test
-    public void notAuthorizedWhenEmptyRoleAssignmentEntityClassifications() {
+    void notAuthorizedWhenEmptyRoleAssignmentEntityClassifications() {
         RoleAssignment roleAssignment = RoleAssignment.builder()
                 .withRole("viewStops")
                 .withAdministrativeZone("01")
@@ -323,7 +323,7 @@ public class ReflectionAuthorizationServiceTest {
     }
 
     @Test
-    public void notAuthorizedForIncorrectSubMode() {
+    void notAuthorizedForIncorrectSubMode() {
         RoleAssignment roleAssignment = RoleAssignment.builder()
                 .withRole("editStops")
                 .withAdministrativeZone("01")
@@ -343,7 +343,7 @@ public class ReflectionAuthorizationServiceTest {
     }
 
     @Test
-    public void notAuthorizedForIncorrectEntityType() {
+    void notAuthorizedForIncorrectEntityType() {
         RoleAssignment roleAssignment = RoleAssignment.builder()
                 .withRole("viewStops")
                 .withAdministrativeZone("01")
@@ -359,7 +359,7 @@ public class ReflectionAuthorizationServiceTest {
     }
 
     @Test
-    public void notAuthorizedToEditAirport() {
+    void notAuthorizedToEditAirport() {
         RoleAssignment roleAssignment = RoleAssignment.builder()
                 .withRole("editStops")
                 .withAdministrativeZone("01")
@@ -376,7 +376,7 @@ public class ReflectionAuthorizationServiceTest {
     }
 
     @Test
-    public void notAuthorizedWhenValueEmpty() {
+    void notAuthorizedWhenValueEmpty() {
         RoleAssignment roleAssignment = RoleAssignment.builder()
                 .withRole("editStops")
                 .withAdministrativeZone("01")
@@ -395,7 +395,7 @@ public class ReflectionAuthorizationServiceTest {
      * Onstreet bus does does contain underscore.
      */
     @Test
-    public void notAuthorizedToEditOnstreetBus() {
+    void notAuthorizedToEditOnstreetBus() {
         RoleAssignment roleAssignment = RoleAssignment.builder()
                 .withRole("editStops")
                 .withAdministrativeZone("01")
@@ -412,7 +412,7 @@ public class ReflectionAuthorizationServiceTest {
     }
 
     @Test
-    public void notAuthorizedToEditWhenOneBlacklisted() {
+    void notAuthorizedToEditWhenOneBlacklisted() {
         RoleAssignment roleAssignment = RoleAssignment.builder()
                 .withRole("editStops")
                 .withAdministrativeZone("01")
@@ -430,7 +430,7 @@ public class ReflectionAuthorizationServiceTest {
     }
 
     @Test
-    public void notAuthorizedToEditWhenNoNegation() {
+    void notAuthorizedToEditWhenNoNegation() {
         RoleAssignment roleAssignment = RoleAssignment.builder()
                 .withRole("editStops")
                 .withAdministrativeZone("01")
@@ -447,7 +447,7 @@ public class ReflectionAuthorizationServiceTest {
     }
 
     @Test
-    public void notAuthorizedToEditWhenEnumValueContainsUnderscore() {
+    void notAuthorizedToEditWhenEnumValueContainsUnderscore() {
         RoleAssignment roleAssignment = RoleAssignment.builder()
                 .withRole("editStops")
                 .withAdministrativeZone("01")
@@ -464,7 +464,7 @@ public class ReflectionAuthorizationServiceTest {
     }
 
     @Test
-    public void multipleEnumsShouldBeAllowed() {
+    void multipleEnumsShouldBeAllowed() {
 
         List<StopPlace.StopPlaceType> types = Arrays.asList(
                 StopPlace.StopPlaceType.AIRPORT,
@@ -493,7 +493,7 @@ public class ReflectionAuthorizationServiceTest {
     }
 
     @Test
-    public void mixNegationForEnums() {
+    void mixNegationForEnums() {
             RoleAssignment roleAssignment = RoleAssignment.builder()
                 .withRole("editStops")
                 .withAdministrativeZone("01")
@@ -522,7 +522,7 @@ public class ReflectionAuthorizationServiceTest {
 
 
     @Test
-    public void authorizedForCertainEnumValues() {
+    void authorizedForCertainEnumValues() {
 
         for(StopPlace.StopPlaceType enumValue : StopPlace.StopPlaceType.values()){
             RoleAssignment roleAssignment = RoleAssignment.builder()
@@ -550,7 +550,7 @@ public class ReflectionAuthorizationServiceTest {
     }
 
     @Test
-    public void authorizedWithSubmodeAndType() {
+    void authorizedWithSubmodeAndType() {
         RoleAssignment roleAssignment = RoleAssignment.builder()
                 .withRole("editStops")
                 .withOrganisation("OST")
