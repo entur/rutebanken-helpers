@@ -18,124 +18,124 @@ package org.rutebanken.helper.calendar;
 
 
 import com.google.common.collect.Sets;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-public class CalendarPatternAnalyzerTest {
+class CalendarPatternAnalyzerTest {
 	CalendarPatternAnalyzer analyzer = new CalendarPatternAnalyzer();
 	LocalDate calStartDate = LocalDate.of(2016, 1, 18); // Jan 18 2016
 
 
 	@Test
-	public void testParseFromStringEmptyPattern() {
+	void testParseFromStringEmptyPattern() {
 		Set<DayOfWeek> significantDays = analyzer.computeSignificantDays(calStartDate, includedDaysAsBoolArray(emptyPattern));
-		Assert.assertTrue(significantDays.isEmpty());
+		Assertions.assertTrue(significantDays.isEmpty());
 	}
 
 	@Test
-	public void testParseFromStringSundayPattern() {
+	void testParseFromStringSundayPattern() {
 		Set<DayOfWeek> significantDays = analyzer.computeSignificantDays(calStartDate, includedDaysAsBoolArray(sundayPattern));
-		Assert.assertEquals(significantDays, Sets.newHashSet(DayOfWeek.SUNDAY));
+		Assertions.assertEquals(significantDays, Sets.newHashSet(DayOfWeek.SUNDAY));
 	}
 
 	@Test
-	public void testParseFromStringSaturdayPattern() {
+	void testParseFromStringSaturdayPattern() {
 		Set<DayOfWeek> significantDays = analyzer.computeSignificantDays(calStartDate, includedDaysAsBoolArray(saturdayPattern));
-		Assert.assertEquals(significantDays, Sets.newHashSet(DayOfWeek.SATURDAY));
+		Assertions.assertEquals(significantDays, Sets.newHashSet(DayOfWeek.SATURDAY));
 	}
 
 	@Test
-	public void testParseFromStringFridayPattern() {
+	void testParseFromStringFridayPattern() {
 		Set<DayOfWeek> significantDays = analyzer.computeSignificantDays(calStartDate, includedDaysAsBoolArray(fridayPattern));
-		Assert.assertEquals(significantDays, Sets.newHashSet(DayOfWeek.FRIDAY));
+		Assertions.assertEquals(significantDays, Sets.newHashSet(DayOfWeek.FRIDAY));
 	}
 
 	@Test
-	public void testParseFromStringWednesdayPattern() {
+	void testParseFromStringWednesdayPattern() {
 		Set<DayOfWeek> significantDays = analyzer.computeSignificantDays(calStartDate, includedDaysAsBoolArray(wednesdayPattern));
-		Assert.assertEquals(significantDays, Sets.newHashSet(DayOfWeek.WEDNESDAY));
+		Assertions.assertEquals(significantDays, Sets.newHashSet(DayOfWeek.WEDNESDAY));
 	}
 
 	@Test
-	public void testFromStringSingleDayPattern() {
+	void testFromStringSingleDayPattern() {
 		Set<DayOfWeek> significantDays = analyzer.computeSignificantDays(calStartDate, includedDaysAsBoolArray(noPattern));
-		Assert.assertTrue(significantDays.isEmpty());
+		Assertions.assertTrue(significantDays.isEmpty());
 	}
 
 	@Test
-	public void testParseFromStringTuesdayToFridayPattern() {
+	void testParseFromStringTuesdayToFridayPattern() {
 		Set<DayOfWeek> significantDays = analyzer.computeSignificantDays(calStartDate, includedDaysAsBoolArray(tuesdayToFridayPattern));
-		Assert.assertEquals(significantDays, Sets.newHashSet(DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY));
+		Assertions.assertEquals(significantDays, Sets.newHashSet(DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY));
 	}
 
 	@Test
-	public void testComputeCalendarPatternEmptyPattern() {
+	void testComputeCalendarPatternEmptyPattern() {
 		CalendarPattern  pattern = analyzer.computeCalendarPattern(includedDaysAsLocalDates(calStartDate, emptyPattern));
-		Assert.assertNull(pattern);
+		Assertions.assertNull(pattern);
 	}
 
 	@Test
-	public void testComputeCalendarPatternSundayPattern() {
+	void testComputeCalendarPatternSundayPattern() {
 		CalendarPattern  pattern = analyzer.computeCalendarPattern(includedDaysAsLocalDates(calStartDate, sundayPattern));
-		Assert.assertEquals(pattern.significantDays, Sets.newHashSet(DayOfWeek.SUNDAY));
-		Assert.assertEquals(pattern.from, LocalDate.of(2016, 2, 1));
-		Assert.assertEquals(pattern.to, LocalDate.of(2016, 6, 25));
+		Assertions.assertEquals(pattern.significantDays, Sets.newHashSet(DayOfWeek.SUNDAY));
+		Assertions.assertEquals(pattern.from, LocalDate.of(2016, 2, 1));
+		Assertions.assertEquals(pattern.to, LocalDate.of(2016, 6, 25));
 	}
 
 	@Test
-	public void testComputeCalendarPatternSaturdayPattern() {
+	void testComputeCalendarPatternSaturdayPattern() {
 		CalendarPattern  pattern = analyzer.computeCalendarPattern(includedDaysAsLocalDates(calStartDate, saturdayPattern));
-		Assert.assertEquals(pattern.significantDays, Sets.newHashSet(DayOfWeek.SATURDAY));
+		Assertions.assertEquals(pattern.significantDays, Sets.newHashSet(DayOfWeek.SATURDAY));
 	}
 
 	@Test
-	public void testComputeCalendarPatternFridayPattern() {
+	void testComputeCalendarPatternFridayPattern() {
 		CalendarPattern  pattern = analyzer.computeCalendarPattern(includedDaysAsLocalDates(calStartDate, fridayPattern));
-		Assert.assertEquals(pattern.significantDays, Sets.newHashSet(DayOfWeek.FRIDAY));
+		Assertions.assertEquals(pattern.significantDays, Sets.newHashSet(DayOfWeek.FRIDAY));
 	}
 
 	@Test
-	public void testComputeCalendarPatternWednesdayPattern() {
+	void testComputeCalendarPatternWednesdayPattern() {
 		CalendarPattern  pattern = analyzer.computeCalendarPattern(includedDaysAsLocalDates(calStartDate, wednesdayPattern));
-		Assert.assertEquals(pattern.significantDays, Sets.newHashSet(DayOfWeek.WEDNESDAY));
+		Assertions.assertEquals(pattern.significantDays, Sets.newHashSet(DayOfWeek.WEDNESDAY));
 	}
 
 	@Test
-	public void testComputeCalendarPatternNoPattern() {
+	void testComputeCalendarPatternNoPattern() {
 		CalendarPattern  pattern = analyzer.computeCalendarPattern(includedDaysAsLocalDates(calStartDate, noPattern));
-		Assert.assertNull(pattern);
+		Assertions.assertNull(pattern);
 	}
 
 	@Test
-	public void testComputeCalendarPatternTuesdayToFridayPattern() {
+	void testComputeCalendarPatternTuesdayToFridayPattern() {
 		CalendarPattern  pattern = analyzer.computeCalendarPattern(includedDaysAsLocalDates(calStartDate, tuesdayToFridayPattern));
-		Assert.assertEquals(pattern.significantDays, Sets.newHashSet(DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY));
-		Assert.assertEquals(pattern.from, LocalDate.of(2016, 1, 16));
-		Assert.assertEquals(pattern.to, LocalDate.of(2016, 6, 20));
-		Assert.assertEquals(pattern.excludedDates, Sets.newHashSet(calStartDate.plusDays(64), calStartDate.plusDays(65), calStartDate.plusDays(66),
+		Assertions.assertEquals(pattern.significantDays, Sets.newHashSet(DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY));
+		Assertions.assertEquals(pattern.from, LocalDate.of(2016, 1, 16));
+		Assertions.assertEquals(pattern.to, LocalDate.of(2016, 6, 20));
+		Assertions.assertEquals(pattern.excludedDates, Sets.newHashSet(calStartDate.plusDays(64), calStartDate.plusDays(65), calStartDate.plusDays(66),
 				calStartDate.plusDays(67), calStartDate.plusDays(108), calStartDate.plusDays(120)));
-		Assert.assertEquals(pattern.additionalDates, Sets.newHashSet(calStartDate.plusDays(6), calStartDate.plusDays(343)));
+		Assertions.assertEquals(pattern.additionalDates, Sets.newHashSet(calStartDate.plusDays(6), calStartDate.plusDays(343)));
 
 	}
 
 	@Test
-	public void testComputeCalendarPatternNoDatesIncluded() {
-		Assert.assertNull(analyzer.computeCalendarPattern(new HashSet<>()));
+	void testComputeCalendarPatternNoDatesIncluded() {
+		Assertions.assertNull(analyzer.computeCalendarPattern(new HashSet<>()));
 	}
 
 
 	@Test
-	public void testComputeCalendarPatternEveryDayPattern() {
+	void testComputeCalendarPatternEveryDayPattern() {
 		CalendarPattern  pattern = analyzer.computeCalendarPattern(includedDaysAsLocalDates(calStartDate, everyDayPattern));
-		Assert.assertEquals(pattern.from, calStartDate);
-		Assert.assertEquals(pattern.to, calStartDate.plusDays(74));
-		Assert.assertTrue(pattern.additionalDates.isEmpty());
-		Assert.assertTrue(pattern.excludedDates.isEmpty());
+		Assertions.assertEquals(pattern.from, calStartDate);
+		Assertions.assertEquals(pattern.to, calStartDate.plusDays(74));
+		Assertions.assertTrue(pattern.additionalDates.isEmpty());
+		Assertions.assertTrue(pattern.excludedDates.isEmpty());
 	}
 
 	String everyDayPattern = "111111111111111111111111111111111111111111111111111111111111111111111111111";

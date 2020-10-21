@@ -95,8 +95,11 @@
         <kubernetes-client.version>4.9.2</kubernetes-client.version>
         <commons-io.version>2.7</commons-io.version>
 
+        <hamcrest.version>2.2</hamcrest.version>
+
+
         <!-- empty argLine property, the value is set up by Jacoco during unit tests execution -->
-        <argLine></argLine>
+        <argLine/>
 
     </properties>
 
@@ -146,6 +149,14 @@
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>${commons-io.version}</version>
+            </dependency>
+
+            <!--test-->
+            <dependency>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest</artifactId>
+                <version>${hamcrest.version}</version>
+                <scope>test</scope>
             </dependency>
 
         </dependencies>

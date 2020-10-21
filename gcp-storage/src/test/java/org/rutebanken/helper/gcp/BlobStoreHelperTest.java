@@ -33,7 +33,7 @@ import java.util.Iterator;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Disabled
-public class BlobStoreHelperTest {
+class BlobStoreHelperTest {
 
     private static final String BUCKET_NAME = "marduk-test";
     private static final String credentialPath = "/home/tomgag/.ssh/Carbon-ef49cabc6d04.json";
@@ -44,25 +44,25 @@ public class BlobStoreHelperTest {
     private final String blobName = directory + fileName;
 
     @BeforeAll
-    public static void beforeAll() {
+    static void beforeAll() {
         storage = BlobStoreHelper.getStorage(credentialPath, "carbon-1287");
     }
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         // Eating our own dog food here
         Iterator<Blob> blobIterator = BlobStoreHelper.listAllBlobsRecursively(storage, BUCKET_NAME, directory);
         blobIterator.forEachRemaining(blob -> BlobStoreHelper.delete(storage, BlobId.of(BUCKET_NAME, blob.getName())));
     }
 
     @Test
-    public void testUpload() throws IOException {
+    void testUpload() throws IOException {
         Blob blob = BlobStoreHelper.uploadBlob(storage, BUCKET_NAME, blobName, IOUtils.toByteArray(this.getClass().getResourceAsStream(fileName)), false);
         assertNotNull(blob);
     }
 
     @Test
-    public void testList() throws IOException {
+    void testList() throws IOException {
         BlobStoreHelper.uploadBlob(storage, BUCKET_NAME, blobName, IOUtils.toByteArray(this.getClass().getResourceAsStream(fileName)), false);
         Iterator<Blob> blobIterator = BlobStoreHelper.listAllBlobsRecursively(storage, BUCKET_NAME, directory);
         assertTrue(blobIterator.hasNext());
@@ -73,7 +73,7 @@ public class BlobStoreHelperTest {
     }
 
     @Test
-    public void testDownload() throws IOException {
+    void testDownload() throws IOException {
         BlobStoreHelper.uploadBlob(storage, BUCKET_NAME, blobName, IOUtils.toByteArray(this.getClass().getResourceAsStream(fileName)), false);
         InputStream inputStream = BlobStoreHelper.getBlob(storage, BUCKET_NAME, blobName);
         assertNotNull(inputStream);
@@ -84,7 +84,7 @@ public class BlobStoreHelperTest {
     }
 
     @Test
-    public void testDelete() throws IOException {
+    void testDelete() throws IOException {
         BlobStoreHelper.uploadBlob(storage, BUCKET_NAME, blobName, IOUtils.toByteArray(this.getClass().getResourceAsStream(fileName)), false);
         BlobStoreHelper.delete(storage, BlobId.of(BUCKET_NAME, blobName));
         Iterator<Blob> blobIterator = BlobStoreHelper.listAllBlobsRecursively(storage, BUCKET_NAME, directory);
