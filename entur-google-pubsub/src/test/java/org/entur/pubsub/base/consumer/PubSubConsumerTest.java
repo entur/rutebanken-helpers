@@ -3,8 +3,8 @@ package org.entur.pubsub.base.consumer;
 import org.entur.pubsub.base.AbstractEnturGooglePubSubConsumer;
 import org.entur.pubsub.base.BasePubSubIntegrationTest;
 import org.entur.pubsub.base.EnturGooglePubSubConsumer;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cloud.gcp.pubsub.core.PubSubTemplate;
@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 
-public class PubSubConsumerTest extends BasePubSubIntegrationTest {
+class PubSubConsumerTest extends BasePubSubIntegrationTest {
 
     public static final String TEST_QUEUE = "TestQueue";
     public static final String TEST_PAYLOAD = "Test Payload";
@@ -48,10 +48,10 @@ public class PubSubConsumerTest extends BasePubSubIntegrationTest {
     }
 
     @Test
-    public void testMessageConsumer() throws InterruptedException, ExecutionException, TimeoutException {
+    void testMessageConsumer() throws InterruptedException, ExecutionException, TimeoutException {
 
         pubSubTemplate.publish(TEST_QUEUE, TEST_PAYLOAD);
-        Assert.assertEquals("The consumer should have received the payload", TEST_PAYLOAD, messageContent.get(10, TimeUnit.SECONDS));
+        Assertions.assertEquals(TEST_PAYLOAD, messageContent.get(10, TimeUnit.SECONDS), "The consumer should have received the payload");
 
     }
 
