@@ -64,7 +64,6 @@ public class HazelCastService {
             try {
                 String name = kubernetesService.findDeploymentName();
                 hazelcast = runHazelcast( kubernetesService.findEndpoints(), name);
-                startupOk = true;
             } catch ( Exception e ) {
                 throw new RutebankenHazelcastException("Could not run initialization of hazelcast.",e);
             }
