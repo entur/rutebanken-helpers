@@ -36,8 +36,6 @@ public class HazelCastService {
 
     protected HazelcastInstance hazelcast;
 
-    private boolean startupOk = false;
-
     private KubernetesService kubernetesService;
 
     @Value("${entur.hazelcast.backup.count.sync:2}")
