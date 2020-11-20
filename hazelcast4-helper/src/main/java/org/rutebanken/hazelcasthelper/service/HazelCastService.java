@@ -71,15 +71,21 @@ public class HazelCastService {
             log.warn("Using local hazelcast as we do not have kubernetes");
             hazelcast = initForLocalHazelCast();
         }
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> hazelcast.shutdown()));
+        // the shutdown hook should be disabled in a Spring environment to prevent Hazelcast from being stopped
+        // too early, leading to the exception "HazelcastInstanceNotActiveException" at shutdown time.
+        // Instead the shutdown should be managed by Spring at application context-closing time
+        // see HazelCastService.shutdown()
+        // TODO the shutdown hook should eventually be disabled by default
+        if (shutDownHookEnabled) {
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> hazelcast.shutdown()));
+        }
     }
-
 
     @PreDestroy
     public final void shutdown() {
-        log.info("Shutdown initiated");
+        log.info("Hazelcast instance shutdown initiated");
         hazelcast.shutdown();
-        log.info("Shutdown finished");
+        log.info("Hazelcast instance shutdown finished");
     }
 
     /**
