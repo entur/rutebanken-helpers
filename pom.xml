@@ -52,6 +52,7 @@
         <module>hazelcast4-helper</module>
         <module>calendar-helper</module>
         <module>organisation</module>
+        <module>logging</module>
         <module>slack</module>
         <module>entur-google-pubsub</module>
         <module>camel-entur-google-pubsub</module>
