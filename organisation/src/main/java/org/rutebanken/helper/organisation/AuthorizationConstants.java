@@ -25,6 +25,8 @@ public class AuthorizationConstants {
     public static final String ROLE_ROUTE_DATA_EDIT = "editRouteData";
     public static final String ROLE_ROUTE_DATA_ADMIN = "adminEditRouteData";
 
+    public static final String ROLE_NETEX_BLOCKS_DATA_VIEW = "viewNetexBlocksData";
+
     public static final String ENTITY_CLASSIFIER_ALL_TYPES = "*";
     public static final String ENTITY_TYPE = "EntityType";
 
