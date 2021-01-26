@@ -1,10 +1,10 @@
 package org.entur.pubsub.camel;
 
+import com.google.cloud.spring.pubsub.core.PubSubTemplate;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cloud.gcp.pubsub.core.PubSubTemplate;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,11 +1,11 @@
 package org.entur.pubsub.camel;
 
+import com.google.cloud.spring.pubsub.core.PubSubTemplate;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Endpoint;
 import org.apache.camel.support.DefaultComponent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.gcp.pubsub.core.PubSubTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;

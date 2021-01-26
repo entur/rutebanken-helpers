@@ -1,6 +1,8 @@
 package org.entur.pubsub.camel;
 
 import com.google.cloud.pubsub.v1.Subscriber;
+import com.google.cloud.spring.pubsub.core.PubSubTemplate;
+import com.google.cloud.spring.pubsub.support.BasicAcknowledgeablePubsubMessage;
 import com.google.pubsub.v1.PubsubMessage;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -9,8 +11,6 @@ import org.apache.camel.spi.Synchronization;
 import org.entur.pubsub.base.EnturGooglePubSubUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cloud.gcp.pubsub.core.PubSubTemplate;
-import org.springframework.cloud.gcp.pubsub.support.BasicAcknowledgeablePubsubMessage;
 
 import java.util.ArrayList;
 import java.util.List;

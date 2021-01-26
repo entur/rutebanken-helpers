@@ -43,7 +43,7 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
         <!-- NOTICE that you put the versions in the parent dependency
         management section, and artifacts without version here. -->
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
+            <groupId>com.google.cloud</groupId>
             <artifactId>spring-cloud-gcp-starter-pubsub</artifactId>
         </dependency>
         <dependency>
