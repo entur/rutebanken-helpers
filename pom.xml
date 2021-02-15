@@ -57,6 +57,7 @@
         <module>entur-google-pubsub</module>
         <module>camel-entur-google-pubsub</module>
         <module>camel3-entur-google-pubsub</module>
+        <module>oauth2</module>
     </modules>
 
     <scm>
@@ -104,6 +105,11 @@
     <dependencyManagement>
         <dependencies>
 
+            <dependency>
+                <groupId>org.entur.helpers</groupId>
+                <artifactId>organisation</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.entur.helpers</groupId>
                 <artifactId>entur-google-pubsub</artifactId>
