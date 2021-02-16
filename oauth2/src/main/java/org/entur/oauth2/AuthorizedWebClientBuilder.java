@@ -30,9 +30,14 @@ import java.util.List;
  */
 public class AuthorizedWebClientBuilder {
 
+    private WebClient.Builder webclientBuilder;
     private OAuth2ClientProperties properties;
     private String audience;
     private String clientRegistrationId;
+
+    public AuthorizedWebClientBuilder(WebClient.Builder webclientBuilder) {
+        this.webclientBuilder = webclientBuilder;
+    }
 
 
     public AuthorizedWebClientBuilder withOAuth2ClientProperties(OAuth2ClientProperties properties) {
@@ -59,7 +64,7 @@ public class AuthorizedWebClientBuilder {
      * @return a WebClient for authorized API calls.
      */
     public WebClient build() {
-        return WebClient.builder()
+        return webclientBuilder
                 .filters(exchangeFilterFunctions -> exchangeFilterFunctions.add(serverOAuth2AuthorizedClientExchangeFilterFunction()))
                 .build();
     }
