@@ -1,6 +1,7 @@
 package org.entur.oauth2;
 
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 import org.springframework.security.oauth2.jwt.MappedJwtClaimSetConverter;
 
 import java.util.Collections;
@@ -44,6 +45,13 @@ public class RorAuth0RolesClaimAdapter implements Converter<Map<String, Object>,
         if (roleAssignments != null) {
             convertedClaims.put("roles", roleAssignments);
         }
+
+        // user preferred name is found in the namespaced "preferred_username" claim
+        Object preferredName = convertedClaims.get(rorAuth0ClaimNamespace + StandardClaimNames.PREFERRED_USERNAME);
+        if (preferredName != null) {
+            convertedClaims.put(StandardClaimNames.PREFERRED_USERNAME, preferredName);
+        }
+
 
         return convertedClaims;
     }
