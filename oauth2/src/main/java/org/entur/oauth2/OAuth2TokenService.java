@@ -35,6 +35,9 @@ public class OAuth2TokenService implements TokenService {
     public String getToken() {
         OAuth2AuthorizeRequest oAuth2AuthorizeRequest = OAuth2AuthorizeRequest.withClientRegistrationId(clientRegistrationId).principal(clientId).build();
         OAuth2AuthorizedClient authorizedClient = authorizedClientServiceReactiveOAuth2AuthorizedClientManager.authorize(oAuth2AuthorizeRequest).block();
+        if(authorizedClient == null) {
+            throw new IllegalStateException("Authorized Client not found for client registration id " + clientRegistrationId);
+        }
         return authorizedClient.getAccessToken().getTokenValue();
     }
 
