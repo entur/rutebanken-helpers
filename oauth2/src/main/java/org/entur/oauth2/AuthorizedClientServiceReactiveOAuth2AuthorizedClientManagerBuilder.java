@@ -23,11 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Build a WebClient for authorized API calls.
- * The WebClient inserts a JWT bearer token in the Authorization HTTP header.
- * The JWT token is obtained from the configured Authorization Server.
+ * Build a ReactiveOAuth2AuthorizedClientManager for authorized API calls.
  */
-public class AuthorizedClientServiceReactiveOAuth2AuthorizedClientManagerBuilder {
+class AuthorizedClientServiceReactiveOAuth2AuthorizedClientManagerBuilder {
 
     private OAuth2ClientProperties properties;
     private String audience;

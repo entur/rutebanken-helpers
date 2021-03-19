@@ -27,6 +27,8 @@ import java.util.List;
  * Build a WebClient for authorized API calls.
  * The WebClient inserts a JWT bearer token in the Authorization HTTP header.
  * The JWT token is obtained from the configured Authorization Server.
+ * Alternatively for Camel applications the {@link TokenService} provides a way to retrieve a JWT token and set it as a
+ * header in the Camel Exchange.
  */
 public class AuthorizedWebClientBuilder {
 
