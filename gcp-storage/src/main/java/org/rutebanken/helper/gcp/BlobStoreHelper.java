@@ -121,7 +121,7 @@ public class BlobStoreHelper {
         if (blob != null) {
             LOGGER.debug("Retrieved blob with name '{}' and size '{}' from bucket '{}'", blob.getName(), blob.getSize(), blob.getBucket());
             byte[] blobContent = blob.getContent();
-            String serverMd5 = blob.getMd5();
+            String serverMd5 = blob.getMd5ToHexString();
             String clientMd5 = DigestUtils.md5Hex(blobContent);
             if (!clientMd5.equals(serverMd5)) {
                 throw new BlobStoreException("Client MD5 checksum (" + clientMd5 + ") and server MD5 checksum(" + serverMd5 + ") do not match");
