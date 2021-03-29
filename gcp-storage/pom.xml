@@ -51,6 +51,10 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+        </dependency>
 
         <!-- test dependencies -->
         <dependency>
@@ -63,7 +67,6 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
             <artifactId>commons-io</artifactId>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
     <build>
