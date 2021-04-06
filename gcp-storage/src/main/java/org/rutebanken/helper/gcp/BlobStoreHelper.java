@@ -27,6 +27,7 @@ import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import com.google.common.collect.ImmutableList;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -119,7 +120,14 @@ public class BlobStoreHelper {
         Blob blob = storage.get(blobId);
         if (blob != null) {
             LOGGER.debug("Retrieved blob with name '{}' and size '{}' from bucket '{}'", blob.getName(), blob.getSize(), blob.getBucket());
-            return new ByteArrayInputStream((blob.getContent()));
+            byte[] blobContent = blob.getContent();
+            String serverMd5 = blob.getMd5ToHexString();
+            String clientMd5 = DigestUtils.md5Hex(blobContent);
+            if (!clientMd5.equals(serverMd5)) {
+                throw new BlobStoreException("Client MD5 checksum (" + clientMd5 + ") and server MD5 checksum(" + serverMd5 + ") do not match");
+            } else {
+                return new ByteArrayInputStream(blobContent);
+            }
         } else {
             LOGGER.info("File '{}' in bucket '{}' does not exist", blobId.getName(), blobId.getBucket());
             return null;
