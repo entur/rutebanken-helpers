@@ -1,12 +1,12 @@
 package org.entur.pubsub.base;
 
+import com.google.cloud.spring.pubsub.PubSubAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.loader.tools.JavaExecutable;
 import org.springframework.boot.loader.tools.RunProcess;
-import org.springframework.cloud.gcp.pubsub.PubSubAdmin;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;

@@ -1,11 +1,11 @@
 package org.entur.pubsub.camel;
 
+import com.google.cloud.spring.pubsub.support.BasicAcknowledgeablePubsubMessage;
 import org.apache.camel.Exchange;
 import org.apache.camel.spi.Synchronization;
 import org.entur.pubsub.base.EnturGooglePubSubException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cloud.gcp.pubsub.support.BasicAcknowledgeablePubsubMessage;
 
 public class EnturExchangeAckTransaction implements Synchronization {
 

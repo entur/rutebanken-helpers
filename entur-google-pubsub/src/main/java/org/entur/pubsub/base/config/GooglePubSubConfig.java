@@ -1,7 +1,7 @@
 package org.entur.pubsub.base.config;
 
+import com.google.cloud.spring.autoconfigure.pubsub.GcpPubSubAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
-import org.springframework.cloud.gcp.autoconfigure.pubsub.GcpPubSubAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 

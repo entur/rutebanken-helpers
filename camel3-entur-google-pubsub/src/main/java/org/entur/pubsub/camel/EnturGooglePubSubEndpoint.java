@@ -1,5 +1,6 @@
 package org.entur.pubsub.camel;
 
+import com.google.cloud.spring.pubsub.core.PubSubTemplate;
 import org.apache.camel.Category;
 import org.apache.camel.Component;
 import org.apache.camel.Consumer;
@@ -10,7 +11,6 @@ import org.apache.camel.spi.UriEndpoint;
 import org.apache.camel.spi.UriParam;
 import org.apache.camel.spi.UriPath;
 import org.apache.camel.support.DefaultEndpoint;
-import org.springframework.cloud.gcp.pubsub.core.PubSubTemplate;
 
 @UriEndpoint(firstVersion = "0.1", scheme = "entur-google-pubsub", title = "Entur Google Pubsub",
         syntax = "entur-google-pubsub:destinationName", category = Category.MESSAGING)

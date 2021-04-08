@@ -1,11 +1,11 @@
 package org.entur.pubsub.base;
 
 import com.google.api.gax.rpc.AlreadyExistsException;
+import com.google.cloud.spring.pubsub.PubSubAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.gcp.pubsub.PubSubAdmin;
 import org.springframework.stereotype.Component;
 
 @Component
