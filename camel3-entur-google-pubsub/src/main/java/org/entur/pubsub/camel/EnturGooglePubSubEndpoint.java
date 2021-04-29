@@ -82,9 +82,5 @@ public class EnturGooglePubSubEndpoint extends DefaultEndpoint {
         this.concurrentConsumers = concurrentConsumers;
     }
 
-    @Override
-    public boolean isSingleton() {
-        return false;
-    }
 }
 
