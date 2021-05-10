@@ -26,7 +26,7 @@
 
     <groupId>org.entur.helpers</groupId>
     <artifactId>helper</artifactId>
-    <version>1.0.49</version>
+    <version>1.0.50-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>rutebanken-helper</name>
@@ -63,7 +63,7 @@
         <connection>scm:git:ssh://git@github.com/entur/rutebanken-helpers.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/entur/rutebanken-helpers.git</developerConnection>
         <url>https://github.com/entur/rutebanken-helpers/tree/master</url>
-        <tag>helper-1.0.49</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
