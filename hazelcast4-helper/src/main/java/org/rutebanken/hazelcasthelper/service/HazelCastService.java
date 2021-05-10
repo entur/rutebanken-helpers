@@ -63,7 +63,7 @@ public class HazelCastService {
             log.info("Configuring hazelcast");
             try {
                 String name = kubernetesService.findDeploymentName();
-                hazelcast = runHazelcast( kubernetesService.findEndpoints(), name);
+                hazelcast = runHazelcast(name);
             } catch ( Exception e ) {
                 throw new RutebankenHazelcastException("Could not run initialization of hazelcast.",e);
             }
@@ -190,11 +190,9 @@ public class HazelCastService {
         return new ArrayList<>();
     }
 
-    private HazelcastInstance runHazelcast(final List<String> nodes, String groupName) {
+    private HazelcastInstance runHazelcast(String groupName) {
         final int HC_PORT = 5701;
-        if ( nodes.isEmpty() ) {
-            log.warn("No nodes given - will start lonely HZ");
-        }
+
         // configure Hazelcast instance
         final Config cfg = new Config()
                 .setInstanceName(UUID.randomUUID().toString())
@@ -209,16 +207,16 @@ public class HazelCastService {
             cfg.setProperty("hazelcast.shutdownhook.enabled", "false");
         }
 
-
-        // tcp
-        final TcpIpConfig tcpCfg = new TcpIpConfig();
-        nodes.forEach(tcpCfg::addMember);
-        tcpCfg.setEnabled(true);
+        final KubernetesConfig kubernetesConfig = new KubernetesConfig();
+        kubernetesConfig
+            .setEnabled(kubernetesService.isKubernetesEnabled())
+            .setProperty("namespace", kubernetesService.namespace)
+            .setProperty("service-name", kubernetesService.findDeploymentName());
 
         // network join configuration
         final JoinConfig joinCfg = new JoinConfig()
                 .setMulticastConfig(new MulticastConfig().setEnabled(false))
-                .setTcpIpConfig(tcpCfg);
+                .setKubernetesConfig(kubernetesConfig);
 
         final NetworkConfig netCfg = new NetworkConfig()
                 .setPortAutoIncrement(false)
