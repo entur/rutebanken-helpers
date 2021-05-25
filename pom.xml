@@ -92,7 +92,7 @@
         <camel.version>2.25.3</camel.version>
         <camel3.version>3.7.3</camel3.version>
         <kubernetes-client.version>4.13.2</kubernetes-client.version>
-        <commons-io.version>2.8.0</commons-io.version>
+        <commons-io.version>2.9.0</commons-io.version>
 
         <hamcrest.version>2.2</hamcrest.version>
 
