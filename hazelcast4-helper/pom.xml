@@ -55,6 +55,12 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
             <artifactId>hazelcast</artifactId>
         </dependency>
 
+        <!-- Needed for autodiscovery in Kubernetes -->
+        <dependency>
+            <groupId>com.hazelcast</groupId>
+            <artifactId>hazelcast-kubernetes</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
