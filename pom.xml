@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.rutebanken.superpom</groupId>
         <artifactId>superpom</artifactId>
-        <version>1.0.25</version>
+        <version>1.0.26</version>
     </parent>
 
     <groupId>org.entur.helpers</groupId>
@@ -91,8 +91,9 @@
         <spring-cloud-gcp.version>2.0.1</spring-cloud-gcp.version>
         <camel.version>2.25.4</camel.version>
         <camel3.version>3.7.4</camel3.version>
-        <kubernetes-client.version>4.13.2</kubernetes-client.version>
-        <commons-io.version>2.9.0</commons-io.version>
+        <kubernetes-client.version>4.13.3</kubernetes-client.version>
+        <commons-io.version>2.10.0</commons-io.version>
+        <hazelcast-kubernetes.version>2.2.3</hazelcast-kubernetes.version>
 
         <hamcrest.version>2.2</hamcrest.version>
 
@@ -133,7 +134,7 @@
             <dependency>
                 <groupId>com.hazelcast</groupId>
                 <artifactId>hazelcast-kubernetes</artifactId>
-                <version>2.2.2</version>
+                <version>${hazelcast-kubernetes.version}</version>
             </dependency>
 
             <!--See compatibility matrix https://github.com/fabric8io/kubernetes-client#compatibility-matrix -->
