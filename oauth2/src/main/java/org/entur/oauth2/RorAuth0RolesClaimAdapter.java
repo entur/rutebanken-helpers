@@ -9,8 +9,8 @@ import java.util.Map;
 
 
 /**
- * Insert a "roles" and "realm_access" claims in the JWT token based on the "permission" claim and the  namespaced "roles" and "role_assignments" claims,
- * for compatibility with the JWT claim formats used by Keycloak (see @{@link JwtRoleAssignmentExtractor}).
+ * Copy the namespaced "roles" and "permissions" claims into a "roles" claim and copy the namespaced "preferred_name" claim into the OAuth2-standard "preferred_named" claim.
+ * (see @{@link JwtRoleAssignmentExtractor}).
  */
 public class RorAuth0RolesClaimAdapter implements Converter<Map<String, Object>, Map<String, Object>> {
 
@@ -31,19 +31,19 @@ public class RorAuth0RolesClaimAdapter implements Converter<Map<String, Object>,
         // roles assigned to a user are found in the namespaced "roles" claim
         Object roles = convertedClaims.get(rorAuth0ClaimNamespace + "roles");
         if (roles != null) {
-            convertedClaims.put("realm_access", Map.of("roles", roles));
+            convertedClaims.put(EnturOAuth2Constants.OAUTH2_CLAIM_ROLES, roles);
         } else {
             // roles assigned to an application (machine-to-machine service call) are found in the "permissions" claim
             Object permissions = convertedClaims.get("permissions");
             if (permissions != null) {
-                convertedClaims.put("realm_access", Map.of("roles", permissions));
+                convertedClaims.put(EnturOAuth2Constants.OAUTH2_CLAIM_ROLES, permissions);
             }
         }
 
         // role assignments for users and applications are found in the namespaced "role_assignments" claim
         Object roleAssignments = convertedClaims.get(rorAuth0ClaimNamespace + "role_assignments");
         if (roleAssignments != null) {
-            convertedClaims.put("roles", roleAssignments);
+            convertedClaims.put(EnturOAuth2Constants.OAUTH2_CLAIM_ROLE_ASSIGNMENTS, roleAssignments);
         }
 
         // user preferred name is found in the namespaced "preferred_username" claim

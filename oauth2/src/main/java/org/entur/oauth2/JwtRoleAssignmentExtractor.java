@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
  */
 public class JwtRoleAssignmentExtractor implements RoleAssignmentExtractor {
 
-    private static final String ATTRIBUTE_NAME_ROLE_ASSIGNMENT = "roles";
     private static ObjectMapper mapper = new ObjectMapper();
 
     public List<RoleAssignment> getRoleAssignmentsForUser() {
@@ -35,7 +34,7 @@ public class JwtRoleAssignmentExtractor implements RoleAssignmentExtractor {
         if (auth instanceof JwtAuthenticationToken) {
             JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) auth;
             Jwt jwt = (Jwt) jwtAuthenticationToken.getPrincipal();
-            Object claim = jwt.getClaim(ATTRIBUTE_NAME_ROLE_ASSIGNMENT);
+            Object claim = jwt.getClaim(EnturOAuth2Constants.OAUTH2_CLAIM_ROLE_ASSIGNMENTS);
             if (claim == null) {
                 return Collections.emptyList();
             }
