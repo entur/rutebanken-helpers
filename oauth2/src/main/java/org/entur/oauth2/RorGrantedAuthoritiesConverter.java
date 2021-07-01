@@ -11,8 +11,9 @@ import java.util.Collections;
 
 /**
  * Extract the roles from the JWT token and convert them into Spring Security Authorities.
+ * Roles are expected to be defined in the claim {@link RoROAuth2Claims#OAUTH2_CLAIM_ROLES}.
  */
-public class JwtGrantedAuthoritiesConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
+class RorGrantedAuthoritiesConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
 
     @Override
     public Collection<GrantedAuthority> convert(Jwt jwt) {
@@ -24,7 +25,7 @@ public class JwtGrantedAuthoritiesConverter implements Converter<Jwt, Collection
     }
 
     private Collection<String> getAuthorities(Jwt jwt) {
-        Object roles = jwt.getClaim(EnturOAuth2Constants.OAUTH2_CLAIM_ROLES);
+        Object roles = jwt.getClaim(RoROAuth2Claims.OAUTH2_CLAIM_ROLES);
         if (roles == null) {
             return Collections.emptyList();
         } else if (roles instanceof Collection && ((Collection) roles).stream().allMatch(String.class::isInstance)) {
