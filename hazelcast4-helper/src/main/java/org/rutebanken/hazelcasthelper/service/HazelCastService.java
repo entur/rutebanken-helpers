@@ -31,8 +31,6 @@ import java.util.UUID;
 public class HazelCastService {
     private static final Logger log = LoggerFactory.getLogger(HazelCastService.class);
 
-    private static final int HC_DEFAULT_PORT = 5701;
-
     protected HazelcastInstance hazelcast;
 
     private final KubernetesService kubernetesService;
@@ -185,6 +183,7 @@ public class HazelCastService {
     }
 
     private HazelcastInstance runHazelcast(String groupName) {
+        final int HC_PORT = 5701;
 
         // configure Hazelcast instance
         final Config cfg = new Config()
@@ -213,7 +212,7 @@ public class HazelCastService {
 
         final NetworkConfig netCfg = new NetworkConfig()
                 .setPortAutoIncrement(false)
-                .setPort(HC_DEFAULT_PORT)
+                .setPort(HC_PORT)
                 .setJoin(joinCfg)
                 .setSSLConfig(new SSLConfig().setEnabled(false));
 
