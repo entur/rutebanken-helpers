@@ -20,12 +20,9 @@ import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-@Service
 public class KubernetesService {
     private static final Logger LOGGER = LoggerFactory.getLogger(KubernetesService.class);
 
