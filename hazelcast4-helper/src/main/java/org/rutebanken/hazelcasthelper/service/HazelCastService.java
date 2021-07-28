@@ -256,6 +256,7 @@ public class HazelCastService {
                 .setProperty("hazelcast.phone.home.enabled", "false");
         final JoinConfig joinCfg = new JoinConfig()
                 .setMulticastConfig(new MulticastConfig().setEnabled(false))
+                .setAutoDetectionConfig(new AutoDetectionConfig().setEnabled(false))
                 .setTcpIpConfig(new TcpIpConfig().setEnabled(false));
         NetworkConfig networkCfg = new NetworkConfig()
                 .setJoin(joinCfg);
