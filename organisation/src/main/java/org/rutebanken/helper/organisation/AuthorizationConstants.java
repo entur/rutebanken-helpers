@@ -22,8 +22,12 @@ public class AuthorizationConstants {
     public static final String ROLE_EDIT_STOPS = "editStops";
 
     public static final String ROLE_ORGANISATION_EDIT = "editOrganisation";
+
     public static final String ROLE_ROUTE_DATA_EDIT = "editRouteData";
+    public static final String ROLE_ROUTE_DATA_VIEW_ALL = "viewAllRouteData";
     public static final String ROLE_ROUTE_DATA_ADMIN = "adminEditRouteData";
+
+
 
     public static final String ROLE_NETEX_BLOCKS_DATA_VIEW = "viewNetexBlocksData";
 
