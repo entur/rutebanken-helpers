@@ -21,9 +21,31 @@ public class AuthorizationConstants {
     public static final String ROLE_DELETE_STOPS = "deleteStops";
     public static final String ROLE_EDIT_STOPS = "editStops";
 
+    /**
+     * Administrator rights for all organisations in the organisation register.
+     */
     public static final String ROLE_ORGANISATION_EDIT = "editOrganisation";
+
+    /**
+     * Editor rights for route data for a single provider.
+     */
     public static final String ROLE_ROUTE_DATA_EDIT = "editRouteData";
+
+    /**
+     * Viewer rights for route data and configuration for all providers.
+     */
+
+    public static final String ROLE_ROUTE_DATA_VIEW_ALL = "viewAllRouteData";
+
+    /**
+     * Administrator rights for route data and configuration for all providers.
+     */
     public static final String ROLE_ROUTE_DATA_ADMIN = "adminEditRouteData";
+
+
+    /**
+     * Viewer rights for NeTEx Blocks for a single provider.
+     */
 
     public static final String ROLE_NETEX_BLOCKS_DATA_VIEW = "viewNetexBlocksData";
 

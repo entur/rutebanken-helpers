@@ -21,8 +21,6 @@ import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -30,21 +28,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Service
 public class HazelCastService {
     private static final Logger log = LoggerFactory.getLogger(HazelCastService.class);
 
     protected HazelcastInstance hazelcast;
 
-    private KubernetesService kubernetesService;
+    private final KubernetesService kubernetesService;
 
-    @Value("${entur.hazelcast.backup.count.sync:2}")
-    private int backupCount;
-
-    @Value("${entur.hazelcast.backup.count.async:0}")
+    private int backupCount = 2;
     private int backupCountAsync;
-
-    @Value("${entur.hazelcast.shutdownhook.enabled:true}")
     private boolean shutDownHookEnabled;
 
     /**
@@ -71,11 +63,11 @@ public class HazelCastService {
             log.warn("Using local hazelcast as we do not have kubernetes");
             hazelcast = initForLocalHazelCast();
         }
-        // the shutdown hook should be disabled in a Spring environment to prevent Hazelcast from being stopped
+        // the shutdown hook should be disabled in a Spring environment or J2E application server to prevent Hazelcast from being stopped
         // too early, leading to the exception "HazelcastInstanceNotActiveException" at shutdown time.
-        // Instead the shutdown should be managed by Spring at application context-closing time
+        // Instead the shutdown should be managed by Spring at application context-closing time or by the J2E server at PreDestroy time.
         // see HazelCastService.shutdown()
-        // TODO the shutdown hook should eventually be disabled by default
+
         if (shutDownHookEnabled) {
             Runtime.getRuntime().addShutdownHook(new Thread(() -> hazelcast.shutdown()));
         }
@@ -264,6 +256,7 @@ public class HazelCastService {
                 .setProperty("hazelcast.phone.home.enabled", "false");
         final JoinConfig joinCfg = new JoinConfig()
                 .setMulticastConfig(new MulticastConfig().setEnabled(false))
+                .setAutoDetectionConfig(new AutoDetectionConfig().setEnabled(false))
                 .setTcpIpConfig(new TcpIpConfig().setEnabled(false));
         NetworkConfig networkCfg = new NetworkConfig()
                 .setJoin(joinCfg);
@@ -281,4 +274,17 @@ public class HazelCastService {
 
         return Hazelcast.newHazelcastInstance(cfg);
     }
+
+    protected void setBackupCount(int backupCount) {
+        this.backupCount = backupCount;
+    }
+
+    protected void setBackupCountAsync(int backupCountAsync) {
+        this.backupCountAsync = backupCountAsync;
+    }
+
+    protected void setShutDownHookEnabled(boolean shutDownHookEnabled) {
+        this.shutDownHookEnabled = shutDownHookEnabled;
+    }
+
 }
