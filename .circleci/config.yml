@@ -36,7 +36,9 @@ jobs:
             - ~/.m2
           key: dep-cache-{{ checksum "pom.xml" }}
         # Cannot use -o because of snapshot dependencies.
-      - run: mvn test -s .circleci/settings.xml
+      - run:
+          name: Run Maven verify
+          command: mvn verify -s .circleci/settings.xml
       - run: *sonar-scan
       - run:
           name: Save test results
@@ -48,6 +50,12 @@ jobs:
           path: ~/junit
       - store_artifacts:
           path: ~/junit
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - target
+            - .circleci
+
   deploy-artifactory:
     docker:
       - image: cimg/openjdk:11.0
@@ -59,12 +67,11 @@ jobs:
       - checkout
       - restore_cache:
           key: dep-cache-{{ checksum "pom.xml" }}
-      - run: mvn com.offbytwo.maven.plugins:maven-dependency-plugin:3.1.1.MDEP568:go-offline -DexcludeGroupIds=org.entur.helpers -s .circleci/settings.xml
-      - save_cache:
-          paths:
-            - ~/.m2
-          key: dep-cache-{{ checksum "pom.xml" }}
-      - run: mvn gitflow:release -B -s .circleci/settings.xml -DargLine='-s .circleci/settings.xml' -DpostReleaseGoals=deploy -DskipTestProject=true
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: Run Maven Gitflow release
+          command: mvn gitflow:release -B -s .circleci/settings.xml -DargLine='-s .circleci/settings.xml' -DpostReleaseGoals=deploy -DskipTestProject=true
 workflows:
   version: 2
   build_test_deploy:
