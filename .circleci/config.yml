@@ -25,17 +25,17 @@ jobs:
       - restore_cache:
           key: dep-cache-{{ checksum "pom.xml" }}
       - run:
-      name: Download Maven settings
-      command: wget https://raw.githubusercontent.com/entur/circleci-toolbox-image-java11/master/tools/m2/settings.xml -O .circleci/settings.xml
-        - run:
-            name: Refresh cache
-            # Use forked version of the dependency plugin to handle correctly inter-module dependencies (https://issues.apache.org/jira/browse/MDEP-568)
-            command: mvn com.offbytwo.maven.plugins:maven-dependency-plugin:3.1.1.MDEP568:go-offline -DexcludeGroupIds=org.entur.helpers -s .circleci/settings.xml
+          name: Download Maven settings
+          command: wget https://raw.githubusercontent.com/entur/circleci-toolbox-image-java11/master/tools/m2/settings.xml -O .circleci/settings.xml
+      - run:
+          name: Refresh cache
+          # Use forked version of the dependency plugin to handle correctly inter-module dependencies (https://issues.apache.org/jira/browse/MDEP-568)
+          command: mvn com.offbytwo.maven.plugins:maven-dependency-plugin:3.1.1.MDEP568:go-offline -DexcludeGroupIds=org.entur.helpers -s .circleci/settings.xml
       - save_cache:
           paths:
             - ~/.m2
           key: dep-cache-{{ checksum "pom.xml" }}
-      # Cannot use -o because of snapshot dependencies.
+        # Cannot use -o because of snapshot dependencies.
       - run: mvn test -s .circleci/settings.xml
       - run: *sonar-scan
       - run:
@@ -50,7 +50,7 @@ jobs:
           path: ~/junit
   deploy-artifactory:
     docker:
-      - image:  cimg/openjdk:11.0
+      - image: cimg/openjdk:11.0
     environment:
       MAVEN_OPTS: -Xmx3G
     steps:
