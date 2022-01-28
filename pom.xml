@@ -88,7 +88,7 @@
         <java.version>8</java.version>
 
         <spring-cloud.version>2020.0.3</spring-cloud.version>
-        <spring-cloud-gcp.version>2.0.1</spring-cloud-gcp.version>
+        <spring-cloud-gcp.version>2.0.8</spring-cloud-gcp.version>
         <camel.version>2.25.4</camel.version>
         <camel3.version>3.11.5</camel3.version>
         <kubernetes-client.version>4.13.3</kubernetes-client.version>
