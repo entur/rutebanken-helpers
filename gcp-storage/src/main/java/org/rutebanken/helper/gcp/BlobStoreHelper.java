@@ -114,6 +114,13 @@ public class BlobStoreHelper {
         }
     }
 
+    public static boolean existBlob(Storage storage, String containerName, String name) {
+        LOGGER.debug("Checking that blob {} from bucket {} exists", name, containerName);
+        BlobId blobId = BlobId.of(containerName, name);
+        Blob blob = storage.get(blobId);
+        return blob != null;
+    }
+
     public static InputStream getBlob(Storage storage, String containerName, String name) {
         LOGGER.debug("Fetching blob {} from bucket {}", name, containerName);
         BlobId blobId = BlobId.of(containerName, name);
