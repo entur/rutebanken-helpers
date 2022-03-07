@@ -27,7 +27,7 @@
 
     <groupId>org.entur.helpers</groupId>
     <artifactId>helper</artifactId>
-    <version>1.0.68</version>
+    <version>1.0.69-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>rutebanken-helper</name>
