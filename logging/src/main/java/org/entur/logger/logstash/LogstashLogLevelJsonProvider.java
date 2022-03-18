@@ -15,9 +15,10 @@ import java.io.IOException;
 public class LogstashLogLevelJsonProvider extends LogLevelJsonProvider {
 
     private static final String DEBUG = "DEBUG";
-    private static final String ERROR = "ERROR";
     private static final String INFO = "INFO";
     private static final String WARNING = "WARNING";
+    private static final String ERROR = "ERROR";
+
     private static final String SEVERITY_FIELD_NAME = "severity";
 
     @Override
@@ -31,7 +32,7 @@ public class LogstashLogLevelJsonProvider extends LogLevelJsonProvider {
         if (event.getLevel() == Level.ALL) {
             return Level.ALL.toString();
         }
-        if (event.getLevel() == Level.DEBUG) {
+        if (event.getLevel() == Level.DEBUG || event.getLevel() == Level.TRACE) {
             return DEBUG;
         }
         if (event.getLevel() == Level.ERROR) {
