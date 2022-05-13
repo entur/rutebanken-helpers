@@ -13,6 +13,11 @@ aliases:
         -Dsonar.projectName=${CIRCLE_PROJECT_REPONAME} \
         -Dsonar.host.url=https://sonarcloud.io \
         -Dsonar.login=${ENTUR_SONAR_PASSWORD}
+  - &jfrog-login
+    name: Rename jfrog environment variable for maven setting.xml
+    command: |
+      echo "export JFROG_USER=$ARTIFACTORY_USER"  >> $BASH_ENV
+      echo "export JFROG_PASS=$ARTIFACTORY_PASSWORD"  >> $BASH_ENV      
 
 jobs:
   test:
@@ -33,6 +38,7 @@ jobs:
       - run:
           name: Download Maven settings
           command: wget https://raw.githubusercontent.com/entur/circleci-toolbox-image-java11/master/tools/m2/settings.xml -O .circleci/settings.xml
+      - run: *jfrog-login
       - run:
           name: Refresh cache
           # Use forked version of the dependency plugin to handle correctly inter-module dependencies (https://issues.apache.org/jira/browse/MDEP-568)
