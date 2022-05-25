@@ -32,10 +32,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -164,7 +165,7 @@ public class BlobStoreHelper {
                     .build();
 
             return StorageOptions.newBuilder()
-                    .setCredentials(ServiceAccountCredentials.fromStream(new FileInputStream(credentialPath)))
+                    .setCredentials(ServiceAccountCredentials.fromStream(Files.newInputStream(Paths.get(credentialPath))))
                     .setProjectId(projectId)
                     .setTransportOptions(transportOptions)
                     .build().getService();

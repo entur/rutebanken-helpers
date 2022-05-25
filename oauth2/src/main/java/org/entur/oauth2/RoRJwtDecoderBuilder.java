@@ -30,7 +30,7 @@ public class RoRJwtDecoderBuilder {
     }
 
     public JwtDecoder build() {
-        NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder) JwtDecoders.fromIssuerLocation(issuer);
+        NimbusJwtDecoder jwtDecoder = JwtDecoders.fromIssuerLocation(issuer);
 
         OAuth2TokenValidator<Jwt> audienceValidator = new AudienceValidator(audience);
         OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(issuer);
