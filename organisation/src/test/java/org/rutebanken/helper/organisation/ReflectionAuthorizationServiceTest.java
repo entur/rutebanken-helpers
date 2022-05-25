@@ -500,7 +500,7 @@ class ReflectionAuthorizationServiceTest {
                 .withOrganisation("OST")
                 .withEntityClassification(ENTITY_TYPE, "StopPlace")
                 .withEntityClassification("StopPlaceType", StopPlace.StopPlaceType.AIRPORT.toString())
-                .withEntityClassification("StopPlaceType", "!"+StopPlace.StopPlaceType.ONSTREET_BUS.toString())
+                .withEntityClassification("StopPlaceType", "!"+ StopPlace.StopPlaceType.ONSTREET_BUS)
                 .withEntityClassification("StopPlaceType", StopPlace.StopPlaceType.ONSTREET_TRAM.toString())
                 .build();
 
@@ -574,10 +574,8 @@ class ReflectionAuthorizationServiceTest {
             ONSTREET_BUS("onstreetBus"),
             ONSTREET_TRAM("onstreetTram"),
             AIRPORT("airport");
-            private final String value;
 
             StopPlaceType(String v) {
-                value = v;
             }
         }
 
