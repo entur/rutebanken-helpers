@@ -85,7 +85,7 @@
         <license.licenseResolver>${project.baseUri}/src/license</license.licenseResolver>
 
         <!-- JDK8 still needed for compatibility with Chouette -->
-        <java.version>8</java.version>
+        <java.version>11</java.version>
 
         <spring-cloud-gcp.version>3.1.0</spring-cloud-gcp.version>
         <camel.version>2.25.4</camel.version>
