@@ -96,13 +96,9 @@ workflows:
   build_test_deploy:
     jobs:
       - test:
-          context:
-            - org-carbon
-            - global
+          context: global
       - deploy-artifactory:
-          context:
-            - org-carbon
-            - global
+          context: global
           requires:
             - test
           filters:
