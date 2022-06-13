@@ -16,6 +16,7 @@
 
 package org.rutebanken.helper.gcp;
 
+import com.google.api.client.http.HttpStatusCodes;
 import com.google.api.gax.paging.Page;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.cloud.WriteChannel;
@@ -25,6 +26,7 @@ import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageException;
 import com.google.cloud.storage.StorageOptions;
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -57,10 +59,19 @@ public class BlobStoreHelper {
         return blobs.iterateAll().iterator();
     }
 
+    /**
+     *
+     * @deprecated Use {@link #createNew(Storage, String, String, InputStream, boolean)} or {@link #createOrReplace(Storage, String, String, InputStream, boolean)}
+     */
+    @Deprecated
     public static Blob uploadBlob(Storage storage, String containerName, String name, byte[] content, boolean makePublic) {
         return uploadBlob(storage, containerName, name, content, makePublic, "application/octet-stream");
     }
 
+    /**
+     * @deprecated Use {@link #createNew(Storage, String, String, InputStream, boolean, String)} or {@link #createOrReplace(Storage, String, String, InputStream, boolean, String)}
+     */
+    @Deprecated
     public static Blob uploadBlob(Storage storage, String containerName, String name, byte[] content, boolean makePublic, String contentType) {
         LOGGER.debug("Uploading blob {} to bucket {}", name, containerName);
         BlobId blobId = BlobId.of(containerName, name);
@@ -74,6 +85,11 @@ public class BlobStoreHelper {
         return blob;
     }
 
+    /**
+     *
+     * @deprecated Use {@link #createNew(Storage, String, String, InputStream, boolean)} or {@link #createOrReplace(Storage, String, String, InputStream, boolean)}
+     */
+    @Deprecated
     public static Blob uploadBlobWithRetry(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic) {
         return uploadBlobWithRetry(storage, containerName, name, inputStream, makePublic, "application/octet-stream");
     }
@@ -82,8 +98,9 @@ public class BlobStoreHelper {
     /**
      * Upload a blob using  a {@link Storage#writer(BlobInfo, Storage.BlobWriteOption...)} as it is recommended for bigger files.
      * Retry/resumable logic is handled internally by the GCS client library.
-     * To be replaced with Blob.uploadFrom() when the method is available. See also  https://github.com/googleapis/java-storage/issues/40
+     * @deprecated Use {@link #createNew(Storage, String, String, InputStream, boolean, String)} or {@link #createOrReplace(Storage, String, String, InputStream, boolean, String)}
      */
+    @Deprecated
     public static Blob uploadBlobWithRetry(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic, String contentType) {
         LOGGER.debug("Uploading with retry blob {} to bucket {}", name, containerName);
         BlobId blobId = BlobId.of(containerName, name);
@@ -112,6 +129,108 @@ public class BlobStoreHelper {
             while ((length = inputStream.read(buffer)) >= 0) {
                 writer.write(ByteBuffer.wrap(buffer, 0, length));
             }
+        }
+    }
+
+
+    /**
+     * Creates a new blob in GCP. Fails if the blob already exists.
+     * Use {@link #createOrReplace(Storage, String, String, InputStream, boolean)} if the blob may already be present in
+     * the bucket.
+     *
+     * @return a reference to the newly created blob.
+     * @throws BlobAlreadyExistsException if the blob already exists.
+     * @throws BlobStoreException         if the blob creation fails.
+     */
+    public static Blob createNew(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic) {
+        return createNew(storage, containerName, name, inputStream, makePublic, "application/octet-stream");
+    }
+
+    /**
+     * Creates a new blob in GCP. Fails if the blob already exists.
+     * Use {@link #createOrReplace(Storage, String, String, InputStream, boolean, String contentType)} if the blob may
+     * already be present in the bucket.
+     * Note: The client library will automatically retry in case of transient network or server-side error. See <a href="https://cloud.google.com/storage/docs/retry-strategy">...</a>
+     * Note: The client library will automatically send data in retryable 15MB chunks.
+     *
+     * @return a reference to the newly created blob.
+     * @throws BlobAlreadyExistsException if the blob already exists.
+     * @throws BlobStoreException         if the blob creation fails.
+     */
+    public static Blob createNew(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic, String contentType) {
+        LOGGER.debug("Creating new blob {} in bucket {}", name, containerName);
+        BlobId blobId = BlobId.of(containerName, name);
+        BlobInfo.Builder builder = BlobInfo.newBuilder(blobId).setContentType(contentType);
+        if (makePublic) {
+            builder.setAcl(List.of(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER)));
+        }
+        BlobInfo blobInfo = builder.build();
+        try {
+            storage.createFrom(blobInfo, inputStream, Storage.BlobWriteOption.doesNotExist());
+        } catch (StorageException e) {
+            if (e.getCode() == HttpStatusCodes.STATUS_CODE_PRECONDITION_FAILED) {
+                throw new BlobAlreadyExistsException("The blob with name '" + blobId.getName() + "' already exists", e);
+            } else {
+                throw new BlobStoreException("Blob upload of blob with name '" + blobId.getName() + "' failed: " + e.getMessage(), e);
+            }
+        } catch (IOException ioE) {
+            throw new BlobStoreException("Blob upload of blob with name '" + blobId.getName() + "' failed: " + ioE.getMessage(), ioE);
+        }
+        Blob blob = storage.get(blobId);
+        LOGGER.debug("Stored blob with name '{}' and size '{}' in bucket '{}'", blob.getName(), blob.getSize(), blob.getBucket());
+        return blob;
+    }
+
+    /**
+     * Creates or replace a blob in GCP. Fails if the blob is modified concurrently.
+     * Use {@link #createNew(Storage, String, String, InputStream, boolean)} instead if there is a guarantee that the
+     * blob does not exist in the bucket since createNew() requires one less return trip to the server.
+     *
+     * @return a reference to the created or modified blob.
+     * @throws BlobConcurrentUpdateException if the blob is modified concurrently by another client.
+     * @throws BlobStoreException            if the blob creation fails.
+     */
+    public static Blob createOrReplace(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic) {
+        return createOrReplace(storage, containerName, name, inputStream, makePublic, "application/octet-stream");
+    }
+
+    /**
+     * Creates or replace a blob in GCP. Fails if the blob is modified concurrently.
+     * Use {@link #createNew(Storage, String, String, InputStream, boolean, String contentType)} instead if there is a guarantee that the
+     * blob does not exist in the bucket since createNew() requires one less return trip to the server.
+     * Note: The client library will automatically retry in case of transient network or server-side error. See <a href="https://cloud.google.com/storage/docs/retry-strategy">...</a>
+     * Note: The client library will automatically send data in retryable 15MB chunks.
+     *
+     * @return a reference to the created or modified blob.
+     * @throws BlobConcurrentUpdateException if the blob is modified concurrently by another client.
+     * @throws BlobStoreException            if the blob creation fails.
+     */
+    public static Blob createOrReplace(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic, String contentType) {
+        LOGGER.debug("Creating or replace blob {} in bucket {}", name, containerName);
+        BlobId blobId = BlobId.of(containerName, name);
+        Blob existingBlob = storage.get(blobId);
+        if (existingBlob == null) {
+            return createNew(storage, containerName, name, inputStream, makePublic, contentType);
+        } else {
+            BlobInfo.Builder builder = BlobInfo.newBuilder(existingBlob.getBlobId()).setContentType(contentType);
+            if (makePublic) {
+                builder.setAcl(List.of(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER)));
+            }
+            BlobInfo blobInfo = builder.build();
+            try {
+                storage.createFrom(blobInfo, inputStream, Storage.BlobWriteOption.generationMatch());
+            } catch (StorageException e) {
+                if (e.getCode() == HttpStatusCodes.STATUS_CODE_PRECONDITION_FAILED) {
+                    throw new BlobConcurrentUpdateException("The blob with name '" + blobId.getName() + "' was updated concurrently", e);
+                } else {
+                    throw new BlobStoreException("Blob upload of blob with name '" + blobId.getName() + "' failed: " + e.getMessage(), e);
+                }
+            } catch (IOException ioE) {
+                throw new BlobStoreException("Blob upload of blob with name '" + blobId.getName() + "' failed: " + ioE.getMessage(), ioE);
+            }
+            Blob blob = storage.get(blobId);
+            LOGGER.debug("Stored blob with name '{}' and size '{}' in bucket '{}'", blob.getName(), blob.getSize(), blob.getBucket());
+            return blob;
         }
     }
 
