@@ -20,7 +20,6 @@ import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.Storage;
 import com.google.common.io.ByteStreams;
-import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -56,14 +55,14 @@ class BlobStoreHelperTest {
     }
 
     @Test
-    void testUpload() throws IOException {
-        Blob blob = BlobStoreHelper.uploadBlob(storage, BUCKET_NAME, blobName, IOUtils.toByteArray(this.getClass().getResourceAsStream(fileName)), false);
+    void testUpload() {
+        Blob blob = BlobStoreHelper.createNew(storage, BUCKET_NAME, blobName, this.getClass().getResourceAsStream(fileName), false);
         assertNotNull(blob);
     }
 
     @Test
-    void testList() throws IOException {
-        BlobStoreHelper.uploadBlob(storage, BUCKET_NAME, blobName, IOUtils.toByteArray(this.getClass().getResourceAsStream(fileName)), false);
+    void testList() {
+        BlobStoreHelper.createNew(storage, BUCKET_NAME, blobName, this.getClass().getResourceAsStream(fileName), false);
         Iterator<Blob> blobIterator = BlobStoreHelper.listAllBlobsRecursively(storage, BUCKET_NAME, directory);
         assertTrue(blobIterator.hasNext());
         Blob result = blobIterator.next();
@@ -74,7 +73,7 @@ class BlobStoreHelperTest {
 
     @Test
     void testDownload() throws IOException {
-        BlobStoreHelper.uploadBlob(storage, BUCKET_NAME, blobName, IOUtils.toByteArray(this.getClass().getResourceAsStream(fileName)), false);
+        BlobStoreHelper.createNew(storage, BUCKET_NAME, blobName, this.getClass().getResourceAsStream(fileName), false);
         InputStream inputStream = BlobStoreHelper.getBlob(storage, BUCKET_NAME, blobName);
         assertNotNull(inputStream);
         byte[] result = ByteStreams.toByteArray(inputStream);
@@ -84,8 +83,8 @@ class BlobStoreHelperTest {
     }
 
     @Test
-    void testDelete() throws IOException {
-        BlobStoreHelper.uploadBlob(storage, BUCKET_NAME, blobName, IOUtils.toByteArray(this.getClass().getResourceAsStream(fileName)), false);
+    void testDelete() {
+        BlobStoreHelper.createNew(storage, BUCKET_NAME, blobName, this.getClass().getResourceAsStream(fileName), false);
         BlobStoreHelper.delete(storage, BlobId.of(BUCKET_NAME, blobName));
         Iterator<Blob> blobIterator = BlobStoreHelper.listAllBlobsRecursively(storage, BUCKET_NAME, directory);
         assertFalse(blobIterator.hasNext());

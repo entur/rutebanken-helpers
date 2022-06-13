@@ -28,7 +28,6 @@ import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageException;
 import com.google.cloud.storage.StorageOptions;
-import com.google.common.collect.ImmutableList;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,7 +76,7 @@ public class BlobStoreHelper {
         BlobId blobId = BlobId.of(containerName, name);
         BlobInfo.Builder builder = BlobInfo.newBuilder(blobId).setContentType(contentType);
         if (makePublic) {
-            builder.setAcl(ImmutableList.of(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER)));
+            builder.setAcl(List.of(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER)));
         }
         BlobInfo blobInfo = builder.build();
         Blob blob = storage.create(blobInfo, content);
@@ -106,7 +105,7 @@ public class BlobStoreHelper {
         BlobId blobId = BlobId.of(containerName, name);
         BlobInfo.Builder builder = BlobInfo.newBuilder(blobId).setContentType(contentType);
         if (makePublic) {
-            builder.setAcl(ImmutableList.of(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER)));
+            builder.setAcl(List.of(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER)));
         }
         BlobInfo blobInfo = builder.build();
         try {
