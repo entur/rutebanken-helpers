@@ -23,7 +23,7 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.entur.helpers</groupId>
+        <groupId>org.entur.ror.helpers</groupId>
         <artifactId>helper</artifactId>
         <version>1.0.78-SNAPSHOT</version>
     </parent>
@@ -48,7 +48,7 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
             <artifactId>camel-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.entur.helpers</groupId>
+            <groupId>org.entur.ror.helpers</groupId>
             <artifactId>entur-google-pubsub</artifactId>
         </dependency>
     </dependencies>

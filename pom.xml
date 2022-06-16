@@ -25,12 +25,12 @@
         <version>1.0.41</version>
     </parent>
 
-    <groupId>org.entur.helpers</groupId>
+    <groupId>org.entur.ror.helpers</groupId>
     <artifactId>helper</artifactId>
     <version>1.0.78-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>rutebanken-helper</name>
+    <name>entur-helper</name>
     <description>Shared libraries used in other route database/journey planning components</description>
     <url>https://github.com/entur/rutebanken-helpers</url>
     <inceptionYear>2016</inceptionYear>
@@ -95,6 +95,9 @@
 
         <hamcrest.version>2.2</hamcrest.version>
 
+        <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
+        <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
+
 
         <!-- empty argLine property, the value is set up by Jacoco during unit tests execution -->
         <argLine/>
@@ -105,12 +108,12 @@
         <dependencies>
 
             <dependency>
-                <groupId>org.entur.helpers</groupId>
+                <groupId>org.entur.ror.helpers</groupId>
                 <artifactId>organisation</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.entur.helpers</groupId>
+                <groupId>org.entur.ror.helpers</groupId>
                 <artifactId>entur-google-pubsub</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -179,19 +182,77 @@
                 <version>${gitflow-maven-plugin.version}</version>
                 <configuration>
                     <allowSnapshots>false</allowSnapshots>
-                    <fetchRemote>false</fetchRemote>
+                    <verbose>true</verbose>
+                    <commitMessagePrefix>[ci skip]</commitMessagePrefix>
                     <gitFlowConfig>
-                        <productionBranch>master</productionBranch>
                         <developmentBranch>master</developmentBranch>
                     </gitFlowConfig>
-                    <commitMessages>
-                        <releaseFinishMessage>Update for next development version [ci skip]</releaseFinishMessage>
-                        <releaseVersionUpdateMessage>Update for next development version [ci skip]
-                        </releaseVersionUpdateMessage>
-                    </commitMessages>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>${nexus-staging-maven-plugin.version}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <!-- Set this to true and the release will automatically proceed and sync to Central Repository will follow  -->
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <distributionManagement>
+                <repository>
+                    <id>ossrh</id>
+                    <name>Sonatype release</name>
+                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                </repository>
+            </distributionManagement>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>${maven-gpg-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                                <phase>verify</phase>
+                                <configuration>
+                                    <passphrase>${env.SONATYPE_GPG_KEY_PASSWORD}</passphrase>
+                                    <gpgArguments>
+                                        <arg>--pinentry-mode</arg>
+                                        <arg>loopback</arg>
+                                    </gpgArguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>
