@@ -48,6 +48,7 @@ public class BlobStoreHelper {
 
     private static final int DEFAULT_CHUNK_SIZE = 15 * 1024 * 1024;
     private static final int CONNECT_AND_READ_TIMEOUT = 60000;
+    private static final String DEFAULT_CACHE_CONTROL = "public, max-age=600";
 
     private BlobStoreHelper() {
     }
@@ -162,6 +163,7 @@ public class BlobStoreHelper {
         BlobInfo.Builder builder = BlobInfo.newBuilder(blobId).setContentType(contentType);
         if (makePublic) {
             builder.setAcl(List.of(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER)));
+            builder.setCacheControl(DEFAULT_CACHE_CONTROL);
         }
         BlobInfo blobInfo = builder.build();
         try {
@@ -213,6 +215,7 @@ public class BlobStoreHelper {
             BlobInfo.Builder builder = BlobInfo.newBuilder(existingBlob.getBlobId()).setContentType(contentType);
             if (makePublic) {
                 builder.setAcl(List.of(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER)));
+                builder.setCacheControl(DEFAULT_CACHE_CONTROL);
             }
             BlobInfo blobInfo = builder.build();
             try {
