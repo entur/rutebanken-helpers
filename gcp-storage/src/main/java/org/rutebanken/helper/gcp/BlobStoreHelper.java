@@ -48,6 +48,7 @@ public class BlobStoreHelper {
 
     private static final int DEFAULT_CHUNK_SIZE = 15 * 1024 * 1024;
     private static final int CONNECT_AND_READ_TIMEOUT = 60000;
+    private static final String DEFAULT_CACHE_CONTROL = "public, max-age=600";
 
     private BlobStoreHelper() {
     }
@@ -85,7 +86,6 @@ public class BlobStoreHelper {
     }
 
     /**
-     *
      * @deprecated Use {@link #createNew(Storage, String, String, InputStream, boolean)} or {@link #createOrReplace(Storage, String, String, InputStream, boolean)}
      */
     @Deprecated
@@ -97,6 +97,7 @@ public class BlobStoreHelper {
     /**
      * Upload a blob using  a {@link Storage#writer(BlobInfo, Storage.BlobWriteOption...)} as it is recommended for bigger files.
      * Retry/resumable logic is handled internally by the GCS client library.
+     *
      * @deprecated Use {@link #createNew(Storage, String, String, InputStream, boolean, String)} or {@link #createOrReplace(Storage, String, String, InputStream, boolean, String)}
      */
     @Deprecated
@@ -162,10 +163,13 @@ public class BlobStoreHelper {
         BlobInfo.Builder builder = BlobInfo.newBuilder(blobId).setContentType(contentType);
         if (makePublic) {
             builder.setAcl(List.of(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER)));
+            builder.setCacheControl(DEFAULT_CACHE_CONTROL);
         }
         BlobInfo blobInfo = builder.build();
         try {
-            storage.createFrom(blobInfo, inputStream, Storage.BlobWriteOption.doesNotExist());
+            Blob blob = storage.createFrom(blobInfo, inputStream, Storage.BlobWriteOption.doesNotExist());
+            LOGGER.debug("Stored blob with name '{}' and size '{}' in bucket '{}'", blob.getName(), blob.getSize(), blob.getBucket());
+            return blob;
         } catch (StorageException e) {
             if (e.getCode() == HttpStatusCodes.STATUS_CODE_PRECONDITION_FAILED) {
                 throw new BlobAlreadyExistsException("The blob with name '" + blobId.getName() + "' already exists", e);
@@ -175,9 +179,6 @@ public class BlobStoreHelper {
         } catch (IOException ioE) {
             throw new BlobStoreException("Blob upload of blob with name '" + blobId.getName() + "' failed: " + ioE.getMessage(), ioE);
         }
-        Blob blob = storage.get(blobId);
-        LOGGER.debug("Stored blob with name '{}' and size '{}' in bucket '{}'", blob.getName(), blob.getSize(), blob.getBucket());
-        return blob;
     }
 
     /**
@@ -214,10 +215,13 @@ public class BlobStoreHelper {
             BlobInfo.Builder builder = BlobInfo.newBuilder(existingBlob.getBlobId()).setContentType(contentType);
             if (makePublic) {
                 builder.setAcl(List.of(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER)));
+                builder.setCacheControl(DEFAULT_CACHE_CONTROL);
             }
             BlobInfo blobInfo = builder.build();
             try {
-                storage.createFrom(blobInfo, inputStream, Storage.BlobWriteOption.generationMatch());
+                Blob blob = storage.createFrom(blobInfo, inputStream, Storage.BlobWriteOption.generationMatch());
+                LOGGER.debug("Stored blob with name '{}' and size '{}' in bucket '{}'", blob.getName(), blob.getSize(), blob.getBucket());
+                return blob;
             } catch (StorageException e) {
                 if (e.getCode() == HttpStatusCodes.STATUS_CODE_PRECONDITION_FAILED) {
                     throw new BlobConcurrentUpdateException("The blob with name '" + blobId.getName() + "' was updated concurrently", e);
@@ -227,9 +231,6 @@ public class BlobStoreHelper {
             } catch (IOException ioE) {
                 throw new BlobStoreException("Blob upload of blob with name '" + blobId.getName() + "' failed: " + ioE.getMessage(), ioE);
             }
-            Blob blob = storage.get(blobId);
-            LOGGER.debug("Stored blob with name '{}' and size '{}' in bucket '{}'", blob.getName(), blob.getSize(), blob.getBucket());
-            return blob;
         }
     }
 
