@@ -274,23 +274,29 @@ public class BlobStoreHelper {
         return storage.delete(blobIdList).stream().allMatch(ret -> ret);
     }
 
+    private static StorageOptions.Builder getBuilder(String projectId) {
+        // prevent copy operations from timing out when copying blobs across buckets
+        // see https://github.com/googleapis/google-cloud-java/issues/2243
+        HttpTransportOptions transportOptions = StorageOptions.getDefaultHttpTransportOptions();
+        transportOptions = transportOptions.toBuilder().setConnectTimeout(CONNECT_AND_READ_TIMEOUT).setReadTimeout(CONNECT_AND_READ_TIMEOUT)
+                .build();
+
+        return StorageOptions.newBuilder()
+                .setProjectId(projectId)
+                .setTransportOptions(transportOptions);
+    }
     public static Storage getStorage(String credentialPath, String projectId) {
         try {
-
-            // prevent copy operations from timing out when copying blobs across buckets
-            // see https://github.com/googleapis/google-cloud-java/issues/2243
-            HttpTransportOptions transportOptions = StorageOptions.getDefaultHttpTransportOptions();
-            transportOptions = transportOptions.toBuilder().setConnectTimeout(CONNECT_AND_READ_TIMEOUT).setReadTimeout(CONNECT_AND_READ_TIMEOUT)
-                    .build();
-
-            return StorageOptions.newBuilder()
+            return getBuilder(projectId)
                     .setCredentials(ServiceAccountCredentials.fromStream(Files.newInputStream(Paths.get(credentialPath))))
-                    .setProjectId(projectId)
-                    .setTransportOptions(transportOptions)
                     .build().getService();
         } catch (IOException e) {
             throw new BlobStoreException(e);
         }
+    }
+    public static Storage getStorage(String projectId) {
+        return getBuilder(projectId)
+                .build().getService();
     }
 
 }
