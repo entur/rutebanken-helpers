@@ -274,6 +274,22 @@ public class BlobStoreHelper {
         return storage.delete(blobIdList).stream().allMatch(ret -> ret);
     }
 
+    /*
+     * Uses default gcp credentials.
+     */
+    public static Storage getStorage( String projectId) {
+
+        // prevent copy operations from timing out when copying blobs across buckets
+        // see https://github.com/googleapis/google-cloud-java/issues/2243
+        HttpTransportOptions transportOptions = StorageOptions.getDefaultHttpTransportOptions();
+        transportOptions = transportOptions.toBuilder().setConnectTimeout(CONNECT_AND_READ_TIMEOUT).setReadTimeout(CONNECT_AND_READ_TIMEOUT).build();
+
+        return StorageOptions.newBuilder()
+                .setProjectId(projectId)
+                .setTransportOptions(transportOptions)
+                .build().getService();
+    }
+
     public static Storage getStorage(String credentialPath, String projectId) {
         try {
 
