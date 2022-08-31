@@ -22,12 +22,12 @@
     <parent>
         <groupId>org.entur.ror</groupId>
         <artifactId>superpom</artifactId>
-        <version>1.0.43</version>
+        <version>1.45</version>
     </parent>
 
     <groupId>org.entur.ror.helpers</groupId>
     <artifactId>helper</artifactId>
-    <version>1.0.83-SNAPSHOT</version>
+    <version>1.83-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>entur-helper</name>
