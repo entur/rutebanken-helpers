@@ -28,7 +28,7 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
 
     <properties>
         <license.licenseResolver>${project.baseUri}/../src/license</license.licenseResolver>
-        <hazelcast.version>3.12.12</hazelcast.version>
+        <hazelcast.version>3.12.13</hazelcast.version>
     </properties>
 
     <modelVersion>4.0.0</modelVersion>
