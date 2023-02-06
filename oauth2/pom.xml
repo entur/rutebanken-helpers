@@ -3,7 +3,7 @@
     <parent>
         <artifactId>helper</artifactId>
         <groupId>org.entur.ror.helpers</groupId>
-        <version>1.88</version>
+        <version>1.89-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
