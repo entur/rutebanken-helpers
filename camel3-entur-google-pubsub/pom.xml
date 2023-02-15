@@ -25,7 +25,7 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
     <parent>
         <groupId>org.entur.ror.helpers</groupId>
         <artifactId>helper</artifactId>
-        <version>1.89</version>
+        <version>1.90-SNAPSHOT</version>
     </parent>
 
     <artifactId>camel3-entur-google-pubsub</artifactId>
