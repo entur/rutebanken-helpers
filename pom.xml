@@ -27,7 +27,7 @@
 
     <groupId>org.entur.ror.helpers</groupId>
     <artifactId>helper</artifactId>
-    <version>1.91</version>
+    <version>1.92-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>entur-helper</name>
