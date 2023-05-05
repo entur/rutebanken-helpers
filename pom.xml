@@ -86,7 +86,7 @@
 
         <java.version>11</java.version>
 
-        <spring-cloud-gcp.version>3.4.4</spring-cloud-gcp.version>
+        <spring-cloud-gcp.version>3.5.0</spring-cloud-gcp.version>
         <camel.version>2.25.4</camel.version>
         <camel3.version>3.14.4</camel3.version>
         <kubernetes-client.version>5.12.4</kubernetes-client.version>
