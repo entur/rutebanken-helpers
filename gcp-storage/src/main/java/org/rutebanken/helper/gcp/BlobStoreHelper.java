@@ -21,13 +21,7 @@ import com.google.api.gax.paging.Page;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.cloud.WriteChannel;
 import com.google.cloud.http.HttpTransportOptions;
-import com.google.cloud.storage.Acl;
-import com.google.cloud.storage.Blob;
-import com.google.cloud.storage.BlobId;
-import com.google.cloud.storage.BlobInfo;
-import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageException;
-import com.google.cloud.storage.StorageOptions;
+import com.google.cloud.storage.*;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -281,7 +275,7 @@ public class BlobStoreHelper {
 
         // prevent copy operations from timing out when copying blobs across buckets
         // see https://github.com/googleapis/google-cloud-java/issues/2243
-        HttpTransportOptions transportOptions = StorageOptions.getDefaultHttpTransportOptions();
+        HttpTransportOptions transportOptions = HttpStorageOptions.defaults().getDefaultTransportOptions();
         transportOptions = transportOptions.toBuilder().setConnectTimeout(CONNECT_AND_READ_TIMEOUT).setReadTimeout(CONNECT_AND_READ_TIMEOUT).build();
 
         return StorageOptions.newBuilder()
@@ -295,7 +289,7 @@ public class BlobStoreHelper {
 
             // prevent copy operations from timing out when copying blobs across buckets
             // see https://github.com/googleapis/google-cloud-java/issues/2243
-            HttpTransportOptions transportOptions = StorageOptions.getDefaultHttpTransportOptions();
+            HttpTransportOptions transportOptions = HttpStorageOptions.defaults().getDefaultTransportOptions();
             transportOptions = transportOptions.toBuilder().setConnectTimeout(CONNECT_AND_READ_TIMEOUT).setReadTimeout(CONNECT_AND_READ_TIMEOUT)
                     .build();
 
