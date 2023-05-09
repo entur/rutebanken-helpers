@@ -19,8 +19,7 @@ package org.rutebanken.hazelcasthelper.service;
 import io.fabric8.kubernetes.api.model.EndpointAddress;
 import io.fabric8.kubernetes.api.model.EndpointSubset;
 import io.fabric8.kubernetes.api.model.Endpoints;
-import io.fabric8.kubernetes.client.DefaultKubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -64,10 +63,11 @@ public class KubernetesService {
         }
         if (kubernetesUrl != null && !"".equals(kubernetesUrl)) {
             LOGGER.info("Connecting to {}", kubernetesUrl);
-            kube = new DefaultKubernetesClient("http://localhost:8000/");
+            Config config = new ConfigBuilder().withMasterUrl("http://localhost:8000/").build();
+            kube = new KubernetesClientBuilder().withConfig(config).build();
         } else {
             LOGGER.info("Using default settings, as this should auto-configure correctly in the kubernetes cluster");
-            kube = new DefaultKubernetesClient();
+            kube = new KubernetesClientBuilder().build();
         }
     }
 
