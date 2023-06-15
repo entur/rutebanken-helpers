@@ -90,7 +90,7 @@
         <camel.version>2.25.4</camel.version>
         <camel3.version>3.20.4</camel3.version>
         <!-- Kubernetes client version aligned on camel-kubernetes transitive dependency -->
-        <kubernetes-client.version>6.5.1</kubernetes-client.version>
+        <kubernetes-client.version>6.7.2</kubernetes-client.version>
         <commons-io.version>2.11.0</commons-io.version>
         <hazelcast-kubernetes.version>2.2.3</hazelcast-kubernetes.version>
 
