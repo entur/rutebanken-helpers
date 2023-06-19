@@ -32,9 +32,12 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class BlobStoreHelper {
 
@@ -63,7 +66,7 @@ public class BlobStoreHelper {
     }
 
     /**
-     * @deprecated Use {@link #createNew(Storage, String, String, InputStream, boolean, String)} or {@link #createOrReplace(Storage, String, String, InputStream, boolean, String)}
+     * @deprecated Use {@link #createNew(Storage, String, String, InputStream, boolean, String, OffsetDateTime,Map)} or {@link #createOrReplace(Storage, String, String, InputStream, boolean, String)}
      */
     @Deprecated
     public static Blob uploadBlob(Storage storage, String containerName, String name, byte[] content, boolean makePublic, String contentType) {
@@ -92,7 +95,7 @@ public class BlobStoreHelper {
      * Upload a blob using  a {@link Storage#writer(BlobInfo, Storage.BlobWriteOption...)} as it is recommended for bigger files.
      * Retry/resumable logic is handled internally by the GCS client library.
      *
-     * @deprecated Use {@link #createNew(Storage, String, String, InputStream, boolean, String)} or {@link #createOrReplace(Storage, String, String, InputStream, boolean, String)}
+     * @deprecated Use {@link #createNew(Storage, String, String, InputStream, boolean, String, OffsetDateTime, Map)} or {@link #createOrReplace(Storage, String, String, InputStream, boolean, String)}
      */
     @Deprecated
     public static Blob uploadBlobWithRetry(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic, String contentType) {
@@ -152,6 +155,22 @@ public class BlobStoreHelper {
      * @throws BlobStoreException         if the blob creation fails.
      */
     public static Blob createNew(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic, String contentType) {
+        return createNew(storage,containerName,name,inputStream,makePublic,contentType,OffsetDateTime.now(),Collections.emptyMap());
+    }
+
+    /**
+     * Creates a new blob in GCP. Fails if the blob already exists.
+     * Use {@link #createOrReplace(Storage, String, String, InputStream, boolean, String contentType)} if the blob may
+     * already be present in the bucket.
+     * Note: The client library will automatically retry in case of transient network or server-side error. See <a href="https://cloud.google.com/storage/docs/retry-strategy">...</a>
+     * Note: The client library will automatically send data in retryable 15MB chunks.
+     *
+     * @return a reference to the newly created blob.
+     * @throws BlobAlreadyExistsException if the blob already exists.
+     * @throws BlobStoreException         if the blob creation fails.
+     */
+
+    public static Blob createNew(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic, String contentType, OffsetDateTime customTime, Map<String,String> metaData) {
         LOGGER.debug("Creating new blob {} in bucket {}", name, containerName);
         BlobId blobId = BlobId.of(containerName, name);
         BlobInfo.Builder builder = BlobInfo.newBuilder(blobId).setContentType(contentType);
@@ -159,6 +178,15 @@ public class BlobStoreHelper {
             builder.setAcl(List.of(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER)));
             builder.setCacheControl(DEFAULT_CACHE_CONTROL);
         }
+
+        if (customTime != null) {
+            builder.setCustomTimeOffsetDateTime(customTime);
+        }
+
+        if (!metaData.isEmpty()) {
+            builder.setMetadata(metaData);
+        }
+
         BlobInfo blobInfo = builder.build();
         try {
             Blob blob = storage.createFrom(blobInfo, inputStream, Storage.BlobWriteOption.doesNotExist());
@@ -190,7 +218,7 @@ public class BlobStoreHelper {
 
     /**
      * Creates or replace a blob in GCP. Fails if the blob is modified concurrently.
-     * Use {@link #createNew(Storage, String, String, InputStream, boolean, String contentType)} instead if there is a guarantee that the
+     * Use {@link #createNew(Storage, String, String, InputStream, boolean, String contentType, OffsetDateTime customTime, Map)} instead if there is a guarantee that the
      * blob does not exist in the bucket since createNew() requires one less return trip to the server.
      * Note: The client library will automatically retry in case of transient network or server-side error. See <a href="https://cloud.google.com/storage/docs/retry-strategy">...</a>
      * Note: The client library will automatically send data in retryable 15MB chunks.
@@ -200,16 +228,34 @@ public class BlobStoreHelper {
      * @throws BlobStoreException            if the blob creation fails.
      */
     public static Blob createOrReplace(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic, String contentType) {
+        return createOrReplace(storage,containerName,name,inputStream,makePublic,contentType,OffsetDateTime.now(),Collections.emptyMap());
+    }
+
+    /**
+     * Creates or replace a blob in GCP. Fails if the blob is modified concurrently.
+     * Use {@link #createNew(Storage, String, String, InputStream, boolean, String contentType, OffsetDateTime customTime, Map)} instead if there is a guarantee that the
+     * blob does not exist in the bucket since createNew() requires one less return trip to the server.
+     * Note: The client library will automatically retry in case of transient network or server-side error. See <a href="https://cloud.google.com/storage/docs/retry-strategy">...</a>
+     * Note: The client library will automatically send data in retryable 15MB chunks.
+     *
+     * @return a reference to the created or modified blob.
+     * @throws BlobConcurrentUpdateException if the blob is modified concurrently by another client.
+     * @throws BlobStoreException            if the blob creation fails.
+     */
+    public static Blob createOrReplace(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic, String contentType, OffsetDateTime customTime, Map<String,String> metaData) {
         LOGGER.debug("Creating or replace blob {} in bucket {}", name, containerName);
         BlobId blobId = BlobId.of(containerName, name);
         Blob existingBlob = storage.get(blobId);
         if (existingBlob == null) {
-            return createNew(storage, containerName, name, inputStream, makePublic, contentType);
+            return createNew(storage, containerName, name, inputStream, makePublic, contentType, customTime,metaData);
         } else {
             BlobInfo.Builder builder = BlobInfo.newBuilder(existingBlob.getBlobId()).setContentType(contentType);
             if (makePublic) {
                 builder.setAcl(List.of(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER)));
                 builder.setCacheControl(DEFAULT_CACHE_CONTROL);
+            }
+            if (existingBlob.getCustomTimeOffsetDateTime() != null) {
+                builder.setCustomTimeOffsetDateTime(OffsetDateTime.now());
             }
             BlobInfo blobInfo = builder.build();
             try {
