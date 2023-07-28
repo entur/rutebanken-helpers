@@ -17,10 +17,10 @@
 package org.rutebanken.hazelcasthelper.service;
 
 import io.fabric8.kubernetes.client.*;
+import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PostConstruct;
 
 public class KubernetesService {
     private static final Logger LOGGER = LoggerFactory.getLogger(KubernetesService.class);
