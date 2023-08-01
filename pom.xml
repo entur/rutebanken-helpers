@@ -89,7 +89,7 @@
         <hamcrest.version>2.2</hamcrest.version>
 
         <nexus-staging-maven-plugin.version>1.6.13</nexus-staging-maven-plugin.version>
-        <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
+        <maven-gpg-plugin.version>3.1.0</maven-gpg-plugin.version>
 
 
         <!-- empty argLine property, the value is set up by Jacoco during unit tests execution -->
