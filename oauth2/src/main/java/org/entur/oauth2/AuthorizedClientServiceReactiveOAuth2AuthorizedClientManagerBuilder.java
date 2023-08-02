@@ -1,7 +1,7 @@
 package org.entur.oauth2;
 
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
-import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientPropertiesRegistrationAdapter;
+import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientPropertiesMapper;
 import org.springframework.security.oauth2.client.AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.ClientCredentialsReactiveOAuth2AuthorizedClientProvider;
 import org.springframework.security.oauth2.client.InMemoryReactiveOAuth2AuthorizedClientService;
@@ -19,8 +19,8 @@ import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Build a ReactiveOAuth2AuthorizedClientManager for authorized API calls.
@@ -74,9 +74,8 @@ class AuthorizedClientServiceReactiveOAuth2AuthorizedClientManagerBuilder {
      * @return the repository of OAuth2 clients.
      */
     private ReactiveClientRegistrationRepository clientRegistrationRepository() {
-        List<ClientRegistration> registrations = new ArrayList<>(
-                OAuth2ClientPropertiesRegistrationAdapter.getClientRegistrations(properties).values());
-        return new InMemoryReactiveClientRegistrationRepository(registrations);
+        Map<String, ClientRegistration> clientRegistrations = new OAuth2ClientPropertiesMapper(properties).asClientRegistrations();
+        return new InMemoryReactiveClientRegistrationRepository(List.copyOf(clientRegistrations.values()));
     }
 
     /**

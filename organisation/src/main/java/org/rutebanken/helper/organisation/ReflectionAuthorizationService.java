@@ -26,7 +26,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toList;
 import static org.rutebanken.helper.organisation.AuthorizationConstants.*;
 
 @Service
@@ -82,7 +81,7 @@ public class ReflectionAuthorizationService {
         List<RoleAssignment> relevantRoles = roleAssignmentExtractor.getRoleAssignmentsForUser()
                 .stream()
                 .filter(roleAssignment -> requiredRole.equals(roleAssignment.r))
-                .collect(toList());
+                .toList();
 
         for (Object entity : entities) {
             boolean allowed = entity == null ||
@@ -205,7 +204,7 @@ public class ReflectionAuthorizationService {
     private boolean isAllowedForFieldAndClassification(String entityType, Object entity, List<String> classificationsForEntityType, boolean isBlacklist) {
         Optional<Field> optionalField = findFieldFromClassifier(entityType, entity);
 
-        if (!optionalField.isPresent()) {
+        if (optionalField.isEmpty()) {
             logger.warn("Cannot fetch field {}. entity: {}", entityType, entity);
             return true;
         }
@@ -217,7 +216,7 @@ public class ReflectionAuthorizationService {
         field.setAccessible(true);
         Optional<Object> optionalValue = getFieldValue(field, entity);
 
-        if (!optionalValue.isPresent()) {
+        if (optionalValue.isEmpty()) {
             logger.trace("Cannot resolve value for {}. This is ok, as the value can be null. entity: {}.", field, entity);
             return isBlacklist;
         }

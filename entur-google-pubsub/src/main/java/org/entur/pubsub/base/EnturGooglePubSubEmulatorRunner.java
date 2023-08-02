@@ -94,13 +94,7 @@ public class EnturGooglePubSubEmulatorRunner {
     }
 
 
-    private static final class RunProcessKiller implements Runnable {
-
-        private final RunProcess runProcess;
-
-        private RunProcessKiller(RunProcess runProcess) {
-            this.runProcess = runProcess;
-        }
+    private record RunProcessKiller(RunProcess runProcess) implements Runnable {
 
         @Override
         public void run() {
