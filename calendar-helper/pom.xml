@@ -22,7 +22,7 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
     <parent>
         <groupId>org.entur.ror.helpers</groupId>
         <artifactId>helper</artifactId>
-        <version>1.100</version>
+        <version>1.101-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
