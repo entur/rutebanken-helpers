@@ -80,7 +80,7 @@
         <license.licenseName>eupl-1.2</license.licenseName>
         <license.licenseResolver>${project.baseUri}/src/license</license.licenseResolver>
 
-        <spring-cloud-gcp.version>4.7.1</spring-cloud-gcp.version>
+        <spring-cloud-gcp.version>4.8.4</spring-cloud-gcp.version>
         <!-- Kubernetes client version aligned on camel-kubernetes transitive dependency -->
         <kubernetes-client.version>6.9.2</kubernetes-client.version>
         <commons-io.version>2.15.0</commons-io.version>
