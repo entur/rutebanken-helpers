@@ -82,7 +82,7 @@
 
         <spring-cloud-gcp.version>4.7.1</spring-cloud-gcp.version>
         <!-- Kubernetes client version aligned on camel-kubernetes transitive dependency -->
-        <kubernetes-client.version>6.7.2</kubernetes-client.version>
+        <kubernetes-client.version>6.9.2</kubernetes-client.version>
         <commons-io.version>2.15.0</commons-io.version>
         <hazelcast-kubernetes.version>2.2.3</hazelcast-kubernetes.version>
 
