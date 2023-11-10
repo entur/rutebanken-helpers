@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.entur.ror</groupId>
         <artifactId>superpom</artifactId>
-        <version>1.64</version>
+        <version>1.67</version>
     </parent>
 
     <groupId>org.entur.ror.helpers</groupId>
@@ -86,12 +86,12 @@
 
         <java.version>11</java.version>
 
-        <spring-cloud-gcp.version>3.5.0</spring-cloud-gcp.version>
+        <spring-cloud-gcp.version>3.7.4</spring-cloud-gcp.version>
         <camel.version>2.25.4</camel.version>
-        <camel3.version>3.20.4</camel3.version>
+        <camel3.version>3.21.2</camel3.version>
         <!-- Kubernetes client version aligned on camel-kubernetes transitive dependency -->
-        <kubernetes-client.version>6.5.1</kubernetes-client.version>
-        <commons-io.version>2.11.0</commons-io.version>
+        <kubernetes-client.version>6.9.2</kubernetes-client.version>
+        <commons-io.version>2.15.0</commons-io.version>
         <hazelcast-kubernetes.version>2.2.3</hazelcast-kubernetes.version>
 
         <hamcrest.version>2.2</hamcrest.version>
