@@ -15,10 +15,18 @@ import java.util.Collections;
  */
 class RorGrantedAuthoritiesConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
 
+    public static final String ENTUR_PARTNER_ROLE_PREFIX = "ror_";
+
     @Override
     public Collection<GrantedAuthority> convert(Jwt jwt) {
         Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
         for (String authority : getAuthorities(jwt)) {
+            // In the Entur Partner tenant, roles are prefixed. This prefix must be removed before passing the role
+            // name to Spring Security.
+            if(authority.startsWith(ENTUR_PARTNER_ROLE_PREFIX)) {
+                authority = authority.substring(ENTUR_PARTNER_ROLE_PREFIX.length());
+            }
+            // Spring Security expects the roles to be prefixed by "ROLE_"
             grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_" + authority));
         }
         return grantedAuthorities;
