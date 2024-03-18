@@ -21,13 +21,13 @@ import java.util.Map;
  * The purpose of this mapping is to simplify the claims produced by Auth0 and make them easier to process by Spring Security.
  * See @{@link JwtRoleAssignmentExtractor}.
  */
-class RorAuth0RolesClaimAdapter implements Converter<Map<String, Object>, Map<String, Object>> {
+public class RorAuth0RolesClaimAdapter implements Converter<Map<String, Object>, Map<String, Object>> {
 
     private final MappedJwtClaimSetConverter delegate =
             MappedJwtClaimSetConverter.withDefaults(Collections.emptyMap());
 
 
-    private String rorAuth0ClaimNamespace;
+    private final String rorAuth0ClaimNamespace;
 
     public RorAuth0RolesClaimAdapter(String rorAuth0ClaimNamespace) {
         this.rorAuth0ClaimNamespace = rorAuth0ClaimNamespace;

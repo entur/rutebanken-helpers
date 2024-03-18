@@ -41,7 +41,7 @@ public class MultiIssuerAuthenticationManagerResolver
     private final BearerTokenResolver resolver = new DefaultBearerTokenResolver();
     private final Map<String, AuthenticationManager> authenticationManagers = new ConcurrentHashMap<>();
 
-    MultiIssuerAuthenticationManagerResolver(String enturInternalAuth0Audience, String enturInternalAuth0Issuer, String enturPartnerAuth0Audience, String enturPartnerAuth0Issuer, String rorAuth0Audience, String rorAuth0Issuer, String rorAuth0ClaimNamespace) {
+    protected MultiIssuerAuthenticationManagerResolver(String enturInternalAuth0Audience, String enturInternalAuth0Issuer, String enturPartnerAuth0Audience, String enturPartnerAuth0Issuer, String rorAuth0Audience, String rorAuth0Issuer, String rorAuth0ClaimNamespace) {
         this.enturInternalAuth0Audience = enturInternalAuth0Audience;
         this.enturInternalAuth0Issuer = enturInternalAuth0Issuer;
         this.enturPartnerAuth0Audience = enturPartnerAuth0Audience;
@@ -56,7 +56,7 @@ public class MultiIssuerAuthenticationManagerResolver
      *
      * @return a @{@link JwtDecoder} for Auth0.
      */
-    private JwtDecoder enturInternalAuth0JwtDecoder() {
+    protected JwtDecoder enturInternalAuth0JwtDecoder() {
         return new RoRJwtDecoderBuilder().withIssuer(enturInternalAuth0Issuer)
                 .withAudience(enturInternalAuth0Audience)
                 .withAuth0ClaimNamespace(rorAuth0ClaimNamespace)
@@ -68,7 +68,7 @@ public class MultiIssuerAuthenticationManagerResolver
      *
      * @return a @{@link JwtDecoder} for Auth0.
      */
-    private JwtDecoder enturPartnerAuth0JwtDecoder() {
+    protected JwtDecoder enturPartnerAuth0JwtDecoder() {
         return new RoRJwtDecoderBuilder().withIssuer(enturPartnerAuth0Issuer)
                 .withAudience(enturPartnerAuth0Audience)
                 .withAuth0ClaimNamespace(rorAuth0ClaimNamespace)
@@ -80,7 +80,7 @@ public class MultiIssuerAuthenticationManagerResolver
      *
      * @return a @{@link JwtDecoder} for Auth0.
      */
-    private JwtDecoder rorAuth0JwtDecoder() {
+    protected JwtDecoder rorAuth0JwtDecoder() {
         return new RoRJwtDecoderBuilder().withIssuer(rorAuth0Issuer)
                 .withAudience(rorAuth0Audience)
                 .withAuth0ClaimNamespace(rorAuth0ClaimNamespace)
