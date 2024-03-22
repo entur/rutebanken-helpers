@@ -43,7 +43,7 @@ public class OAuth2TokenService implements TokenService {
 
     public static class Builder {
 
-        private OAuth2TokenService oAuth2TokenService;
+        private final OAuth2TokenService oAuth2TokenService;
         private OAuth2ClientProperties properties;
         private String audience;
 
