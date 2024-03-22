@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  */
 public class JwtRoleAssignmentExtractor implements RoleAssignmentExtractor {
 
-    private static ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     public List<RoleAssignment> getRoleAssignmentsForUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -55,10 +55,10 @@ public class JwtRoleAssignmentExtractor implements RoleAssignmentExtractor {
 
     private static RoleAssignment parse(Object roleAssignment) {
         if (roleAssignment instanceof Map) {
-            return mapper.convertValue(roleAssignment, RoleAssignment.class);
+            return MAPPER.convertValue(roleAssignment, RoleAssignment.class);
         }
         try {
-            return mapper.readValue((String) roleAssignment, RoleAssignment.class);
+            return MAPPER.readValue((String) roleAssignment, RoleAssignment.class);
         } catch (IOException e) {
             throw new IllegalArgumentException("Exception while parsing role assignments from JSON", e);
         }

@@ -38,7 +38,7 @@ aliases:
 jobs:
   test:
     docker:
-      - image: cimg/openjdk:17.0
+      - image: cimg/openjdk:17.0.10
         auth:
           username: $DOCKERHUB_LOGIN
           password: $DOCKERHUB_PASSWORD
@@ -86,7 +86,7 @@ jobs:
 
   deploy-nexus:
     docker:
-      - image: cimg/openjdk:17.0
+      - image: cimg/openjdk:17.0.10
         auth:
           username: $DOCKERHUB_LOGIN
           password: $DOCKERHUB_PASSWORD

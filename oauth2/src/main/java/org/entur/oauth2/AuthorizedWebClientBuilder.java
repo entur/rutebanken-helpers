@@ -32,7 +32,7 @@ import java.util.Map;
  */
 public class AuthorizedWebClientBuilder {
 
-    private WebClient.Builder webclientBuilder;
+    private final WebClient.Builder webclientBuilder;
     private OAuth2ClientProperties properties;
     private String audience;
     private String clientRegistrationId;
