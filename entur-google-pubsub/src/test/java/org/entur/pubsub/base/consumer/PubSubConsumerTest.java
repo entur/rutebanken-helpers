@@ -25,7 +25,7 @@ class PubSubConsumerTest extends BasePubSubIntegrationTest {
     @Autowired
     private PubSubTemplate pubSubTemplate;
 
-    private static CompletableFuture<String> messageContent = new CompletableFuture<>();
+    private static final CompletableFuture<String> messageContent = new CompletableFuture<>();
 
 
     @TestConfiguration

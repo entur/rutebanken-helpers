@@ -57,7 +57,7 @@ import static org.rutebanken.helper.organisation.AuthorizationConstants.ENTITY_T
 class ReflectionAuthorizationServiceTest {
 
 
-    private RoleAssignmentExtractor roleAssignmentExtractor = new RoleAssignmentExtractor() {
+    private final RoleAssignmentExtractor roleAssignmentExtractor = new RoleAssignmentExtractor() {
         @Override
         public List<RoleAssignment> getRoleAssignmentsForUser() {
             return null;
@@ -69,12 +69,12 @@ class ReflectionAuthorizationServiceTest {
         }
     };
 
-    private OrganisationChecker organisationChecker = (roleAssignment, entity) -> true;
-    private AdministrativeZoneChecker administrativeZoneChecker = (roleAssignment, entity) -> true;
-    private EntityResolver entityResolver = (entity -> entity);
-    private Map<String, List<String>> fieldMappings = new HashMap<>();
+    private final OrganisationChecker organisationChecker = (roleAssignment, entity) -> true;
+    private final AdministrativeZoneChecker administrativeZoneChecker = (roleAssignment, entity) -> true;
+    private final EntityResolver entityResolver = (entity -> entity);
+    private final Map<String, List<String>> fieldMappings = new HashMap<>();
 
-    private ReflectionAuthorizationService reflectionAuthorizationService = new ReflectionAuthorizationService(roleAssignmentExtractor, true, organisationChecker, administrativeZoneChecker, entityResolver, fieldMappings);
+    private final ReflectionAuthorizationService reflectionAuthorizationService = new ReflectionAuthorizationService(roleAssignmentExtractor, true, organisationChecker, administrativeZoneChecker, entityResolver, fieldMappings);
 
     @Test
     void authorizedForLegalStopPlaceTypesWhenOthersBlacklisted() {
