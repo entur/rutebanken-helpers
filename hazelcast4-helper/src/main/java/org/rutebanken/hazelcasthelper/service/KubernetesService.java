@@ -56,7 +56,7 @@ public class KubernetesService {
             LOGGER.warn("Disabling kubernetes connection as rutebanken.kubernetes.enabled={}", kubernetesEnabled);
             return;
         }
-        if (kubernetesUrl != null && !"".equals(kubernetesUrl)) {
+        if (kubernetesUrl != null && !kubernetesUrl.isEmpty()) {
             LOGGER.info("Connecting to {}", kubernetesUrl);
             Config config = new ConfigBuilder().withMasterUrl("http://localhost:8000/").build();
             kube = new KubernetesClientBuilder().withConfig(config).build();
@@ -83,7 +83,7 @@ public class KubernetesService {
      * TODO It is known that this will fail if the hostname contains dashes. Improve later
      */
     public String findDeploymentName() {
-        if (serviceName != null && !"".equals(serviceName)) {
+        if (serviceName != null && !serviceName.isEmpty()) {
             // serviceName has been set explicitly
             return serviceName;
         }

@@ -37,7 +37,7 @@ public abstract class AbstractEnturGooglePubSubConsumer implements EnturGooglePu
     @Value("${entur.pubsub.consumer.retry.delay:15000}")
     private long retryDelay;
 
-    private List<Subscriber> subscribers = new ArrayList<>();
+    private final List<Subscriber> subscribers = new ArrayList<>();
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEnturGooglePubSubConsumer.class);
 
     protected abstract String getDestinationName();
@@ -54,22 +54,18 @@ public abstract class AbstractEnturGooglePubSubConsumer implements EnturGooglePu
 
         enturGooglePubSubAdmin.createSubscriptionIfMissing(getDestinationName());
 
-        Consumer<BasicAcknowledgeablePubsubMessage> messageConsumer = new Consumer<BasicAcknowledgeablePubsubMessage>() {
-
-            @Override
-            public void accept(BasicAcknowledgeablePubsubMessage basicAcknowledgeablePubsubMessage) {
-                PubsubMessage pubsubMessage = basicAcknowledgeablePubsubMessage.getPubsubMessage();
-                if (LOGGER.isTraceEnabled()) {
-                    LOGGER.trace("Received message ID : {}", pubsubMessage.getMessageId());
-                }
-                try {
-                    onMessage(pubsubMessage.getData().toByteArray(), pubsubMessage.getAttributesMap());
-                    basicAcknowledgeablePubsubMessage.ack();
-                } catch (Exception e) {
-                    basicAcknowledgeablePubsubMessage.nack();
-                    LOGGER.error("Message processing failed, retrying in {} milliseconds", retryDelay, e);
-                    delay(retryDelay);
-                }
+        Consumer<BasicAcknowledgeablePubsubMessage> messageConsumer = basicAcknowledgeablePubsubMessage -> {
+            PubsubMessage pubsubMessage = basicAcknowledgeablePubsubMessage.getPubsubMessage();
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("Received message ID : {}", pubsubMessage.getMessageId());
+            }
+            try {
+                onMessage(pubsubMessage.getData().toByteArray(), pubsubMessage.getAttributesMap());
+                basicAcknowledgeablePubsubMessage.ack();
+            } catch (Exception e) {
+                basicAcknowledgeablePubsubMessage.nack();
+                LOGGER.error("Message processing failed, retrying in {} milliseconds", retryDelay, e);
+                delay(retryDelay);
             }
         };
         for (int i = 0; i < getConcurrentConsumers(); i++) {
