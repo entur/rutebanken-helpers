@@ -54,7 +54,7 @@ public class EnturGooglePubSubEmulatorRunner {
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public void handleContextRefreshed(ContextRefreshedEvent contextRefreshedEvent) throws InterruptedException {
         try {
-            LOGGER.info("Starting Google PubSub Emulator");
+            LOGGER.info("Starting Google PubSub Emulator on {}", emulatorHostAndPort);
             File emulatorExecutable = new File(pathToEmulator);
             if(!emulatorExecutable.exists()) {
                 throw new IllegalStateException("Google PubSub Emulator not found at " + pathToEmulator + ".\n The emulator can be installed with the following command:\n gcloud -q components install pubsub-emulator ");
@@ -77,7 +77,7 @@ public class EnturGooglePubSubEmulatorRunner {
                     Thread.sleep(2000);
                 }
             } while (!ready);
-            LOGGER.info("Started Google PubSub Emulator");
+            LOGGER.info("Started Google PubSub Emulator on {}", emulatorHostAndPort);
         } catch (IOException e) {
             throw new EnturGooglePubSubException(e);
         }
@@ -86,9 +86,9 @@ public class EnturGooglePubSubEmulatorRunner {
     @EventListener
     public void handleContextClosedEvent(ContextClosedEvent contextClosedEvent) {
         if (pubsubEmulatorProcess != null) {
-            LOGGER.info("Stopping Google PubSub Emulator");
+            LOGGER.info("Stopping Google PubSub Emulator on {}", emulatorHostAndPort);
             pubsubEmulatorProcess.kill();
-            LOGGER.info("Stopped Google PubSub Emulator");
+            LOGGER.info("Stopped Google PubSub Emulator on {}", emulatorHostAndPort);
 
         }
     }
