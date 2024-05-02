@@ -52,6 +52,10 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
             <artifactId>guava</artifactId>
         </dependency>
         <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+        <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
         </dependency>
@@ -62,11 +66,7 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
             <artifactId>junit-jupiter-engine</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <scope>test</scope>
-        </dependency>
+
     </dependencies>
 
     <build>
