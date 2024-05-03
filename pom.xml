@@ -80,9 +80,9 @@
         <license.licenseName>eupl-1.2</license.licenseName>
         <license.licenseResolver>${project.baseUri}/src/license</license.licenseResolver>
 
-        <spring-cloud-gcp.version>5.1.0</spring-cloud-gcp.version>
+        <spring-cloud-gcp.version>5.1.2</spring-cloud-gcp.version>
         <!-- Kubernetes client version aligned on camel-kubernetes transitive dependency -->
-        <kubernetes-client.version>6.10.0</kubernetes-client.version>
+        <kubernetes-client.version>6.12.1</kubernetes-client.version>
         <commons-io.version>2.16.1</commons-io.version>
         <hazelcast-kubernetes.version>2.2.3</hazelcast-kubernetes.version>
 
