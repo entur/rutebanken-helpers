@@ -35,7 +35,11 @@ public class GcsBlobStoreRepository implements BlobStoreRepository {
 
     private String containerName;
 
-    public GcsBlobStoreRepository(Storage storage) {
+    public GcsBlobStoreRepository(String projectId, String credentialPath) {
+       this(buildStorage(projectId, credentialPath));
+    }
+
+    private GcsBlobStoreRepository(Storage storage) {
         this.storage = storage;
     }
 
@@ -112,6 +116,15 @@ public class GcsBlobStoreRepository implements BlobStoreRepository {
 
     public Storage storage() {
         return storage;
+    }
+
+    private static Storage buildStorage(String projectId, String credentialPath) {
+        if (credentialPath == null || credentialPath.isEmpty()) {
+            // Use Default gcp credentials
+            return BlobStoreHelper.getStorage(projectId);
+        } else {
+            return BlobStoreHelper.getStorage(credentialPath, projectId);
+        }
     }
 
 }
