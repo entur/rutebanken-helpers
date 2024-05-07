@@ -55,6 +55,16 @@ public interface BlobStoreRepository {
     long uploadBlob(String objectName, InputStream inputStream, String contentType);
 
     /**
+     * Upload a blob and returns its generation number. Fails if the blob already exists.
+     *
+     * @param objectName  the name of the blob.
+     * @param inputStream the blob data.
+     * @return the blob generation.
+     * @throws org.rutebanken.helper.gcp.BlobAlreadyExistsException if the blob already exists.
+     */
+    long uploadNewBlob(String objectName, InputStream inputStream);
+
+    /**
      * Copy a blob to another container.
      */
     void copyBlob(String sourceContainerName, String sourceObjectName, String targetContainerName, String targetObjectName);
@@ -85,8 +95,6 @@ public interface BlobStoreRepository {
 
     /**
      * Specify the name of the container.
-     *
-     * @param containerName
      */
     void setContainerName(String containerName);
 
