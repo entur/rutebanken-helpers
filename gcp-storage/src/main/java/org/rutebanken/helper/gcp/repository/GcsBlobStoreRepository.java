@@ -65,6 +65,12 @@ public class GcsBlobStoreRepository implements BlobStoreRepository {
     }
 
     @Override
+    public long uploadNewBlob(String objectName, InputStream inputStream) {
+        Blob blob = BlobStoreHelper.createNew(storage, containerName, objectName, inputStream, false);
+        return blob.getGeneration();
+    }
+
+    @Override
     public void copyBlob(String sourceContainerName, String sourceObjectName, String targetContainerName, String targetObjectName) {
         copyVersionedBlob(sourceContainerName, sourceObjectName, null, targetContainerName, targetObjectName);
     }

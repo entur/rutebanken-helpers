@@ -15,6 +15,7 @@
 
 package org.rutebanken.helper.gcp.repository;
 
+import org.rutebanken.helper.gcp.BlobAlreadyExistsException;
 import org.rutebanken.helper.gcp.BlobStoreException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,6 +112,14 @@ public class LocalDiskBlobStoreRepository implements BlobStoreRepository {
 
     @Override
     public long uploadBlob(String objectName, InputStream inputStream, String contentType) {
+        return uploadBlob(objectName, inputStream);
+    }
+
+    @Override
+    public long uploadNewBlob(String objectName, InputStream inputStream) {
+        if(getBlob(objectName) != null) {
+            throw new BlobAlreadyExistsException("The blob with name '" + objectName + "' already exists");
+        }
         return uploadBlob(objectName, inputStream);
     }
 
