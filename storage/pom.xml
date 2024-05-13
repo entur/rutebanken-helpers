@@ -32,46 +32,29 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
 
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>gcp-storage</artifactId>
+    <artifactId>storage</artifactId>
 
-    <name>gcp-storage</name>
+    <name>storage</name>
     <description>
-        Utilities for reading/writing binary files (blobs) to Google Cloud Storage.
+        Utilities for reading/writing binary files (blobs) to storage.
     </description>
 
     <dependencies>
-
-        <dependency>
-            <groupId>org.entur.ror.helpers</groupId>
-            <artifactId>storage</artifactId>
-            <version>2.20-SNAPSHOT</version>
-        </dependency>
-
-
         <!-- NOTICE that you put the versions in the parent dependency
         management section, and artifacts without version here. -->
-        <dependency>
-            <groupId>com.google.cloud</groupId>
-            <artifactId>google-cloud-storage</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
         </dependency>
 
         <!-- test dependencies -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
             <scope>test</scope>
         </dependency>
 

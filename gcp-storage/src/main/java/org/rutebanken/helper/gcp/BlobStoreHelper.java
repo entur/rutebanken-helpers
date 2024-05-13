@@ -23,6 +23,9 @@ import com.google.cloud.WriteChannel;
 import com.google.cloud.http.HttpTransportOptions;
 import com.google.cloud.storage.*;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.rutebanken.helper.storage.BlobAlreadyExistsException;
+import org.rutebanken.helper.storage.BlobConcurrentUpdateException;
+import org.rutebanken.helper.storage.BlobStoreException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,7 +109,7 @@ public class BlobStoreHelper {
         try {
             writeWithRetry(storage, blobInfo, inputStream);
         } catch (IOException ioE) {
-            throw new BlobStoreException("Blob upload of blob with name '" + blobId.getName() + "' failed: " + ioE.getMessage(), ioE);
+            throw new org.rutebanken.helper.storage.BlobStoreException("Blob upload of blob with name '" + blobId.getName() + "' failed: " + ioE.getMessage(), ioE);
         }
         Blob blob = storage.get(blobId);
         LOGGER.debug("Stored blob with name '{}' and size '{}' in bucket '{}'", blob.getName(), blob.getSize(), blob.getBucket());
@@ -133,8 +136,8 @@ public class BlobStoreHelper {
      * the bucket.
      *
      * @return a reference to the newly created blob.
-     * @throws BlobAlreadyExistsException if the blob already exists.
-     * @throws BlobStoreException         if the blob creation fails.
+     * @throws org.rutebanken.helper.storage.BlobAlreadyExistsException if the blob already exists.
+     * @throws org.rutebanken.helper.storage.BlobStoreException         if the blob creation fails.
      */
     public static Blob createNew(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic) {
         return createNew(storage, containerName, name, inputStream, makePublic, "application/octet-stream");
@@ -148,8 +151,8 @@ public class BlobStoreHelper {
      * Note: The client library will automatically send data in retryable 15MB chunks.
      *
      * @return a reference to the newly created blob.
-     * @throws BlobAlreadyExistsException if the blob already exists.
-     * @throws BlobStoreException         if the blob creation fails.
+     * @throws org.rutebanken.helper.storage.BlobAlreadyExistsException if the blob already exists.
+     * @throws org.rutebanken.helper.storage.BlobStoreException         if the blob creation fails.
      */
     public static Blob createNew(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic, String contentType) {
         LOGGER.debug("Creating new blob {} in bucket {}", name, containerName);
@@ -168,10 +171,10 @@ public class BlobStoreHelper {
             if (e.getCode() == HttpStatusCodes.STATUS_CODE_PRECONDITION_FAILED) {
                 throw new BlobAlreadyExistsException("The blob with name '" + blobId.getName() + "' already exists", e);
             } else {
-                throw new BlobStoreException("Blob upload of blob with name '" + blobId.getName() + "' failed: " + e.getMessage(), e);
+                throw new org.rutebanken.helper.storage.BlobStoreException("Blob upload of blob with name '" + blobId.getName() + "' failed: " + e.getMessage(), e);
             }
         } catch (IOException ioE) {
-            throw new BlobStoreException("Blob upload of blob with name '" + blobId.getName() + "' failed: " + ioE.getMessage(), ioE);
+            throw new org.rutebanken.helper.storage.BlobStoreException("Blob upload of blob with name '" + blobId.getName() + "' failed: " + ioE.getMessage(), ioE);
         }
     }
 
@@ -181,8 +184,8 @@ public class BlobStoreHelper {
      * blob does not exist in the bucket since createNew() requires one less return trip to the server.
      *
      * @return a reference to the created or modified blob.
-     * @throws BlobConcurrentUpdateException if the blob is modified concurrently by another client.
-     * @throws BlobStoreException            if the blob creation fails.
+     * @throws org.rutebanken.helper.storage.BlobConcurrentUpdateException if the blob is modified concurrently by another client.
+     * @throws org.rutebanken.helper.storage.BlobStoreException            if the blob creation fails.
      */
     public static Blob createOrReplace(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic) {
         return createOrReplace(storage, containerName, name, inputStream, makePublic, "application/octet-stream");
@@ -196,8 +199,8 @@ public class BlobStoreHelper {
      * Note: The client library will automatically send data in retryable 15MB chunks.
      *
      * @return a reference to the created or modified blob.
-     * @throws BlobConcurrentUpdateException if the blob is modified concurrently by another client.
-     * @throws BlobStoreException            if the blob creation fails.
+     * @throws org.rutebanken.helper.storage.BlobConcurrentUpdateException if the blob is modified concurrently by another client.
+     * @throws org.rutebanken.helper.storage.BlobStoreException            if the blob creation fails.
      */
     public static Blob createOrReplace(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic, String contentType) {
         LOGGER.debug("Creating or replace blob {} in bucket {}", name, containerName);
@@ -220,10 +223,10 @@ public class BlobStoreHelper {
                 if (e.getCode() == HttpStatusCodes.STATUS_CODE_PRECONDITION_FAILED) {
                     throw new BlobConcurrentUpdateException("The blob with name '" + blobId.getName() + "' was updated concurrently", e);
                 } else {
-                    throw new BlobStoreException("Blob upload of blob with name '" + blobId.getName() + "' failed: " + e.getMessage(), e);
+                    throw new org.rutebanken.helper.storage.BlobStoreException("Blob upload of blob with name '" + blobId.getName() + "' failed: " + e.getMessage(), e);
                 }
             } catch (IOException ioE) {
-                throw new BlobStoreException("Blob upload of blob with name '" + blobId.getName() + "' failed: " + ioE.getMessage(), ioE);
+                throw new org.rutebanken.helper.storage.BlobStoreException("Blob upload of blob with name '" + blobId.getName() + "' failed: " + ioE.getMessage(), ioE);
             }
         }
     }
@@ -245,7 +248,7 @@ public class BlobStoreHelper {
             String serverMd5 = blob.getMd5ToHexString();
             String clientMd5 = DigestUtils.md5Hex(blobContent);
             if (!clientMd5.equals(serverMd5)) {
-                throw new BlobStoreException("Client MD5 checksum (" + clientMd5 + ") and server MD5 checksum(" + serverMd5 + ") do not match");
+                throw new org.rutebanken.helper.storage.BlobStoreException("Client MD5 checksum (" + clientMd5 + ") and server MD5 checksum(" + serverMd5 + ") do not match");
             } else {
                 return new ByteArrayInputStream(blobContent);
             }

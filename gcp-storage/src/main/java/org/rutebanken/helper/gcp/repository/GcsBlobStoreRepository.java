@@ -21,6 +21,7 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import org.rutebanken.helper.gcp.BlobStoreHelper;
+import org.rutebanken.helper.storage.repository.BlobStoreRepository;
 
 import java.io.InputStream;
 import java.util.Iterator;
