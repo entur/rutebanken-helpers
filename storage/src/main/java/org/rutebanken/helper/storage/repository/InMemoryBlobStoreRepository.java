@@ -14,12 +14,12 @@
  *
  */
 
-package org.rutebanken.helper.gcp.repository;
+package org.rutebanken.helper.storage.repository;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.rutebanken.helper.gcp.BlobAlreadyExistsException;
-import org.rutebanken.helper.gcp.BlobStoreException;
+import org.rutebanken.helper.storage.BlobAlreadyExistsException;
+import org.rutebanken.helper.storage.BlobStoreException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

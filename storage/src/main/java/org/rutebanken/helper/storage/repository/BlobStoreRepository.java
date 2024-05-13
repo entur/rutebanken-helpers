@@ -14,13 +14,16 @@
  *
  */
 
-package org.rutebanken.helper.gcp.repository;
+package org.rutebanken.helper.storage.repository;
+
+import org.rutebanken.helper.storage.BlobAlreadyExistsException;
 
 import java.io.InputStream;
 
 /**
  * Repository for managing binary files.
- * The main implementation {@link GcsBlobStoreRepository} uses Google Cloud Storage as the storage backend.
+ * See GcsBlobStoreRepository in the library org.entur.ror.helpers:gcp-storage for an implementation that uses
+ * Google Cloud Storage as the storage backend.
  * A simple implementation {@link LocalDiskBlobStoreRepository} uses local disk as the storage backend (for testing purpose).
  * A simple implementation {@link InMemoryBlobStoreRepository} uses an in-memory map as the storage backend (for testing purpose).
  */
@@ -60,7 +63,7 @@ public interface BlobStoreRepository {
      * @param objectName  the name of the blob.
      * @param inputStream the blob data.
      * @return the blob generation.
-     * @throws org.rutebanken.helper.gcp.BlobAlreadyExistsException if the blob already exists.
+     * @throws BlobAlreadyExistsException if the blob already exists.
      */
     long uploadNewBlob(String objectName, InputStream inputStream);
 

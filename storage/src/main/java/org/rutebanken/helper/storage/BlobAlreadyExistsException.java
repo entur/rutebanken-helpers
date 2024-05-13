@@ -1,4 +1,4 @@
-package org.rutebanken.helper.gcp;
+package org.rutebanken.helper.storage;
 
 public class BlobAlreadyExistsException extends RuntimeException {
 

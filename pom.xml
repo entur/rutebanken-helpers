@@ -47,6 +47,7 @@
     </licenses>
 
     <modules>
+        <module>storage</module>
         <module>gcp-storage</module>
         <module>hazelcast4-helper</module>
         <module>calendar-helper</module>
