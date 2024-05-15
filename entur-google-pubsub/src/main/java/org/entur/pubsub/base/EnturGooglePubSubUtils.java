@@ -19,7 +19,7 @@ public final class EnturGooglePubSubUtils {
 
     /**
      * Close a subscriber and release the associated resources.
-     * Wait (10s max) for the subscriber to shutdown before returning.
+     * Wait (10s max) for the subscriber to shut down before returning.
      *
      * @param subscriber the subscriber to close.
      */
