@@ -2,9 +2,9 @@ package org.entur.pubsub.base;
 
 import com.google.api.gax.rpc.AlreadyExistsException;
 import com.google.cloud.spring.pubsub.PubSubAdmin;
+import com.google.pubsub.v1.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -13,11 +13,13 @@ public class EnturGooglePubSubAdmin {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EnturGooglePubSubAdmin.class);
 
-    @Autowired
-    private PubSubAdmin pubSubAdmin;
+    private final PubSubAdmin pubSubAdmin;
+    private final boolean autocreate;
 
-    @Value("${entur.pubsub.subscriber.autocreate:true}")
-    private boolean autocreate;
+    public EnturGooglePubSubAdmin(PubSubAdmin pubSubAdmin, @Value("${entur.pubsub.subscriber.autocreate:true}") boolean autocreate) {
+        this.pubSubAdmin = pubSubAdmin;
+        this.autocreate = autocreate;
+    }
 
     public void createSubscriptionIfMissing(String destinationName) {
 
@@ -37,4 +39,12 @@ public class EnturGooglePubSubAdmin {
             }
         }
     }
+
+    public void deleteAllSubscriptions() {
+        pubSubAdmin.listSubscriptions().stream()
+                .map(Subscription::getName)
+                .forEach(pubSubAdmin::deleteSubscription);
+    }
+
 }
+
