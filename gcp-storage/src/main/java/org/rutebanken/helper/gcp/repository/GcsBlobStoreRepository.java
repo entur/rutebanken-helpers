@@ -44,6 +44,10 @@ public class GcsBlobStoreRepository implements BlobStoreRepository {
         this.storage = storage;
     }
 
+    protected String containerName() {
+        return containerName;
+    }
+
     public void setContainerName(String containerName) {
         this.containerName = containerName;
     }
