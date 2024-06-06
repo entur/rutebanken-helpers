@@ -23,8 +23,8 @@ import static org.entur.oauth2.RoROAuth2Claims.OAUTH2_CLAIM_ROLE_ASSIGNMENTS;
  *   {@link RoROAuth2Claims#OAUTH2_CLAIM_ROLE_ASSIGNMENTS}, in JSON format.</li>
  *     <li>For internal machine-to-machine tokens, the role assignments are derived from the claim
  *   {@link RoROAuth2Claims#OAUTH2_CLAIM_PERMISSIONS} that Auth0 builds from the internal client configuration:
- *   each permission is converted into a role assignment tied to the admin organization ("RB").
- *   Permission granted to an internal client are always cross-organization (not limited to a given provider)</li>
+ *   each permission is converted into a role assignment tied to the admin organisation ("RB").
+ *   Permission granted to an internal client are always cross-organisation (not limited to a given provider)</li>
  * </ul>
  */
 public class JwtRoleAssignmentExtractor implements RoleAssignmentExtractor {
@@ -32,14 +32,14 @@ public class JwtRoleAssignmentExtractor implements RoleAssignmentExtractor {
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final String DEFAULT_ADMIN_ORG = "RB";
 
-    private final String adminOrganization;
+    private final String adminOrganisation;
 
     public JwtRoleAssignmentExtractor() {
         this(DEFAULT_ADMIN_ORG);
     }
 
-    public JwtRoleAssignmentExtractor(String adminOrganization) {
-        this.adminOrganization = adminOrganization;
+    public JwtRoleAssignmentExtractor(String adminOrganisation) {
+        this.adminOrganisation = adminOrganisation;
     }
 
 
@@ -87,13 +87,13 @@ public class JwtRoleAssignmentExtractor implements RoleAssignmentExtractor {
 
     /**
      * Extract RoleAssignments from the permissions claim.
-     * Internal machine-to-machine tokens contain cross-organization roles under this claim.
+     * Internal machine-to-machine tokens contain cross-organisation roles under this claim.
      */
     private List<RoleAssignment> parsePermissionsClaim(Object permissionsClaim) {
         if (permissionsClaim instanceof List claimPermissionAsList) {
             List<String> claimPermissionAsStringList = claimPermissionAsList;
             return claimPermissionAsStringList.stream()
-                    .map(role -> RoleAssignment.builder().withRole(role).withOrganisation(adminOrganization).build())
+                    .map(role -> RoleAssignment.builder().withRole(role).withOrganisation(adminOrganisation).build())
                     .toList();
         } else {
             throw new IllegalArgumentException("Unsupported claim type: " + permissionsClaim);

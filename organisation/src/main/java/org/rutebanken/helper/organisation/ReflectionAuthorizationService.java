@@ -123,7 +123,7 @@ public class ReflectionAuthorizationService {
         }
 
         if (!organisationChecker.entityMatchesOrganisationRef(roleAssignment, entity)) {
-            logger.debug("Entity does not match organization ref. RoleAssignment: {}, Entity: {}", roleAssignment, entity);
+            logger.debug("Entity does not match organisation ref. RoleAssignment: {}, Entity: {}", roleAssignment, entity);
             return false;
         }
 

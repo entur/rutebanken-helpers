@@ -1,0 +1,63 @@
+package org.entur.oauth2.authorization;
+
+
+import org.springframework.security.access.AccessDeniedException;
+
+/**
+ * Service returning the privileges of the current user.
+ * @param <T> the type of the provider unique id
+ */
+public interface UserContextService<T> {
+
+  /**
+   * Is the current user a route data administrator?
+   */
+  boolean isRouteDataAdmin();
+
+  /**
+   * Validate that the current user is a route data administrator.
+   * @throws org.springframework.security.access.AccessDeniedException if the role is missing
+   */
+  default void validateRouteDataAdmin() {
+    if(!isRouteDataAdmin()) {
+      throw new AccessDeniedException("Insufficient privileges for operation");
+    }
+  }
+
+  /**
+   * Is the current user an organisation administrator?
+   */
+  boolean isOrganisationAdmin();
+
+  /**
+   * Whether the current user can edit data for a provider
+   * @param providerId The internal code of the provider
+   * @return true if the user has access
+   */
+  boolean canViewProvider(T providerId);
+
+  boolean canEditProvider(T providerId);
+
+  /**
+   * Validate that the current user is a route data administrator.
+   * @throws org.springframework.security.access.AccessDeniedException if the role is missing
+   */
+  default void validateEditProvider(T providerId) {
+    if(!canEditProvider(providerId)) {
+      throw new AccessDeniedException("Insufficient privileges for operation");
+    }
+  }
+
+  boolean canViewBlocks(T providerId);
+
+  /**
+   * Validate that the current user can view blocks for the given provider id.
+   * @throws org.springframework.security.access.AccessDeniedException if the role is missing
+   */
+  default void validateViewBlocks(T providerId) {
+    if(!canViewBlocks(providerId)) {
+      throw new AccessDeniedException("Insufficient privileges for operation");
+    }
+  }
+  String getPreferredName();
+}
