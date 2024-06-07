@@ -88,7 +88,7 @@ public class RoleAssignment {
 
     public static class Builder {
 
-        protected RoleAssignment roleAssignment = new RoleAssignment();
+        protected final RoleAssignment roleAssignment = new RoleAssignment();
 
         private Builder() {
         }

@@ -68,7 +68,7 @@ class OAuth2TokenUserContextServiceTest {
     void testVerifyRouteDataEditorPrivileges(String role, String organisation, boolean isAuthorized) {
         List<RoleAssignment> roleAssignments = roleAssignments(role, organisation);
         UserContextService<Long> userContextService = new OAuth2TokenUserContextService<>(OAuth2TokenUserContextServiceTest::getProviderCodespaceByProviderId, rolAssignmentExtractor(roleAssignments));
-        assertEquals(isAuthorized, userContextService.canEditProvider(PROVIDER_ID_RUT));
+        assertEquals(isAuthorized, userContextService.canEditRouteData(PROVIDER_ID_RUT));
     }
 
     static Stream<Arguments> testCasesVerifyRouteDataViewerPrivileges() {
@@ -85,7 +85,7 @@ class OAuth2TokenUserContextServiceTest {
     void testVerifyRouteDataViewerPrivileges(String role, String organisation, boolean isAuthorized) {
         List<RoleAssignment> roleAssignments = roleAssignments(role, organisation);
         UserContextService<Long> userContextService = new OAuth2TokenUserContextService<>(OAuth2TokenUserContextServiceTest::getProviderCodespaceByProviderId, rolAssignmentExtractor(roleAssignments));
-        assertEquals(isAuthorized, userContextService.canViewProvider(PROVIDER_ID_RUT));
+        assertEquals(isAuthorized, userContextService.canViewRouteData(PROVIDER_ID_RUT));
     }
 
     static Stream<Arguments> testCasesVerifyBlockViewerPrivileges() {
@@ -103,7 +103,7 @@ class OAuth2TokenUserContextServiceTest {
     void testVerifyBlockViewerPrivileges(String role, String organisation, boolean isAuthorized) {
         List<RoleAssignment> roleAssignments = roleAssignments(role, organisation);
         UserContextService<Long> userContextService = new OAuth2TokenUserContextService<>(OAuth2TokenUserContextServiceTest::getProviderCodespaceByProviderId, rolAssignmentExtractor(roleAssignments));
-        assertEquals(isAuthorized, userContextService.canViewBlocks(PROVIDER_ID_RUT));
+        assertEquals(isAuthorized, userContextService.canViewBlockData(PROVIDER_ID_RUT));
     }
 
 

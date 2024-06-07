@@ -16,7 +16,7 @@ public interface UserContextService<T> {
 
   /**
    * Validate that the current user is a route data administrator.
-   * @throws org.springframework.security.access.AccessDeniedException if the role is missing
+   * @throws org.springframework.security.access.AccessDeniedException if the role is missing.
    */
   default void validateRouteDataAdmin() {
     if(!isRouteDataAdmin()) {
@@ -30,34 +30,50 @@ public interface UserContextService<T> {
   boolean isOrganisationAdmin();
 
   /**
-   * Whether the current user can edit data for a provider
-   * @param providerId The internal code of the provider
-   * @return true if the user has access
+   * Whether the current user can view route data belonging to a given provider.
+   * @param providerId The internal code of the provider.
+   * @return true if the user has access.
    */
-  boolean canViewProvider(T providerId);
-
-  boolean canEditProvider(T providerId);
+  boolean canViewRouteData(T providerId);
 
   /**
-   * Validate that the current user is a route data administrator.
-   * @throws org.springframework.security.access.AccessDeniedException if the role is missing
+   * Whether the current user can edit route data belonging to a given provider.
+   * @param providerId The internal code of the provider.
+   * @return true if the user has access.
    */
-  default void validateEditProvider(T providerId) {
-    if(!canEditProvider(providerId)) {
+  boolean canEditRouteData(T providerId);
+
+  /**
+   * Validate that the current user can edit route data belonging to a given provider.
+   * @param providerId The internal code of the provider.
+   * @throws org.springframework.security.access.AccessDeniedException if the role is missing.
+   */
+  default void validateEditRouteData(T providerId) {
+    if(!canEditRouteData(providerId)) {
       throw new AccessDeniedException("Insufficient privileges for operation");
     }
   }
 
-  boolean canViewBlocks(T providerId);
+  /**
+   * Whether the current user can view block data belonging to a given provider.
+   * @param providerId The internal code of the provider.
+   * @return true if the user has access.
+   */
+  boolean canViewBlockData(T providerId);
 
   /**
-   * Validate that the current user can view blocks for the given provider id.
-   * @throws org.springframework.security.access.AccessDeniedException if the role is missing
+   * Validate that the current user can view block data belonging to a given provider.
+   * @param providerId The internal code of the provider.
+   * @throws org.springframework.security.access.AccessDeniedException if the role is missing.
    */
-  default void validateViewBlocks(T providerId) {
-    if(!canViewBlocks(providerId)) {
+  default void validateViewBlockData(T providerId) {
+    if(!canViewBlockData(providerId)) {
       throw new AccessDeniedException("Insufficient privileges for operation");
     }
   }
+
+  /**
+   * The preferred named for the current user.
+   */
   String getPreferredName();
 }
