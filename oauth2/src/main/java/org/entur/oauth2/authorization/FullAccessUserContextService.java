@@ -16,17 +16,17 @@ public class FullAccessUserContextService implements UserContextService<Long> {
     }
 
     @Override
-    public boolean canViewProvider(Long providerId) {
+    public boolean canViewRouteData(Long providerId) {
         return true;
     }
 
     @Override
-    public boolean canEditProvider(Long providerId) {
+    public boolean canEditRouteData(Long providerId) {
         return true;
     }
 
     @Override
-    public boolean canViewBlocks(Long providerId) {
+    public boolean canViewBlockData(Long providerId) {
         return true;
     }
 

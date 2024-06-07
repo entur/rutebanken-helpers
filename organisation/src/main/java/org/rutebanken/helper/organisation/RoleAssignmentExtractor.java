@@ -24,8 +24,6 @@ public interface RoleAssignmentExtractor {
 
     /**
      * Extract role assignments for user from security context.
-     *
-     * @return
      */
     List<RoleAssignment> getRoleAssignmentsForUser();
 

@@ -44,7 +44,7 @@ public class OAuth2TokenUserContextService<T> implements UserContextService<T> {
     }
 
     @Override
-    public boolean canViewProvider(T providerId) {
+    public boolean canViewRouteData(T providerId) {
         String providerOrganisation = getProviderOrganisationById.apply(providerId);
         if (providerOrganisation == null) {
             return false;
@@ -58,7 +58,7 @@ public class OAuth2TokenUserContextService<T> implements UserContextService<T> {
     }
 
     @Override
-    public boolean canEditProvider(T providerId) {
+    public boolean canEditRouteData(T providerId) {
         String providerOrganisation = getProviderOrganisationById.apply(providerId);
         if (providerOrganisation == null) {
             return false;
@@ -71,7 +71,7 @@ public class OAuth2TokenUserContextService<T> implements UserContextService<T> {
     }
 
     @Override
-    public boolean canViewBlocks(T providerId) {
+    public boolean canViewBlockData(T providerId) {
         String providerOrganisation = getProviderOrganisationById.apply(providerId);
         if (providerOrganisation == null) {
             return false;

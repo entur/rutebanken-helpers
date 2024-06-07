@@ -36,8 +36,8 @@ class RorGrantedAuthoritiesConverter implements Converter<Jwt, Collection<Grante
         Object roles = jwt.getClaim(RoROAuth2Claims.OAUTH2_CLAIM_ROLES);
         if (roles == null) {
             return Collections.emptyList();
-        } else if (roles instanceof Collection && ((Collection) roles).stream().allMatch(String.class::isInstance)) {
-            return (Collection<String>) roles;
+        } else if (roles instanceof Collection rolesAsCollection && rolesAsCollection.stream().allMatch(String.class::isInstance)) {
+            return (Collection<String>) rolesAsCollection;
         } else {
             throw new IllegalArgumentException("Unknown format for claim " + roles);
         }
