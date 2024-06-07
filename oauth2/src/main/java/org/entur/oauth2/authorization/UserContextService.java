@@ -30,6 +30,17 @@ public interface UserContextService<T> {
   boolean isOrganisationAdmin();
 
   /**
+   * Validate that the current user is an organisation administrator.
+   * @throws org.springframework.security.access.AccessDeniedException if the role is missing.
+   */
+  default void validateOrganisationAdmin() {
+    if(!isOrganisationAdmin()) {
+      throw new AccessDeniedException("Insufficient privileges for operation");
+    }
+  }
+
+
+  /**
    * Whether the current user can view route data belonging to a given provider.
    * @param providerId The internal code of the provider.
    * @return true if the user has access.

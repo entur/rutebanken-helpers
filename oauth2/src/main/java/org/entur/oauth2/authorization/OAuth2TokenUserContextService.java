@@ -13,7 +13,13 @@ import java.util.function.Function;
 import static org.rutebanken.helper.organisation.AuthorizationConstants.*;
 
 /**
- * Implementation of the UserContextService that retrieves user privileges from a OAuth2 user token
+ * Implementation of the UserContextService that retrieves user privileges from an OAuth2 token.
+ * <ul>
+ *     <li>A {@link RoleAssignmentExtractor} is used to extract the roles from the token.</li>
+ *     <li>A mapping function is used to convert the internal provider id used by the client application to
+ *     the organisation codespace of this provider.</li>
+ * </ul>
+ *
  */
 public class OAuth2TokenUserContextService<T> implements UserContextService<T> {
 
@@ -22,10 +28,23 @@ public class OAuth2TokenUserContextService<T> implements UserContextService<T> {
     private final Function<T, String> getProviderOrganisationById;
     private final RoleAssignmentExtractor roleAssignmentExtractor;
 
+    /**
+     * Create a user context service with a default role assignment extractor.
+     */
+    public OAuth2TokenUserContextService() {
+        this(t -> null, new JwtRoleAssignmentExtractor());
+    }
+
+    /**
+     * Create a user context service with a default role assignment extractor and a codespace mapping function.
+     */
     public OAuth2TokenUserContextService(Function<T, String> getProviderOrganisationById) {
         this(getProviderOrganisationById, new JwtRoleAssignmentExtractor());
     }
 
+    /**
+     * Create a user context service with the given role assignment extractor and a codespace mapping function.
+     */
     public OAuth2TokenUserContextService(Function<T, String> getProviderOrganisationById,
                                          RoleAssignmentExtractor roleAssignmentExtractor) {
         this.getProviderOrganisationById = getProviderOrganisationById;
@@ -100,7 +119,7 @@ public class OAuth2TokenUserContextService<T> implements UserContextService<T> {
     }
 
     /**
-     * Return true if the role assignment gives access to the given role for the Entur organisation
+     * Return true if the role assignment gives access to the given role for the Entur organisation.
      */
     private static boolean matchAdminRole(RoleAssignment roleAssignment, String role) {
         return matchProviderRole(roleAssignment, role, ENTUR_ORG);
