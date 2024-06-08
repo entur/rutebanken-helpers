@@ -1,27 +1,21 @@
-package org.entur.oauth2.authorization;
+package org.rutebanken.helper.organisation.authorization;
 
-import org.entur.oauth2.JwtRoleAssignmentExtractor;
 import org.rutebanken.helper.organisation.RoleAssignment;
 import org.rutebanken.helper.organisation.RoleAssignmentExtractor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 import java.util.function.Function;
 
 import static org.rutebanken.helper.organisation.AuthorizationConstants.*;
 
 /**
- * Implementation of the UserContextService that retrieves user privileges from an OAuth2 token.
+ * Default implementation of the {@link AuthorizationService}.
  * <ul>
  *     <li>A {@link RoleAssignmentExtractor} is used to extract the roles from the token.</li>
  *     <li>A mapping function is used to convert the internal provider id used by the client application to
  *     the organisation codespace of this provider.</li>
  * </ul>
- *
  */
-public class OAuth2TokenUserContextService<T> implements UserContextService<T> {
+public class DefaultAuthorizationService<T> implements AuthorizationService<T> {
 
     private static final String ENTUR_ORG = "RB";
 
@@ -29,24 +23,17 @@ public class OAuth2TokenUserContextService<T> implements UserContextService<T> {
     private final RoleAssignmentExtractor roleAssignmentExtractor;
 
     /**
-     * Create a user context service with a default role assignment extractor.
+     * Create a user context service with the given role assignment extractor and user info extractor.
      */
-    public OAuth2TokenUserContextService() {
-        this(t -> null, new JwtRoleAssignmentExtractor());
+    public DefaultAuthorizationService(RoleAssignmentExtractor roleAssignmentExtractor) {
+        this(t -> null, roleAssignmentExtractor);
     }
 
     /**
-     * Create a user context service with a default role assignment extractor and a codespace mapping function.
+     * Create a user context service with the given role assignment extractor, user info extractor and a codespace mapping function.
      */
-    public OAuth2TokenUserContextService(Function<T, String> getProviderOrganisationById) {
-        this(getProviderOrganisationById, new JwtRoleAssignmentExtractor());
-    }
-
-    /**
-     * Create a user context service with the given role assignment extractor and a codespace mapping function.
-     */
-    public OAuth2TokenUserContextService(Function<T, String> getProviderOrganisationById,
-                                         RoleAssignmentExtractor roleAssignmentExtractor) {
+    public DefaultAuthorizationService(Function<T, String> getProviderOrganisationById,
+                                       RoleAssignmentExtractor roleAssignmentExtractor) {
         this.getProviderOrganisationById = getProviderOrganisationById;
         this.roleAssignmentExtractor = roleAssignmentExtractor;
     }
@@ -101,14 +88,6 @@ public class OAuth2TokenUserContextService<T> implements UserContextService<T> {
                         || matchProviderRole(roleAssignment, ROLE_NETEX_BLOCKS_DATA_VIEW, providerOrganisation)
                         || matchProviderRole(roleAssignment, ROLE_ROUTE_DATA_EDIT, providerOrganisation)
                 );
-    }
-
-    @Override
-    public String getPreferredName() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) auth;
-        Jwt jwt = (Jwt) jwtAuthenticationToken.getPrincipal();
-        return jwt.getClaimAsString("https://ror.entur.io/preferred_name");
     }
 
 

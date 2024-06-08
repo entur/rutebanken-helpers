@@ -1,4 +1,4 @@
-package org.entur.oauth2.authorization;
+package org.rutebanken.helper.organisation.authorization;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
-class OAuth2TokenUserContextServiceTest {
+class DefaultAuthorizationServiceTest {
 
     private static final long PROVIDER_ID_RUT = 2L;
     private static final String CODESPACE_RB = "RB";
@@ -34,10 +34,9 @@ class OAuth2TokenUserContextServiceTest {
     @MethodSource("testCasesVerifyRouteDataAdministratorPrivileges")
     void testVerifyRouteDataAdministratorPrivileges(String role, String organisation, boolean isAuthorized) {
         List<RoleAssignment> roleAssignments = roleAssignments(role, organisation);
-        UserContextService<Long> userContextService = new OAuth2TokenUserContextService<>(OAuth2TokenUserContextServiceTest::getProviderCodespaceByProviderId, rolAssignmentExtractor(roleAssignments));
-        assertEquals(isAuthorized, userContextService.isRouteDataAdmin());
+        AuthorizationService<Long> authorizationService = authorizationService(roleAssignments);
+        assertEquals(isAuthorized, authorizationService.isRouteDataAdmin());
     }
-
 
     static Stream<Arguments> testCasesVerifyOrganisationAdministratorPrivileges() {
         return Stream.of(
@@ -51,8 +50,8 @@ class OAuth2TokenUserContextServiceTest {
     @MethodSource("testCasesVerifyOrganisationAdministratorPrivileges")
     void testVerifyOrganisationAdministratorPrivileges(String role, String organisation, boolean isAuthorized) {
         List<RoleAssignment> roleAssignments = roleAssignments(role, organisation);
-        UserContextService<Long> userContextService = new OAuth2TokenUserContextService<>(OAuth2TokenUserContextServiceTest::getProviderCodespaceByProviderId, rolAssignmentExtractor(roleAssignments));
-        assertEquals(isAuthorized, userContextService.isOrganisationAdmin());
+        AuthorizationService<Long> authorizationService = authorizationService(roleAssignments);
+        assertEquals(isAuthorized, authorizationService.isOrganisationAdmin());
     }
 
     static Stream<Arguments> testCasesVerifyRouteDataEditorPrivileges() {
@@ -67,8 +66,8 @@ class OAuth2TokenUserContextServiceTest {
     @MethodSource("testCasesVerifyRouteDataEditorPrivileges")
     void testVerifyRouteDataEditorPrivileges(String role, String organisation, boolean isAuthorized) {
         List<RoleAssignment> roleAssignments = roleAssignments(role, organisation);
-        UserContextService<Long> userContextService = new OAuth2TokenUserContextService<>(OAuth2TokenUserContextServiceTest::getProviderCodespaceByProviderId, rolAssignmentExtractor(roleAssignments));
-        assertEquals(isAuthorized, userContextService.canEditRouteData(PROVIDER_ID_RUT));
+        AuthorizationService<Long> authorizationService = authorizationService(roleAssignments);
+        assertEquals(isAuthorized, authorizationService.canEditRouteData(PROVIDER_ID_RUT));
     }
 
     static Stream<Arguments> testCasesVerifyRouteDataViewerPrivileges() {
@@ -84,8 +83,8 @@ class OAuth2TokenUserContextServiceTest {
     @MethodSource("testCasesVerifyRouteDataViewerPrivileges")
     void testVerifyRouteDataViewerPrivileges(String role, String organisation, boolean isAuthorized) {
         List<RoleAssignment> roleAssignments = roleAssignments(role, organisation);
-        UserContextService<Long> userContextService = new OAuth2TokenUserContextService<>(OAuth2TokenUserContextServiceTest::getProviderCodespaceByProviderId, rolAssignmentExtractor(roleAssignments));
-        assertEquals(isAuthorized, userContextService.canViewRouteData(PROVIDER_ID_RUT));
+        AuthorizationService<Long> authorizationService = authorizationService(roleAssignments);
+        assertEquals(isAuthorized, authorizationService.canViewRouteData(PROVIDER_ID_RUT));
     }
 
     static Stream<Arguments> testCasesVerifyBlockViewerPrivileges() {
@@ -102,8 +101,13 @@ class OAuth2TokenUserContextServiceTest {
     @MethodSource("testCasesVerifyBlockViewerPrivileges")
     void testVerifyBlockViewerPrivileges(String role, String organisation, boolean isAuthorized) {
         List<RoleAssignment> roleAssignments = roleAssignments(role, organisation);
-        UserContextService<Long> userContextService = new OAuth2TokenUserContextService<>(OAuth2TokenUserContextServiceTest::getProviderCodespaceByProviderId, rolAssignmentExtractor(roleAssignments));
-        assertEquals(isAuthorized, userContextService.canViewBlockData(PROVIDER_ID_RUT));
+        AuthorizationService<Long> authorizationService = authorizationService(roleAssignments);
+        assertEquals(isAuthorized, authorizationService.canViewBlockData(PROVIDER_ID_RUT));
+    }
+
+    private static DefaultAuthorizationService<Long> authorizationService(List<RoleAssignment> roleAssignments) {
+        return new DefaultAuthorizationService<>(DefaultAuthorizationServiceTest::getProviderCodespaceByProviderId,
+                rolAssignmentExtractor(roleAssignments));
     }
 
 

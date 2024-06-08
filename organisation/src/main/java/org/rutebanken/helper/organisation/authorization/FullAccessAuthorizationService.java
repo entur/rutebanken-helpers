@@ -1,10 +1,10 @@
-package org.entur.oauth2.authorization;
+package org.rutebanken.helper.organisation.authorization;
 
 /**
  * Fallback implementation giving full access to all operations for authenticated users.
  * Used for testing purpose.
  */
-public class FullAccessUserContextService implements UserContextService<Long> {
+public class FullAccessAuthorizationService implements AuthorizationService<Long> {
     @Override
     public boolean isRouteDataAdmin() {
         return true;
@@ -30,8 +30,4 @@ public class FullAccessUserContextService implements UserContextService<Long> {
         return true;
     }
 
-    @Override
-    public String getPreferredName() {
-        return "";
-    }
 }

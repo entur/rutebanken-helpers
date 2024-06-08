@@ -1,4 +1,4 @@
-package org.entur.oauth2.authorization;
+package org.rutebanken.helper.organisation.authorization;
 
 
 import org.springframework.security.access.AccessDeniedException;
@@ -7,7 +7,7 @@ import org.springframework.security.access.AccessDeniedException;
  * Service returning the privileges of the current user.
  * @param <T> the type of the provider unique id
  */
-public interface UserContextService<T> {
+public interface AuthorizationService<T> {
 
   /**
    * Is the current user a route data administrator?
@@ -82,9 +82,4 @@ public interface UserContextService<T> {
       throw new AccessDeniedException("Insufficient privileges for operation");
     }
   }
-
-  /**
-   * The preferred named for the current user.
-   */
-  String getPreferredName();
 }
