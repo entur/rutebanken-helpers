@@ -28,8 +28,12 @@ import java.util.stream.Stream;
 
 import static org.rutebanken.helper.organisation.AuthorizationConstants.*;
 
+/**
+ * Implementation of the {@link DataScopedAuthorizationService} that relies on Java object reflection
+ * to grant access to data objects.
+ */
 @Service
-public class ReflectionAuthorizationService {
+public class ReflectionAuthorizationService  implements DataScopedAuthorizationService {
 
     private static final Logger logger = LoggerFactory.getLogger(ReflectionAuthorizationService.class);
 
@@ -62,6 +66,7 @@ public class ReflectionAuthorizationService {
         this.fieldMappings = fieldMappings;
     }
 
+    @Override
     public void assertAuthorized(String requiredRole, Collection<?> entities) {
 
         final boolean allowed = isAuthorized(requiredRole, entities);
@@ -71,6 +76,7 @@ public class ReflectionAuthorizationService {
     }
 
 
+    @Override
     public boolean isAuthorized(String requiredRole, Collection<?> entities) {
         if (!authorizationEnabled) {
             return true;
@@ -99,6 +105,7 @@ public class ReflectionAuthorizationService {
         return true;
     }
 
+    @Override
     public Set<String> getRelevantRolesForEntity(Object entity) {
         return roleAssignmentExtractor.getRoleAssignmentsForUser().stream()
                 .filter(roleAssignment -> roleAssignment.getEntityClassifications().get(ENTITY_TYPE).stream()
@@ -108,6 +115,7 @@ public class ReflectionAuthorizationService {
                 .collect(Collectors.toSet());
     }
 
+    @Override
     public boolean authorized(RoleAssignment roleAssignment, Object entity, String requiredRole) {
 
         entity = entityResolver.resolveCorrectEntity(entity);
@@ -269,7 +277,7 @@ public class ReflectionAuthorizationService {
         return string.replace("_", "");
     }
 
-    public boolean checkAdministrativeZone(RoleAssignment roleAssignment, Object entity) {
+    private boolean checkAdministrativeZone(RoleAssignment roleAssignment, Object entity) {
         return roleAssignment.getAdministrativeZone() == null
                 || roleAssignment.getAdministrativeZone().isEmpty()
                 || administrativeZoneChecker.entityMatchesAdministrativeZone(roleAssignment, entity);
