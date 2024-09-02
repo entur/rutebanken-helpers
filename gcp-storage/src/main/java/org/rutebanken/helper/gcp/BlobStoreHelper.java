@@ -244,17 +244,21 @@ public class BlobStoreHelper {
         Blob blob = storage.get(blobId);
         if (blob != null) {
             LOGGER.debug("Retrieved blob with name '{}' and size '{}' from bucket '{}'", blob.getName(), blob.getSize(), blob.getBucket());
-            byte[] blobContent = blob.getContent();
-            String serverMd5 = blob.getMd5ToHexString();
-            String clientMd5 = DigestUtils.md5Hex(blobContent);
-            if (!clientMd5.equals(serverMd5)) {
-                throw new org.rutebanken.helper.storage.BlobStoreException("Client MD5 checksum (" + clientMd5 + ") and server MD5 checksum(" + serverMd5 + ") do not match");
-            } else {
-                return new ByteArrayInputStream(blobContent);
-            }
+            return getBlobInputStream(blob);
         } else {
             LOGGER.info("File '{}' in bucket '{}' does not exist", blobId.getName(), blobId.getBucket());
             return null;
+        }
+    }
+
+    public static InputStream getBlobInputStream(Blob blob) {
+        byte[] blobContent = blob.getContent();
+        String serverMd5 = blob.getMd5ToHexString();
+        String clientMd5 = DigestUtils.md5Hex(blobContent);
+        if (!clientMd5.equals(serverMd5)) {
+            throw new BlobStoreException("Client MD5 checksum (" + clientMd5 + ") and server MD5 checksum(" + serverMd5 + ") do not match");
+        } else {
+            return new ByteArrayInputStream(blobContent);
         }
     }
 

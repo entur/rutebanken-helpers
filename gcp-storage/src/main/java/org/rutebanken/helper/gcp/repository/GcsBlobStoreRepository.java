@@ -40,7 +40,7 @@ public class GcsBlobStoreRepository implements BlobStoreRepository {
        this(buildStorage(projectId, credentialPath));
     }
 
-    private GcsBlobStoreRepository(Storage storage) {
+    public GcsBlobStoreRepository(Storage storage) {
         this.storage = storage;
     }
 
