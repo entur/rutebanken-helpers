@@ -252,13 +252,16 @@ public class BlobStoreHelper {
     }
 
     public static InputStream getBlobInputStream(Blob blob) {
+        validateBlob(blob);
+        return new ByteArrayInputStream(blob.getContent());
+    }
+
+    public static void validateBlob(Blob blob) {
         byte[] blobContent = blob.getContent();
         String serverMd5 = blob.getMd5ToHexString();
         String clientMd5 = DigestUtils.md5Hex(blobContent);
         if (!clientMd5.equals(serverMd5)) {
             throw new BlobStoreException("Client MD5 checksum (" + clientMd5 + ") and server MD5 checksum(" + serverMd5 + ") do not match");
-        } else {
-            return new ByteArrayInputStream(blobContent);
         }
     }
 
