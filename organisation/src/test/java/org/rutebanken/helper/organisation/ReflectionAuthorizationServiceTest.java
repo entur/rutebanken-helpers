@@ -20,11 +20,13 @@ import com.google.common.base.MoreObjects;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.Authentication;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -69,12 +71,41 @@ class ReflectionAuthorizationServiceTest {
         }
     };
 
+    private final RoleAssignmentExtractor roleAssignmentExtractorNoEntityClassification = new RoleAssignmentExtractor() {
+        @Override
+        public List<RoleAssignment> getRoleAssignmentsForUser() {
+            List<RoleAssignment> roleAssignments = new ArrayList<>();
+            RoleAssignment roleAssignment1 = RoleAssignment.builder()
+                    .withRole("deleteStops")
+                    .withAdministrativeZone("01")
+                    .withOrganisation("OST")
+                    .build();
+            roleAssignments.add(roleAssignment1);
+
+            RoleAssignment roleAssignment2 =RoleAssignment.builder()
+                    .withRole("editStops")
+                    .withOrganisation("OST")
+                    .withEntityClassification(ENTITY_TYPE, "StopPlace")
+                    .withEntityClassification("StopPlaceType", "!airport")
+                    .withEntityClassification("StopPlaceType", "!railStation")
+                    .build();
+            roleAssignments.add(roleAssignment2);
+            return roleAssignments;
+        }
+
+        @Override
+        public List<RoleAssignment> getRoleAssignmentsForUser(Authentication authentication) {
+            return null;
+        }
+    };
+
     private final OrganisationChecker organisationChecker = (roleAssignment, entity) -> true;
     private final AdministrativeZoneChecker administrativeZoneChecker = (roleAssignment, entity) -> true;
     private final EntityResolver entityResolver = (entity -> entity);
     private final Map<String, List<String>> fieldMappings = new HashMap<>();
 
     private final ReflectionAuthorizationService reflectionAuthorizationService = new ReflectionAuthorizationService(roleAssignmentExtractor, true, organisationChecker, administrativeZoneChecker, entityResolver, fieldMappings);
+    private final ReflectionAuthorizationService reflectionAuthorizationServiceNoEntityClassification = new ReflectionAuthorizationService(roleAssignmentExtractorNoEntityClassification, true, organisationChecker, administrativeZoneChecker, entityResolver, fieldMappings);
 
     @Test
     void authorizedForLegalStopPlaceTypesWhenOthersBlacklisted() {
@@ -567,6 +598,20 @@ class ReflectionAuthorizationServiceTest {
 
         boolean authorized = reflectionAuthorizationService.authorized(roleAssignment, stopPlace, roleAssignment.r);
         assertThat(authorized, is(true));
+    }
+
+
+    // RoleAssignment{r=deleteStops, o=RB, z=null, e=null}
+    // RoleAssignment{r=editStops, o=RB, z=null, e={EntityType=[StopPlace], StopPlaceType=[!airport, !railStation]}}
+    @Test
+    void getRelevantRolesForEntityTest() {
+        StopPlace stopPlace = new StopPlace();
+        stopPlace.someField1 = null;
+        stopPlace.someField2 = "somethingElse";
+        final Set<String> relevantRolesForEntity = reflectionAuthorizationServiceNoEntityClassification.getRelevantRolesForEntity(stopPlace);
+        assertThat(relevantRolesForEntity.size(), is(1));
+        assertThat(relevantRolesForEntity.iterator().next(), is("editStops"));
+
     }
 
     private static class StopPlace {
