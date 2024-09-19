@@ -109,6 +109,7 @@ public class ReflectionAuthorizationService  implements DataScopedAuthorizationS
     public Set<String> getRelevantRolesForEntity(Object entity) {
         return roleAssignmentExtractor.getRoleAssignmentsForUser().stream()
                 .filter(roleAssignment -> roleAssignment.getEntityClassifications() != null)
+                .filter(roleAssignment -> roleAssignment.getEntityClassifications().get(ENTITY_TYPE) != null)
                 .filter(roleAssignment -> roleAssignment.getEntityClassifications().get(ENTITY_TYPE).stream()
                         .anyMatch(entityTypeString -> entityTypeString.equalsIgnoreCase(entity.getClass().getSimpleName())
                                 || entityTypeString.contains(ENTITY_CLASSIFIER_ALL_TYPES)))
