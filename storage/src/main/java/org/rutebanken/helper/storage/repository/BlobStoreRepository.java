@@ -17,6 +17,7 @@
 package org.rutebanken.helper.storage.repository;
 
 import org.rutebanken.helper.storage.BlobAlreadyExistsException;
+import org.rutebanken.helper.storage.model.BlobDescriptor;
 
 import java.io.InputStream;
 
@@ -37,6 +38,21 @@ public interface BlobStoreRepository {
      * @return an InputStream on the file content.
      */
     InputStream getBlob(String objectName);
+
+    /**
+     * Upload a blob and return its generation number.
+     *
+     * @param blobDescriptor Container type describing the blob to upload.
+     * @return the blob generation
+     * @see #uploadBlob(String, InputStream)
+     */
+    default long uploadBlob(BlobDescriptor blobDescriptor) {
+        if (blobDescriptor.contentType().isPresent()) {
+            return uploadBlob(blobDescriptor.name(), blobDescriptor.inputStream(), blobDescriptor.contentType().get());
+        } else {
+            return uploadBlob(blobDescriptor.name(), blobDescriptor.inputStream());
+        }
+    }
 
     /**
      * Upload a blob and returns its generation number.

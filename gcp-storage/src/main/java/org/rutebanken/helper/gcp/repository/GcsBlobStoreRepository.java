@@ -21,10 +21,12 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import org.rutebanken.helper.gcp.BlobStoreHelper;
+import org.rutebanken.helper.storage.model.BlobDescriptor;
 import org.rutebanken.helper.storage.repository.BlobStoreRepository;
 
 import java.io.InputStream;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Blob store repository targeting Google Cloud Storage.
@@ -55,6 +57,19 @@ public class GcsBlobStoreRepository implements BlobStoreRepository {
     @Override
     public InputStream getBlob(String name) {
         return BlobStoreHelper.getBlob(storage, containerName, name);
+    }
+
+    @Override
+    public long uploadBlob(BlobDescriptor blobDescriptor) {
+        Blob blob = BlobStoreHelper.createOrReplace(
+                storage,
+                containerName,
+                blobDescriptor.name(),
+                blobDescriptor.inputStream(),
+                false,
+                blobDescriptor.contentType().orElse(BlobStoreHelper.DEFAULT_CONTENT_TYPE),
+                blobDescriptor.metadata().orElse(Map.of()));
+        return blob.getGeneration();
     }
 
     @Override

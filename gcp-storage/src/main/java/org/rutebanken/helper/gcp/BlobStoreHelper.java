@@ -38,6 +38,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class BlobStoreHelper {
 
@@ -46,6 +47,7 @@ public class BlobStoreHelper {
     private static final int DEFAULT_CHUNK_SIZE = 15 * 1024 * 1024;
     private static final int CONNECT_AND_READ_TIMEOUT = 60000;
     private static final String DEFAULT_CACHE_CONTROL = "public, max-age=600";
+    public static final String DEFAULT_CONTENT_TYPE = "application/octet-stream";
 
     private BlobStoreHelper() {
     }
@@ -62,7 +64,7 @@ public class BlobStoreHelper {
      */
     @Deprecated
     public static Blob uploadBlob(Storage storage, String containerName, String name, byte[] content, boolean makePublic) {
-        return uploadBlob(storage, containerName, name, content, makePublic, "application/octet-stream");
+        return uploadBlob(storage, containerName, name, content, makePublic, DEFAULT_CONTENT_TYPE);
     }
 
     /**
@@ -87,7 +89,7 @@ public class BlobStoreHelper {
      */
     @Deprecated
     public static Blob uploadBlobWithRetry(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic) {
-        return uploadBlobWithRetry(storage, containerName, name, inputStream, makePublic, "application/octet-stream");
+        return uploadBlobWithRetry(storage, containerName, name, inputStream, makePublic, DEFAULT_CONTENT_TYPE);
     }
 
 
@@ -140,7 +142,7 @@ public class BlobStoreHelper {
      * @throws org.rutebanken.helper.storage.BlobStoreException         if the blob creation fails.
      */
     public static Blob createNew(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic) {
-        return createNew(storage, containerName, name, inputStream, makePublic, "application/octet-stream");
+        return createNew(storage, containerName, name, inputStream, makePublic, DEFAULT_CONTENT_TYPE);
     }
 
     /**
@@ -188,9 +190,21 @@ public class BlobStoreHelper {
      * @throws org.rutebanken.helper.storage.BlobStoreException            if the blob creation fails.
      */
     public static Blob createOrReplace(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic) {
-        return createOrReplace(storage, containerName, name, inputStream, makePublic, "application/octet-stream");
+        return createOrReplace(storage, containerName, name, inputStream, makePublic, DEFAULT_CONTENT_TYPE);
     }
 
+    /**
+     * Creates or replace a blob in GCP. Fails if the blob is modified concurrently.
+     * Use {@link #createNew(Storage, String, String, InputStream, boolean, String contentType)} instead if there is a guarantee that the
+     * blob does not exist in the bucket since createNew() requires one less return trip to the server.
+     *
+     * @return a reference to the created or modified blob.
+     * @throws org.rutebanken.helper.storage.BlobConcurrentUpdateException if the blob is modified concurrently by another client.
+     * @throws org.rutebanken.helper.storage.BlobStoreException            if the blob creation fails.
+     */
+    public static Blob createOrReplace(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic, String contentType) {
+        return createOrReplace(storage, containerName, name, inputStream, makePublic, contentType, Map.of());
+    }
     /**
      * Creates or replace a blob in GCP. Fails if the blob is modified concurrently.
      * Use {@link #createNew(Storage, String, String, InputStream, boolean, String contentType)} instead if there is a guarantee that the
@@ -202,7 +216,7 @@ public class BlobStoreHelper {
      * @throws org.rutebanken.helper.storage.BlobConcurrentUpdateException if the blob is modified concurrently by another client.
      * @throws org.rutebanken.helper.storage.BlobStoreException            if the blob creation fails.
      */
-    public static Blob createOrReplace(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic, String contentType) {
+    public static Blob createOrReplace(Storage storage, String containerName, String name, InputStream inputStream, boolean makePublic, String contentType, Map<String, String> metadata) {
         LOGGER.debug("Creating or replace blob {} in bucket {}", name, containerName);
         BlobId blobId = BlobId.of(containerName, name);
         Blob existingBlob = storage.get(blobId);
@@ -213,6 +227,9 @@ public class BlobStoreHelper {
             if (makePublic) {
                 builder.setAcl(List.of(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER)));
                 builder.setCacheControl(DEFAULT_CACHE_CONTROL);
+            }
+            if (metadata != null && !metadata.isEmpty()) {
+                builder.setMetadata(metadata);
             }
             BlobInfo blobInfo = builder.build();
             try {
