@@ -22,12 +22,12 @@
     <parent>
         <groupId>org.entur.ror</groupId>
         <artifactId>superpom</artifactId>
-        <version>2.17</version>
+        <version>3.0</version>
     </parent>
 
     <groupId>org.entur.ror.helpers</groupId>
     <artifactId>helper</artifactId>
-    <version>2.35-SNAPSHOT</version>
+    <version>3.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>entur-helper</name>
@@ -81,15 +81,14 @@
         <license.licenseName>eupl-1.2</license.licenseName>
         <license.licenseResolver>${project.baseUri}/src/license</license.licenseResolver>
 
-        <spring-cloud-gcp.version>5.1.2</spring-cloud-gcp.version>
+        <spring-cloud-gcp.version>5.8.0</spring-cloud-gcp.version>
         <!-- Kubernetes client version aligned on camel-kubernetes transitive dependency -->
-        <kubernetes-client.version>6.12.1</kubernetes-client.version>
-        <commons-io.version>2.16.1</commons-io.version>
+        <kubernetes-client.version>6.13.4</kubernetes-client.version>
+        <commons-io.version>2.17.0</commons-io.version>
         <hazelcast-kubernetes.version>2.2.3</hazelcast-kubernetes.version>
+        <httpclient5.version>5.4.1</httpclient5.version>
+        <hamcrest.version>3.0</hamcrest.version>
 
-        <hamcrest.version>2.2</hamcrest.version>
-
-        <nexus-staging-maven-plugin.version>1.6.13</nexus-staging-maven-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
 
 
