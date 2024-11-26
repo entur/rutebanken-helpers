@@ -32,7 +32,7 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
 
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>gcp-storage</artifactId>
+    <artifactId>storage-gcp-gcs</artifactId>
 
     <name>gcp-storage</name>
     <description>
