@@ -22,7 +22,7 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
     <parent>
         <groupId>org.entur.ror.helpers</groupId>
         <artifactId>helper</artifactId>
-        <version>3.1-SNAPSHOT</version>
+        <version>4.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -32,7 +32,7 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
 
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>gcp-storage</artifactId>
+    <artifactId>storage-gcp-gcs</artifactId>
 
     <name>gcp-storage</name>
     <description>
@@ -44,7 +44,7 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
         <dependency>
             <groupId>org.entur.ror.helpers</groupId>
             <artifactId>storage</artifactId>
-            <version>3.1-SNAPSHOT</version>
+            <version>4.0-SNAPSHOT</version>
         </dependency>
 
 
