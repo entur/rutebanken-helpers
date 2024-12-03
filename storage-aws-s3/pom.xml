@@ -31,7 +31,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>aws-s3-storage</artifactId>
+    <artifactId>storage-aws-s3</artifactId>
 
     <name>aws-s3-storage</name>
     <description>
