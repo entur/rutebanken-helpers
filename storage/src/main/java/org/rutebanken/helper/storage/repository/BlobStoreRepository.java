@@ -16,6 +16,7 @@
 
 package org.rutebanken.helper.storage.repository;
 
+import jakarta.annotation.Nullable;
 import org.rutebanken.helper.storage.BlobAlreadyExistsException;
 import org.rutebanken.helper.storage.model.BlobDescriptor;
 
@@ -32,11 +33,21 @@ public interface BlobStoreRepository {
 
 
     /**
+     * Return true if the given blob exists in the repository.
+     * The default implementation retrieves the object and test for nullity.
+     * Specific implementations can provide an optimized algorithm.
+     */
+    default boolean exist(String objectName) {
+      return getBlob(objectName) != null;
+    }
+
+    /**
      * Download a blob from storage.
      *
      * @param objectName the name of the blob
-     * @return an InputStream on the file content.
+     * @return an InputStream on the file content or null if the object does not exist.
      */
+    @Nullable
     InputStream getBlob(String objectName);
 
     /**

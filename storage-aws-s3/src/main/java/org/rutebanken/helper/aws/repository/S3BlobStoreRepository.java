@@ -4,6 +4,8 @@ import org.rutebanken.helper.storage.BlobAlreadyExistsException;
 import org.rutebanken.helper.storage.BlobStoreException;
 import org.rutebanken.helper.storage.model.BlobDescriptor;
 import org.rutebanken.helper.storage.repository.BlobStoreRepository;
+import software.amazon.awssdk.awscore.exception.AwsServiceException;
+import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -49,10 +51,14 @@ public class S3BlobStoreRepository implements BlobStoreRepository {
 
     @Override
     public InputStream getBlob(String objectName) {
-        return s3Client.getObject(
-                GetObjectRequest.builder().bucket(containerName).key(objectName).build(),
-                ResponseTransformer.toInputStream()
-        );
+        try {
+            return s3Client.getObject(
+                    GetObjectRequest.builder().bucket(containerName).key(objectName).build(),
+                    ResponseTransformer.toInputStream()
+            );
+        } catch (NoSuchKeyException e) {
+            return null;
+        }
     }
 
     @Override
