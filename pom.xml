@@ -48,7 +48,6 @@
 
     <modules>
         <module>storage</module>
-        <module>storage-aws-s3</module>
         <module>storage-gcp-gcs</module>
         <module>hazelcast4-helper</module>
         <module>calendar-helper</module>
