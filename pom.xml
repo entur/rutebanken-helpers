@@ -89,7 +89,7 @@
         <hazelcast-kubernetes.version>2.2.3</hazelcast-kubernetes.version>
         <httpclient5.version>5.4.1</httpclient5.version>
         <hamcrest.version>3.0</hamcrest.version>
-
+        <jakarta.annotation-api.version>3.0.0</jakarta.annotation-api.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
 
 

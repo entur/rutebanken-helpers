@@ -55,6 +55,11 @@ public class GcsBlobStoreRepository implements BlobStoreRepository {
     }
 
     @Override
+    public boolean exist(String objectName) {
+        return BlobStoreHelper.existBlob(storage, containerName, objectName);
+    }
+
+    @Override
     public InputStream getBlob(String name) {
         return BlobStoreHelper.getBlob(storage, containerName, name);
     }
