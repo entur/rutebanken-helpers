@@ -7,7 +7,9 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
  */
 public class RorAuthenticationConverter extends JwtAuthenticationConverter {
 
-    public RorAuthenticationConverter() {
-        this.setJwtGrantedAuthoritiesConverter(new RorGrantedAuthoritiesConverter());
-    }
+  public RorAuthenticationConverter() {
+    this.setJwtGrantedAuthoritiesConverter(
+        new RorGrantedAuthoritiesConverter()
+      );
+  }
 }
