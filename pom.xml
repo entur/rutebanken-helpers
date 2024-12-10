@@ -91,6 +91,10 @@
         <hamcrest.version>3.0</hamcrest.version>
         <jakarta.annotation-api.version>3.0.0</jakarta.annotation-api.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
+        <sonar-maven-plugin.version>4.0.0.4121</sonar-maven-plugin.version>
+        <prettier-java.version>2.1.0</prettier-java.version>
+        <prettier-maven-plugin.version>0.22</prettier-maven-plugin.version>
+        <plugin.prettier.goal>write</plugin.prettier.goal>
 
 
         <!-- empty argLine property, the value is set up by Jacoco during unit tests execution -->
@@ -187,6 +191,22 @@
                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>com.hubspot.maven.plugins</groupId>
+                <artifactId>prettier-maven-plugin</artifactId>
+                <version>${prettier-maven-plugin.version}</version>
+                <configuration>
+                    <prettierJavaVersion>${prettier-java.version}</prettierJavaVersion>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>${plugin.prettier.goal}</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -265,6 +285,36 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <id>sonar</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.sonarsource.scanner.maven</groupId>
+                        <artifactId>sonar-maven-plugin</artifactId>
+                        <version>${sonar-maven-plugin.version}</version>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.hubspot.maven.plugins</groupId>
+                        <artifactId>prettier-maven-plugin</artifactId>
+                        <version>${prettier-maven-plugin.version}</version>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>prettierCheck</id>
+            <properties>
+                <!-- In the CI environment we want to validate that code is formatted -->
+                <plugin.prettier.goal>check</plugin.prettier.goal>
+            </properties>
         </profile>
     </profiles>
 
