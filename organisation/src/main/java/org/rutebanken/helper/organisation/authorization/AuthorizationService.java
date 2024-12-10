@@ -1,6 +1,5 @@
 package org.rutebanken.helper.organisation.authorization;
 
-
 import org.springframework.security.access.AccessDeniedException;
 
 /**
@@ -8,7 +7,6 @@ import org.springframework.security.access.AccessDeniedException;
  * @param <T> the type of the provider unique id
  */
 public interface AuthorizationService<T> {
-
   /**
    * Is the current user a route data administrator?
    */
@@ -19,7 +17,7 @@ public interface AuthorizationService<T> {
    * @throws org.springframework.security.access.AccessDeniedException if the role is missing.
    */
   default void validateRouteDataAdmin() {
-    if(!isRouteDataAdmin()) {
+    if (!isRouteDataAdmin()) {
       throw new AccessDeniedException("Insufficient privileges for operation");
     }
   }
@@ -34,11 +32,10 @@ public interface AuthorizationService<T> {
    * @throws org.springframework.security.access.AccessDeniedException if the role is missing.
    */
   default void validateOrganisationAdmin() {
-    if(!isOrganisationAdmin()) {
+    if (!isOrganisationAdmin()) {
       throw new AccessDeniedException("Insufficient privileges for operation");
     }
   }
-
 
   /**
    * Whether the current user can view route data belonging to a given provider.
@@ -60,7 +57,7 @@ public interface AuthorizationService<T> {
    * @throws org.springframework.security.access.AccessDeniedException if the role is missing.
    */
   default void validateEditRouteData(T providerId) {
-    if(!canEditRouteData(providerId)) {
+    if (!canEditRouteData(providerId)) {
       throw new AccessDeniedException("Insufficient privileges for operation");
     }
   }
@@ -78,7 +75,7 @@ public interface AuthorizationService<T> {
    * @throws org.springframework.security.access.AccessDeniedException if the role is missing.
    */
   default void validateViewBlockData(T providerId) {
-    if(!canViewBlockData(providerId)) {
+    if (!canViewBlockData(providerId)) {
       throw new AccessDeniedException("Insufficient privileges for operation");
     }
   }

@@ -8,6 +8,5 @@ package org.entur.oauth2;
  * the token and adding it in the HTTP Authorization header.
  */
 public interface TokenService {
-
-    String getToken();
+  String getToken();
 }

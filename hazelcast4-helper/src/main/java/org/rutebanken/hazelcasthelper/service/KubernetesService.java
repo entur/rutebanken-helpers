@@ -17,85 +17,102 @@
 package org.rutebanken.hazelcasthelper.service;
 
 import io.fabric8.kubernetes.client.*;
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import jakarta.annotation.PostConstruct;
 
 public class KubernetesService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(KubernetesService.class);
 
-    private final String kubernetesUrl;
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+    KubernetesService.class
+  );
 
-    protected final String serviceName;
+  private final String kubernetesUrl;
 
-    protected final String namespace;
+  protected final String serviceName;
 
-    private final boolean kubernetesEnabled;
+  protected final String namespace;
 
-    protected KubernetesClient kube;
+  private final boolean kubernetesEnabled;
 
-    public KubernetesService(String kubernetesUrl, String serviceName, String namespace, boolean kubernetesEnabled) {
-        this.kubernetesUrl = kubernetesUrl;
-        this.serviceName = serviceName;
-        this.namespace = namespace;
-        this.kubernetesEnabled = kubernetesEnabled;
+  protected KubernetesClient kube;
+
+  public KubernetesService(
+    String kubernetesUrl,
+    String serviceName,
+    String namespace,
+    boolean kubernetesEnabled
+  ) {
+    this.kubernetesUrl = kubernetesUrl;
+    this.serviceName = serviceName;
+    this.namespace = namespace;
+    this.kubernetesEnabled = kubernetesEnabled;
+  }
+
+  public KubernetesService(
+    String kubernetesUrl,
+    String namespace,
+    boolean kubernetesEnabled
+  ) {
+    this(kubernetesUrl, null, namespace, kubernetesEnabled);
+  }
+
+  public KubernetesService(String namespace, boolean kubernetesEnabled) {
+    this(null, null, namespace, kubernetesEnabled);
+  }
+
+  @PostConstruct
+  public final void init() {
+    if (!kubernetesEnabled) {
+      LOGGER.warn(
+        "Disabling kubernetes connection as rutebanken.kubernetes.enabled={}",
+        kubernetesEnabled
+      );
+      return;
+    }
+    if (kubernetesUrl != null && !kubernetesUrl.isEmpty()) {
+      LOGGER.info("Connecting to {}", kubernetesUrl);
+      Config config = new ConfigBuilder()
+        .withMasterUrl("http://localhost:8000/")
+        .build();
+      kube = new KubernetesClientBuilder().withConfig(config).build();
+    } else {
+      LOGGER.info(
+        "Using default settings, as this should auto-configure correctly in the kubernetes cluster"
+      );
+      kube = new KubernetesClientBuilder().build();
+    }
+  }
+
+  @PreDestroy
+  public final void end() {
+    if (kube != null) {
+      kube.close();
+    }
+  }
+
+  public boolean isKubernetesEnabled() {
+    return kubernetesEnabled;
+  }
+
+  /**
+   * Returns name for deployment if it is set explicitly, otherwise tries to resolve the name based
+   * on property "HOSTNAME".
+   * TODO It is known that this will fail if the hostname contains dashes. Improve later
+   */
+  public String findDeploymentName() {
+    if (serviceName != null && !serviceName.isEmpty()) {
+      // serviceName has been set explicitly
+      return serviceName;
     }
 
-    public KubernetesService(String kubernetesUrl, String namespace, boolean kubernetesEnabled) {
-        this(kubernetesUrl, null, namespace, kubernetesEnabled);
+    // Resolve name
+    String hostname = System.getenv("HOSTNAME");
+    if (hostname == null) {
+      hostname = "localhost";
     }
-
-    public KubernetesService(String namespace, boolean kubernetesEnabled) {
-        this(null, null, namespace, kubernetesEnabled);
-    }
-
-    @PostConstruct
-    public final void init() {
-        if (!kubernetesEnabled) {
-            LOGGER.warn("Disabling kubernetes connection as rutebanken.kubernetes.enabled={}", kubernetesEnabled);
-            return;
-        }
-        if (kubernetesUrl != null && !kubernetesUrl.isEmpty()) {
-            LOGGER.info("Connecting to {}", kubernetesUrl);
-            Config config = new ConfigBuilder().withMasterUrl("http://localhost:8000/").build();
-            kube = new KubernetesClientBuilder().withConfig(config).build();
-        } else {
-            LOGGER.info("Using default settings, as this should auto-configure correctly in the kubernetes cluster");
-            kube = new KubernetesClientBuilder().build();
-        }
-    }
-
-    @PreDestroy
-    public final void end() {
-        if (kube != null) {
-            kube.close();
-        }
-    }
-
-    public boolean isKubernetesEnabled() {
-        return kubernetesEnabled;
-    }
-
-    /**
-     * Returns name for deployment if it is set explicitly, otherwise tries to resolve the name based
-     * on property "HOSTNAME".
-     * TODO It is known that this will fail if the hostname contains dashes. Improve later
-     */
-    public String findDeploymentName() {
-        if (serviceName != null && !serviceName.isEmpty()) {
-            // serviceName has been set explicitly
-            return serviceName;
-        }
-
-        // Resolve name
-        String hostname = System.getenv("HOSTNAME");
-        if (hostname == null) {
-            hostname = "localhost";
-        }
-        int dash = hostname.indexOf('-');
-        return dash == -1
-                ? hostname
-                : hostname.substring(0, dash);
-    }
+    int dash = hostname.indexOf('-');
+    return dash == -1 ? hostname : hostname.substring(0, dash);
+  }
 }

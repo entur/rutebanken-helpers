@@ -1,11 +1,10 @@
 package org.rutebanken.helper.organisation.authorization;
 
-import org.rutebanken.helper.organisation.RoleAssignment;
-import org.rutebanken.helper.organisation.RoleAssignmentExtractor;
+import static org.rutebanken.helper.organisation.AuthorizationConstants.*;
 
 import java.util.function.Function;
-
-import static org.rutebanken.helper.organisation.AuthorizationConstants.*;
+import org.rutebanken.helper.organisation.RoleAssignment;
+import org.rutebanken.helper.organisation.RoleAssignmentExtractor;
 
 /**
  * Default implementation of the {@link AuthorizationService}.
@@ -17,102 +16,133 @@ import static org.rutebanken.helper.organisation.AuthorizationConstants.*;
  */
 public class DefaultAuthorizationService<T> implements AuthorizationService<T> {
 
-    private static final String ENTUR_ORG = "RB";
+  private static final String ENTUR_ORG = "RB";
 
-    private final Function<T, String> getProviderOrganisationById;
-    private final RoleAssignmentExtractor roleAssignmentExtractor;
+  private final Function<T, String> getProviderOrganisationById;
+  private final RoleAssignmentExtractor roleAssignmentExtractor;
 
-    /**
-     * Create a user context service with the given role assignment extractor and user info extractor.
-     */
-    public DefaultAuthorizationService(RoleAssignmentExtractor roleAssignmentExtractor) {
-        this(t -> null, roleAssignmentExtractor);
+  /**
+   * Create a user context service with the given role assignment extractor and user info extractor.
+   */
+  public DefaultAuthorizationService(
+    RoleAssignmentExtractor roleAssignmentExtractor
+  ) {
+    this(t -> null, roleAssignmentExtractor);
+  }
+
+  /**
+   * Create a user context service with the given role assignment extractor, user info extractor and a codespace mapping function.
+   */
+  public DefaultAuthorizationService(
+    Function<T, String> getProviderOrganisationById,
+    RoleAssignmentExtractor roleAssignmentExtractor
+  ) {
+    this.getProviderOrganisationById = getProviderOrganisationById;
+    this.roleAssignmentExtractor = roleAssignmentExtractor;
+  }
+
+  @Override
+  public boolean isRouteDataAdmin() {
+    return isAdminFor(ROLE_ROUTE_DATA_ADMIN);
+  }
+
+  @Override
+  public boolean isOrganisationAdmin() {
+    // ROLE_ORGANISATION_EDIT provides admin privilege on all organisations
+    return isAdminFor(ROLE_ORGANISATION_EDIT);
+  }
+
+  @Override
+  public boolean canViewRouteData(T providerId) {
+    String providerOrganisation = getProviderOrganisationById.apply(providerId);
+    if (providerOrganisation == null) {
+      return false;
     }
+    return roleAssignmentExtractor
+      .getRoleAssignmentsForUser()
+      .stream()
+      .anyMatch(roleAssignment ->
+        matchAdminRole(roleAssignment, ROLE_ROUTE_DATA_ADMIN) ||
+        matchAdminRole(roleAssignment, ROLE_ROUTE_DATA_VIEW_ALL) ||
+        matchProviderRole(
+          roleAssignment,
+          ROLE_ROUTE_DATA_EDIT,
+          providerOrganisation
+        )
+      );
+  }
 
-    /**
-     * Create a user context service with the given role assignment extractor, user info extractor and a codespace mapping function.
-     */
-    public DefaultAuthorizationService(Function<T, String> getProviderOrganisationById,
-                                       RoleAssignmentExtractor roleAssignmentExtractor) {
-        this.getProviderOrganisationById = getProviderOrganisationById;
-        this.roleAssignmentExtractor = roleAssignmentExtractor;
+  @Override
+  public boolean canEditRouteData(T providerId) {
+    String providerOrganisation = getProviderOrganisationById.apply(providerId);
+    if (providerOrganisation == null) {
+      return false;
     }
+    return roleAssignmentExtractor
+      .getRoleAssignmentsForUser()
+      .stream()
+      .anyMatch(roleAssignment ->
+        matchAdminRole(roleAssignment, ROLE_ROUTE_DATA_ADMIN) ||
+        matchProviderRole(
+          roleAssignment,
+          ROLE_ROUTE_DATA_EDIT,
+          providerOrganisation
+        )
+      );
+  }
 
-    @Override
-    public boolean isRouteDataAdmin() {
-        return isAdminFor(ROLE_ROUTE_DATA_ADMIN);
+  @Override
+  public boolean canViewBlockData(T providerId) {
+    String providerOrganisation = getProviderOrganisationById.apply(providerId);
+    if (providerOrganisation == null) {
+      return false;
     }
+    return roleAssignmentExtractor
+      .getRoleAssignmentsForUser()
+      .stream()
+      .anyMatch(roleAssignment ->
+        matchAdminRole(roleAssignment, ROLE_ROUTE_DATA_ADMIN) ||
+        matchProviderRole(
+          roleAssignment,
+          ROLE_NETEX_BLOCKS_DATA_VIEW,
+          providerOrganisation
+        ) ||
+        matchProviderRole(
+          roleAssignment,
+          ROLE_ROUTE_DATA_EDIT,
+          providerOrganisation
+        )
+      );
+  }
 
-    @Override
-    public boolean isOrganisationAdmin() {
-        // ROLE_ORGANISATION_EDIT provides admin privilege on all organisations
-        return isAdminFor(ROLE_ORGANISATION_EDIT);
-    }
+  private boolean isAdminFor(String role) {
+    return roleAssignmentExtractor
+      .getRoleAssignmentsForUser()
+      .stream()
+      .anyMatch(roleAssignment -> matchAdminRole(roleAssignment, role));
+  }
 
-    @Override
-    public boolean canViewRouteData(T providerId) {
-        String providerOrganisation = getProviderOrganisationById.apply(providerId);
-        if (providerOrganisation == null) {
-            return false;
-        }
-        return roleAssignmentExtractor.getRoleAssignmentsForUser()
-                .stream()
-                .anyMatch(roleAssignment -> matchAdminRole(roleAssignment, ROLE_ROUTE_DATA_ADMIN)
-                        || matchAdminRole(roleAssignment, ROLE_ROUTE_DATA_VIEW_ALL)
-                        || matchProviderRole(roleAssignment, ROLE_ROUTE_DATA_EDIT, providerOrganisation)
-                );
-    }
+  /**
+   * Return true if the role assignment gives access to the given role for the Entur organisation.
+   */
+  private static boolean matchAdminRole(
+    RoleAssignment roleAssignment,
+    String role
+  ) {
+    return matchProviderRole(roleAssignment, role, ENTUR_ORG);
+  }
 
-    @Override
-    public boolean canEditRouteData(T providerId) {
-        String providerOrganisation = getProviderOrganisationById.apply(providerId);
-        if (providerOrganisation == null) {
-            return false;
-        }
-        return roleAssignmentExtractor.getRoleAssignmentsForUser()
-                .stream()
-                .anyMatch(roleAssignment -> matchAdminRole(roleAssignment, ROLE_ROUTE_DATA_ADMIN)
-                        || matchProviderRole(roleAssignment, ROLE_ROUTE_DATA_EDIT, providerOrganisation)
-                );
-    }
-
-    @Override
-    public boolean canViewBlockData(T providerId) {
-        String providerOrganisation = getProviderOrganisationById.apply(providerId);
-        if (providerOrganisation == null) {
-            return false;
-        }
-        return roleAssignmentExtractor.getRoleAssignmentsForUser()
-                .stream()
-                .anyMatch(roleAssignment -> matchAdminRole(roleAssignment, ROLE_ROUTE_DATA_ADMIN)
-                        || matchProviderRole(roleAssignment, ROLE_NETEX_BLOCKS_DATA_VIEW, providerOrganisation)
-                        || matchProviderRole(roleAssignment, ROLE_ROUTE_DATA_EDIT, providerOrganisation)
-                );
-    }
-
-
-    private boolean isAdminFor(String role) {
-        return roleAssignmentExtractor.getRoleAssignmentsForUser()
-                .stream()
-                .anyMatch(roleAssignment -> matchAdminRole(roleAssignment, role));
-    }
-
-    /**
-     * Return true if the role assignment gives access to the given role for the Entur organisation.
-     */
-    private static boolean matchAdminRole(RoleAssignment roleAssignment, String role) {
-        return matchProviderRole(roleAssignment, role, ENTUR_ORG);
-    }
-
-    /**
-     * Return true if the role assignment gives access to the given role for the given provider.
-     */
-    private static boolean matchProviderRole(RoleAssignment roleAssignment, String role, String providerOrganisation) {
-        return (
-                role.equals(roleAssignment.getRole()) &&
-                        providerOrganisation.equals(roleAssignment.getOrganisation())
-        );
-    }
-
-
+  /**
+   * Return true if the role assignment gives access to the given role for the given provider.
+   */
+  private static boolean matchProviderRole(
+    RoleAssignment roleAssignment,
+    String role,
+    String providerOrganisation
+  ) {
+    return (
+      role.equals(roleAssignment.getRole()) &&
+      providerOrganisation.equals(roleAssignment.getOrganisation())
+    );
+  }
 }

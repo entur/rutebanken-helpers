@@ -12,7 +12,4 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @AutoConfigureBefore(GcpPubSubAutoConfiguration.class)
 @ComponentScan("org.entur.pubsub")
-public class GooglePubSubConfig {
-
-
-}
+public class GooglePubSubConfig {}

@@ -27,53 +27,75 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
  */
 public class OAuth2TokenService implements TokenService {
 
-    private String clientId;
-    private String clientRegistrationId;
-    private AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager authorizedClientServiceReactiveOAuth2AuthorizedClientManager;
+  private String clientId;
+  private String clientRegistrationId;
+  private AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager authorizedClientServiceReactiveOAuth2AuthorizedClientManager;
 
-    @Override
-    public String getToken() {
-        OAuth2AuthorizeRequest oAuth2AuthorizeRequest = OAuth2AuthorizeRequest.withClientRegistrationId(clientRegistrationId).principal(clientId).build();
-        OAuth2AuthorizedClient authorizedClient = authorizedClientServiceReactiveOAuth2AuthorizedClientManager.authorize(oAuth2AuthorizeRequest).block();
-        if(authorizedClient == null) {
-            throw new IllegalStateException("Authorized Client not found for client registration id " + clientRegistrationId);
-        }
-        return authorizedClient.getAccessToken().getTokenValue();
+  @Override
+  public String getToken() {
+    OAuth2AuthorizeRequest oAuth2AuthorizeRequest = OAuth2AuthorizeRequest
+      .withClientRegistrationId(clientRegistrationId)
+      .principal(clientId)
+      .build();
+    OAuth2AuthorizedClient authorizedClient =
+      authorizedClientServiceReactiveOAuth2AuthorizedClientManager
+        .authorize(oAuth2AuthorizeRequest)
+        .block();
+    if (authorizedClient == null) {
+      throw new IllegalStateException(
+        "Authorized Client not found for client registration id " +
+        clientRegistrationId
+      );
+    }
+    return authorizedClient.getAccessToken().getTokenValue();
+  }
+
+  public static class Builder {
+
+    private final OAuth2TokenService oAuth2TokenService;
+    private OAuth2ClientProperties properties;
+    private String audience;
+
+    public Builder() {
+      oAuth2TokenService = new OAuth2TokenService();
     }
 
-    public static class Builder {
-
-        private final OAuth2TokenService oAuth2TokenService;
-        private OAuth2ClientProperties properties;
-        private String audience;
-
-        public Builder() {
-            oAuth2TokenService = new OAuth2TokenService();
-        }
-
-        public OAuth2TokenService build() {
-            AuthorizedClientServiceReactiveOAuth2AuthorizedClientManagerBuilder authorizedClientServiceReactiveOAuth2AuthorizedClientManagerBuilder = new AuthorizedClientServiceReactiveOAuth2AuthorizedClientManagerBuilder();
-            authorizedClientServiceReactiveOAuth2AuthorizedClientManagerBuilder.withOAuth2ClientProperties(properties);
-            authorizedClientServiceReactiveOAuth2AuthorizedClientManagerBuilder.withAudience(audience);
-            oAuth2TokenService.clientId = properties.getRegistration().get(this.oAuth2TokenService.clientRegistrationId).getClientId();
-            oAuth2TokenService.authorizedClientServiceReactiveOAuth2AuthorizedClientManager = authorizedClientServiceReactiveOAuth2AuthorizedClientManagerBuilder.build();
-            return oAuth2TokenService;
-        }
-
-        public OAuth2TokenService.Builder withClientRegistrationId(String clientRegistrationId) {
-            this.oAuth2TokenService.clientRegistrationId = clientRegistrationId;
-            return this;
-        }
-
-        public OAuth2TokenService.Builder withOAuth2ClientProperties(OAuth2ClientProperties properties) {
-            this.properties = properties;
-            return this;
-        }
-
-        public OAuth2TokenService.Builder withAudience(String audience) {
-            this.audience = audience;
-            return this;
-        }
+    public OAuth2TokenService build() {
+      AuthorizedClientServiceReactiveOAuth2AuthorizedClientManagerBuilder authorizedClientServiceReactiveOAuth2AuthorizedClientManagerBuilder =
+        new AuthorizedClientServiceReactiveOAuth2AuthorizedClientManagerBuilder();
+      authorizedClientServiceReactiveOAuth2AuthorizedClientManagerBuilder.withOAuth2ClientProperties(
+        properties
+      );
+      authorizedClientServiceReactiveOAuth2AuthorizedClientManagerBuilder.withAudience(
+        audience
+      );
+      oAuth2TokenService.clientId =
+        properties
+          .getRegistration()
+          .get(this.oAuth2TokenService.clientRegistrationId)
+          .getClientId();
+      oAuth2TokenService.authorizedClientServiceReactiveOAuth2AuthorizedClientManager =
+        authorizedClientServiceReactiveOAuth2AuthorizedClientManagerBuilder.build();
+      return oAuth2TokenService;
     }
 
+    public OAuth2TokenService.Builder withClientRegistrationId(
+      String clientRegistrationId
+    ) {
+      this.oAuth2TokenService.clientRegistrationId = clientRegistrationId;
+      return this;
+    }
+
+    public OAuth2TokenService.Builder withOAuth2ClientProperties(
+      OAuth2ClientProperties properties
+    ) {
+      this.properties = properties;
+      return this;
+    }
+
+    public OAuth2TokenService.Builder withAudience(String audience) {
+      this.audience = audience;
+      return this;
+    }
+  }
 }

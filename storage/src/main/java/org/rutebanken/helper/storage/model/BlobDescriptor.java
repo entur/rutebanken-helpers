@@ -11,17 +11,18 @@ import java.util.Optional;
  * @param contentType
  * @param metadata
  */
-public record BlobDescriptor(String name,
-                             InputStream inputStream,
-                             Optional<String> contentType,
-                             Optional<Map<String, String>> metadata) {
-
-    /**
-     * Convenience constructor for building <code>BlobDescriptor</code> with just the required parameters.
-     * @param name
-     * @param inputStream
-     */
-    public BlobDescriptor(String name, InputStream inputStream) {
-        this(name, inputStream, Optional.empty(), Optional.empty());
-    }
+public record BlobDescriptor(
+  String name,
+  InputStream inputStream,
+  Optional<String> contentType,
+  Optional<Map<String, String>> metadata
+) {
+  /**
+   * Convenience constructor for building <code>BlobDescriptor</code> with just the required parameters.
+   * @param name
+   * @param inputStream
+   */
+  public BlobDescriptor(String name, InputStream inputStream) {
+    this(name, inputStream, Optional.empty(), Optional.empty());
+  }
 }

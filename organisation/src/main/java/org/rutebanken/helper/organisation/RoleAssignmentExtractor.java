@@ -16,17 +16,14 @@
 
 package org.rutebanken.helper.organisation;
 
+import java.util.List;
 import org.springframework.security.core.Authentication;
 
-import java.util.List;
-
 public interface RoleAssignmentExtractor {
+  /**
+   * Extract role assignments for user from security context.
+   */
+  List<RoleAssignment> getRoleAssignmentsForUser();
 
-    /**
-     * Extract role assignments for user from security context.
-     */
-    List<RoleAssignment> getRoleAssignmentsForUser();
-
-    List<RoleAssignment> getRoleAssignmentsForUser(Authentication authentication);
-
+  List<RoleAssignment> getRoleAssignmentsForUser(Authentication authentication);
 }

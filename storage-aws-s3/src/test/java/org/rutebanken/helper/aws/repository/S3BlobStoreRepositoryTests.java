@@ -1,5 +1,13 @@
 package org.rutebanken.helper.aws.repository;
 
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Before;
@@ -19,219 +27,237 @@ import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
 import software.amazon.awssdk.services.s3.model.NoSuchBucketException;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 @Testcontainers
 public class S3BlobStoreRepositoryTests {
 
-    private static final String TEST_BUCKET = "test-blobstore-exports";
+  private static final String TEST_BUCKET = "test-blobstore-exports";
 
-    private static final Pattern MIME_PATTERN = Pattern.compile(
-            "^=\\?UTF-8\\?B\\?(.+?)\\?=$"
+  private static final Pattern MIME_PATTERN = Pattern.compile(
+    "^=\\?UTF-8\\?B\\?(.+?)\\?=$"
+  );
+
+  private static LocalStackContainer localStack;
+
+  private S3Client s3Client;
+
+  private S3BlobStoreRepository blobStore;
+
+  private void createBucket(String bucketName) {
+    try {
+      s3Client.headBucket(request -> request.bucket(bucketName));
+    } catch (NoSuchBucketException e) {
+      s3Client.createBucket(request -> request.bucket(bucketName));
+    }
+  }
+
+  @BeforeClass
+  public static void init() {
+    localStack =
+      new LocalStackContainer(
+        DockerImageName.parse("localstack/localstack:3.4.0")
+      )
+        .withServices(Service.S3)
+        .withEnv("DEFAULT_REGION", Region.EU_NORTH_1.id());
+    localStack.start();
+  }
+
+  @Before
+  public void setUp() {
+    s3Client =
+      S3Client
+        .builder()
+        .endpointOverride(localStack.getEndpointOverride(Service.S3))
+        .region(Region.of(localStack.getRegion()))
+        .credentialsProvider(
+          StaticCredentialsProvider.create(
+            AwsBasicCredentials.create(
+              localStack.getAccessKey(),
+              localStack.getSecretKey()
+            )
+          )
+        )
+        .build();
+    blobStore = new S3BlobStoreRepository(s3Client);
+    createBucket(TEST_BUCKET);
+    blobStore.setContainerName(TEST_BUCKET);
+  }
+
+  @Test
+  public void canRoundtripAFile() throws Exception {
+    String original = "Hello, BlobStore!";
+    assertBlobExists(TEST_BUCKET, "myblob", false);
+    blobStore.uploadBlob(
+      "myblob",
+      new ByteArrayInputStream(original.getBytes())
     );
+    assertBlobExists(TEST_BUCKET, "myblob", true);
+    Assert.assertEquals(
+      original,
+      new String(blobStore.getBlob("myblob").readAllBytes())
+    );
+    Assert.assertTrue(blobStore.delete("myblob"));
+  }
 
-    private static LocalStackContainer localStack;
+  @Test(expected = BlobAlreadyExistsException.class)
+  public void cannotOverWriteExistingObject() {
+    String original = "another bytes the dust";
+    assertBlobExists(TEST_BUCKET, "anotherblob", false);
+    blobStore.uploadNewBlob(
+      "anotherblob",
+      new ByteArrayInputStream(original.getBytes())
+    );
+    assertBlobExists(TEST_BUCKET, "anotherblob", true);
+    blobStore.uploadNewBlob(
+      "anotherblob",
+      new ByteArrayInputStream("something silly".getBytes())
+    );
+  }
 
-    private S3Client s3Client;
+  /**
+   * Implementation note: Content type can be set for S3, but it does not mean much when downloading. The header
+   * does persist in object metadata though.
+   */
+  @Test
+  public void canSetContentTypeForUpload() throws Exception {
+    String contentType = "application/json";
+    blobStore.uploadBlob(
+      "json",
+      new ByteArrayInputStream("{\"key\":false}".getBytes()),
+      contentType
+    );
+    assertBlobExists(TEST_BUCKET, "json", true);
+    HeadObjectResponse response = s3Client.headObject(request ->
+      request.bucket(TEST_BUCKET).key("json")
+    );
+    Assert.assertEquals(contentType, response.contentType());
+  }
 
-    private S3BlobStoreRepository blobStore;
+  @Test
+  public void canCopyContentBetweenBuckets() throws Exception {
+    String targetBucket = "another-bucket";
+    String content = "1";
+    createBucket(targetBucket);
+    blobStore.uploadBlob("smallfile", asStream(content));
+    blobStore.copyBlob(TEST_BUCKET, "smallfile", targetBucket, "tinyfile");
+    blobStore.setContainerName(targetBucket);
+    Assert.assertEquals(
+      content,
+      new String(blobStore.getBlob("tinyfile").readAllBytes())
+    );
+    blobStore.setContainerName(TEST_BUCKET);
+  }
 
-    private void createBucket(String bucketName) {
-        try {
-            s3Client.headBucket(request -> request.bucket(bucketName));
-        } catch (NoSuchBucketException e) {
-            s3Client.createBucket(request -> request.bucket(bucketName));
-        }
+  /**
+   * Implementation note: Version is no-op with S3 as the current interface models it based on GCP's blob storage
+   * semantics. This is effectively the same as copying the blob normally.
+   * @throws Exception
+   */
+  @Test
+  public void canCopyVersionedContentBetweenBuckets() throws Exception {
+    String targetBucket = "yet-another-bucket";
+    String content = "a";
+    createBucket(targetBucket);
+    blobStore.uploadBlob("minusculefile", asStream(content));
+    blobStore.copyVersionedBlob(
+      TEST_BUCKET,
+      "minusculefile",
+      -1_000_000L,
+      targetBucket,
+      "barelyworthmentioningfile"
+    );
+    blobStore.setContainerName(targetBucket);
+    Assert.assertEquals(
+      content,
+      new String(blobStore.getBlob("barelyworthmentioningfile").readAllBytes())
+    );
+    blobStore.setContainerName(TEST_BUCKET);
+  }
+
+  @Test
+  public void canCopyAllBlobsWithSharedPrefix() {
+    String targetBucket = "one-more-bucket";
+    createBucket(targetBucket);
+    blobStore.uploadBlob("things/a", asStream("a"));
+    blobStore.uploadBlob("things/b", asStream("b"));
+    blobStore.uploadBlob("things/c", asStream("c"));
+    blobStore.uploadBlob("stuff/d", asStream("d"));
+    blobStore.copyAllBlobs(TEST_BUCKET, "things", targetBucket, "bits");
+    assertBlobExists(targetBucket, "bits/a", true);
+    assertBlobExists(targetBucket, "bits/b", true);
+    assertBlobExists(targetBucket, "bits/c", true);
+    assertBlobExists(targetBucket, "stuff/d", false);
+  }
+
+  @Test
+  public void attachesGivenMetadataToUploadWhenPresent() {
+    Map<String, String> metadata = Map.of("metadata.test", "testing");
+    blobStore.uploadBlob(
+      new BlobDescriptor(
+        "things/a",
+        asStream("a"),
+        Optional.empty(),
+        Optional.of(metadata)
+      )
+    );
+    assertBlobExists(TEST_BUCKET, "things/a", true, metadata);
+  }
+
+  private static @NotNull ByteArrayInputStream asStream(String source) {
+    return new ByteArrayInputStream(source.getBytes(StandardCharsets.UTF_8));
+  }
+
+  private void assertBlobExists(String bucket, String key, boolean exists) {
+    assertBlobExists(bucket, key, exists, null);
+  }
+
+  private void assertBlobExists(
+    String bucket,
+    String key,
+    boolean exists,
+    Map<String, String> expectedMetadata
+  ) {
+    HeadObjectResponse response = null;
+    try {
+      response =
+        s3Client.headObject(request -> request.bucket(bucket).key(key));
+    } catch (NoSuchKeyException ignored) {}
+    if (!exists && response != null) {
+      Assert.fail(bucket + " / " + key + " exists");
     }
-
-    @BeforeClass
-    public static void init() {
-        localStack = new LocalStackContainer(DockerImageName.parse("localstack/localstack:3.4.0"))
-                        .withServices(Service.S3)
-                        .withEnv("DEFAULT_REGION", Region.EU_NORTH_1.id());
-        localStack.start();
+    if (exists && response == null) {
+      Assert.fail(bucket + " / " + key + " does not exist");
     }
-
-    @Before
-    public void setUp() {
-        s3Client = S3Client.builder()
-                .endpointOverride(localStack.getEndpointOverride(Service.S3))
-                .region(Region.of(localStack.getRegion()))
-                .credentialsProvider(StaticCredentialsProvider.create(
-                        AwsBasicCredentials.create(localStack.getAccessKey(), localStack.getSecretKey()))
-                )
-                .build();
-        blobStore = new S3BlobStoreRepository(s3Client);
-        createBucket(TEST_BUCKET);
-        blobStore.setContainerName(TEST_BUCKET);
+    if (expectedMetadata != null) {
+      Assert.assertEquals(
+        expectedMetadata,
+        mimeDecodeValues(response.metadata())
+      );
     }
+  }
 
-    @Test
-    public void canRoundtripAFile() throws Exception {
-        String original = "Hello, BlobStore!";
-        assertBlobExists(TEST_BUCKET, "myblob", false);
-        blobStore.uploadBlob("myblob", new ByteArrayInputStream(original.getBytes()));
-        assertBlobExists(TEST_BUCKET, "myblob", true);
-        Assert.assertEquals(original, new String(blobStore.getBlob("myblob").readAllBytes()));
-        Assert.assertTrue(blobStore.delete("myblob"));
-    }
+  private static Map<String, String> mimeDecodeValues(
+    Map<String, String> metadata
+  ) {
+    Map<String, String> decodedMetadata = new HashMap<>(metadata.size());
 
-    @Test(expected = BlobAlreadyExistsException.class)
-    public void cannotOverWriteExistingObject() {
-        String original = "another bytes the dust";
-        assertBlobExists(TEST_BUCKET, "anotherblob", false);
-        blobStore.uploadNewBlob("anotherblob", new ByteArrayInputStream(original.getBytes()));
-        assertBlobExists(TEST_BUCKET, "anotherblob", true);
-        blobStore.uploadNewBlob(
-                "anotherblob",
-                new ByteArrayInputStream("something silly".getBytes())
+    for (Map.Entry<String, String> entry : metadata.entrySet()) {
+      Matcher matcher = MIME_PATTERN.matcher(entry.getValue());
+      if (matcher.find()) {
+        String base64Encoded = matcher.group(1);
+        byte[] utf8Bytes = Base64.getDecoder().decode(base64Encoded);
+        decodedMetadata.put(
+          entry.getKey(),
+          new String(utf8Bytes, StandardCharsets.UTF_8)
         );
-    }
-
-    /**
-     * Implementation note: Content type can be set for S3, but it does not mean much when downloading. The header
-     * does persist in object metadata though.
-     */
-    @Test
-    public void canSetContentTypeForUpload() throws Exception {
-        String contentType = "application/json";
-        blobStore.uploadBlob(
-                "json",
-                new ByteArrayInputStream("{\"key\":false}".getBytes()),
-                contentType
+      } else {
+        throw new IllegalArgumentException(
+          "Metadata entry's value (" +
+          entry +
+          ") is not in the expected MIME format"
         );
-        assertBlobExists(TEST_BUCKET, "json", true);
-        HeadObjectResponse response = s3Client.headObject(request ->
-                request.bucket(TEST_BUCKET).key("json")
-        );
-        Assert.assertEquals(contentType, response.contentType());
+      }
     }
 
-    @Test
-    public void canCopyContentBetweenBuckets() throws Exception {
-        String targetBucket = "another-bucket";
-        String content = "1";
-        createBucket(targetBucket);
-        blobStore.uploadBlob("smallfile", asStream(content));
-        blobStore.copyBlob(TEST_BUCKET, "smallfile", targetBucket, "tinyfile");
-        blobStore.setContainerName(targetBucket);
-        Assert.assertEquals(
-                content,
-                new String(blobStore.getBlob("tinyfile").readAllBytes())
-        );
-        blobStore.setContainerName(TEST_BUCKET);
-    }
-
-    /**
-     * Implementation note: Version is no-op with S3 as the current interface models it based on GCP's blob storage
-     * semantics. This is effectively the same as copying the blob normally.
-     * @throws Exception
-     */
-    @Test
-    public void canCopyVersionedContentBetweenBuckets() throws Exception {
-        String targetBucket = "yet-another-bucket";
-        String content = "a";
-        createBucket(targetBucket);
-        blobStore.uploadBlob("minusculefile", asStream(content));
-        blobStore.copyVersionedBlob(
-                TEST_BUCKET,
-                "minusculefile",
-                -1_000_000L,
-                targetBucket,
-                "barelyworthmentioningfile"
-        );
-        blobStore.setContainerName(targetBucket);
-        Assert.assertEquals(
-                content,
-                new String(blobStore.getBlob("barelyworthmentioningfile").readAllBytes())
-        );
-        blobStore.setContainerName(TEST_BUCKET);
-    }
-
-    @Test
-    public void canCopyAllBlobsWithSharedPrefix() {
-        String targetBucket = "one-more-bucket";
-        createBucket(targetBucket);
-        blobStore.uploadBlob("things/a", asStream("a"));
-        blobStore.uploadBlob("things/b", asStream("b"));
-        blobStore.uploadBlob("things/c", asStream("c"));
-        blobStore.uploadBlob("stuff/d", asStream("d"));
-        blobStore.copyAllBlobs(TEST_BUCKET, "things", targetBucket, "bits");
-        assertBlobExists(targetBucket, "bits/a", true);
-        assertBlobExists(targetBucket, "bits/b", true);
-        assertBlobExists(targetBucket, "bits/c", true);
-        assertBlobExists(targetBucket, "stuff/d", false);
-    }
-
-    @Test
-    public void attachesGivenMetadataToUploadWhenPresent() {
-        Map<String, String> metadata = Map.of("metadata.test", "testing");
-        blobStore.uploadBlob(
-                new BlobDescriptor(
-                        "things/a",
-                        asStream("a"),
-                        Optional.empty(),
-                        Optional.of(metadata)
-                )
-        );
-        assertBlobExists(TEST_BUCKET, "things/a", true, metadata);
-    }
-
-    private static @NotNull ByteArrayInputStream asStream(String source) {
-        return new ByteArrayInputStream(source.getBytes(StandardCharsets.UTF_8));
-    }
-
-    private void assertBlobExists(String bucket, String key, boolean exists) {
-        assertBlobExists(bucket, key, exists, null);
-    }
-
-    private void assertBlobExists(
-            String bucket,
-            String key,
-            boolean exists,
-            Map<String, String> expectedMetadata
-    ) {
-        HeadObjectResponse response = null;
-        try {
-            response = s3Client.headObject(request -> request.bucket(bucket).key(key));
-        } catch (NoSuchKeyException ignored) {}
-        if (!exists && response != null) {
-            Assert.fail(bucket + " / " + key + " exists");
-        }
-        if (exists && response == null) {
-            Assert.fail(bucket + " / " + key + " does not exist");
-        }
-        if (expectedMetadata != null) {
-            Assert.assertEquals(expectedMetadata, mimeDecodeValues(response.metadata()));
-        }
-    }
-
-    private static Map<String, String> mimeDecodeValues(Map<String, String> metadata) {
-        Map<String, String> decodedMetadata = new HashMap<>(metadata.size());
-
-        for (Map.Entry<String, String> entry : metadata.entrySet()) {
-            Matcher matcher = MIME_PATTERN.matcher(entry.getValue());
-            if (matcher.find()) {
-                String base64Encoded = matcher.group(1);
-                byte[] utf8Bytes = Base64.getDecoder().decode(base64Encoded);
-                decodedMetadata.put(
-                        entry.getKey(),
-                        new String(utf8Bytes, StandardCharsets.UTF_8)
-                );
-            } else {
-                throw new IllegalArgumentException(
-                        "Metadata entry's value (" + entry + ") is not in the expected MIME format"
-                );
-            }
-        }
-
-        return decodedMetadata;
-    }
+    return decodedMetadata;
+  }
 }

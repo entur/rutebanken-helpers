@@ -18,41 +18,41 @@ package org.rutebanken.helper.organisation;
 
 public final class AuthorizationConstants {
 
-    private AuthorizationConstants() {}
+  private AuthorizationConstants() {}
 
-    public static final String ROLE_DELETE_STOPS = "deleteStops";
-    public static final String ROLE_EDIT_STOPS = "editStops";
+  public static final String ROLE_DELETE_STOPS = "deleteStops";
+  public static final String ROLE_EDIT_STOPS = "editStops";
 
-    /**
-     * Administrator rights for all organisations in the organisation register.
-     */
-    public static final String ROLE_ORGANISATION_EDIT = "editOrganisation";
+  /**
+   * Administrator rights for all organisations in the organisation register.
+   */
+  public static final String ROLE_ORGANISATION_EDIT = "editOrganisation";
 
-    /**
-     * Editor rights for route data for a single provider.
-     */
-    public static final String ROLE_ROUTE_DATA_EDIT = "editRouteData";
+  /**
+   * Editor rights for route data for a single provider.
+   */
+  public static final String ROLE_ROUTE_DATA_EDIT = "editRouteData";
 
-    /**
-     * Viewer rights for route data and configuration for all providers.
-     */
+  /**
+   * Viewer rights for route data and configuration for all providers.
+   */
 
-    public static final String ROLE_ROUTE_DATA_VIEW_ALL = "viewAllRouteData";
+  public static final String ROLE_ROUTE_DATA_VIEW_ALL = "viewAllRouteData";
 
-    /**
-     * Administrator rights for route data and configuration for all providers.
-     */
-    public static final String ROLE_ROUTE_DATA_ADMIN = "adminEditRouteData";
+  /**
+   * Administrator rights for route data and configuration for all providers.
+   */
+  public static final String ROLE_ROUTE_DATA_ADMIN = "adminEditRouteData";
 
+  /**
+   * Viewer rights for NeTEx Blocks for a single provider.
+   */
 
-    /**
-     * Viewer rights for NeTEx Blocks for a single provider.
-     */
+  public static final String ROLE_NETEX_BLOCKS_DATA_VIEW =
+    "viewNetexBlocksData";
 
-    public static final String ROLE_NETEX_BLOCKS_DATA_VIEW = "viewNetexBlocksData";
+  public static final String ENTITY_CLASSIFIER_ALL_TYPES = "*";
+  public static final String ENTITY_TYPE = "EntityType";
 
-    public static final String ENTITY_CLASSIFIER_ALL_TYPES = "*";
-    public static final String ENTITY_TYPE = "EntityType";
-
-    public static final String ENTITY_CLASSIFIER_ALL_ATTRIBUTES = "*";
+  public static final String ENTITY_CLASSIFIER_ALL_ATTRIBUTES = "*";
 }

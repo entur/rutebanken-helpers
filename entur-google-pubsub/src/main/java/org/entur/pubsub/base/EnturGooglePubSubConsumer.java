@@ -7,11 +7,10 @@ import java.util.Map;
  */
 @FunctionalInterface
 public interface EnturGooglePubSubConsumer {
-
-    /**
-     * Callback for PubSub message consumer, called upon message arrival.
-     * @param content message content
-     * @param headers message headers
-     */
-    void onMessage(byte[] content, Map<String, String> headers);
+  /**
+   * Callback for PubSub message consumer, called upon message arrival.
+   * @param content message content
+   * @param headers message headers
+   */
+  void onMessage(byte[] content, Map<String, String> headers);
 }

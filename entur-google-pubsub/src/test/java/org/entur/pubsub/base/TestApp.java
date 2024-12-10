@@ -8,7 +8,8 @@ import org.springframework.context.annotation.Import;
 @SpringBootApplication
 @Import(GooglePubSubConfig.class)
 public class TestApp {
-    public static void main(String[] args) {
-        new SpringApplicationBuilder(TestApp.class).run(args);
-    }
+
+  public static void main(String[] args) {
+    new SpringApplicationBuilder(TestApp.class).run(args);
+  }
 }
