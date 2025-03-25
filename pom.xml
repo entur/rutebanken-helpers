@@ -91,7 +91,7 @@
         <hamcrest.version>3.0</hamcrest.version>
         <jakarta.annotation-api.version>3.0.0</jakarta.annotation-api.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
-        <sonar-maven-plugin.version>5.0.0.4389</sonar-maven-plugin.version>
+        <sonar-maven-plugin.version>5.1.0.4751</sonar-maven-plugin.version>
         <prettier-java.version>2.1.0</prettier-java.version>
         <prettier-maven-plugin.version>0.22</prettier-maven-plugin.version>
         <plugin.prettier.goal>write</plugin.prettier.goal>
