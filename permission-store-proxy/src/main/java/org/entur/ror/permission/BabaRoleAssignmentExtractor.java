@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.function.Predicate;
 import org.rutebanken.helper.organisation.RoleAssignment;
 import org.rutebanken.helper.organisation.RoleAssignmentExtractor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -18,8 +20,12 @@ import reactor.util.retry.Retry;
  */
 public class BabaRoleAssignmentExtractor implements RoleAssignmentExtractor {
 
-  protected static final long MAX_RETRY_ATTEMPTS = 3;
-  public static final String OAUTH2_CLAIM_PREFERRED_USERNAME =
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+    BabaRoleAssignmentExtractor.class
+  );
+
+  private static final long MAX_RETRY_ATTEMPTS = 3;
+  private static final String OAUTH2_CLAIM_PREFERRED_USERNAME =
     "https://ror.entur.io/preferred_username";
 
   private final WebClient webClient;
@@ -43,6 +49,8 @@ public class BabaRoleAssignmentExtractor implements RoleAssignmentExtractor {
   public List<RoleAssignment> getRoleAssignmentsForUser(
     Authentication authentication
   ) {
+    long t1 = System.currentTimeMillis();
+
     if (
       !(authentication instanceof JwtAuthenticationToken jwtAuthenticationToken)
     ) {
@@ -53,7 +61,7 @@ public class BabaRoleAssignmentExtractor implements RoleAssignmentExtractor {
       .getTokenAttributes()
       .get(OAUTH2_CLAIM_PREFERRED_USERNAME);
 
-    return webClient
+    List<RoleAssignment> roleAssignments = webClient
       .get()
       .uri(
         uri,
@@ -69,5 +77,10 @@ public class BabaRoleAssignmentExtractor implements RoleAssignmentExtractor {
       )
       .collectList()
       .block();
+
+    long t2 = System.currentTimeMillis();
+    LOGGER.trace("Retrieved role assignments in {} ms", t2 - t1);
+
+    return roleAssignments;
   }
 }
