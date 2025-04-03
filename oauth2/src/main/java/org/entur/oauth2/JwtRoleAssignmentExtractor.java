@@ -11,7 +11,6 @@ import org.rutebanken.helper.organisation.RoleAssignment;
 import org.rutebanken.helper.organisation.RoleAssignmentExtractor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
@@ -39,13 +38,6 @@ public class JwtRoleAssignmentExtractor implements RoleAssignmentExtractor {
 
   public JwtRoleAssignmentExtractor(String adminOrganisation) {
     this.adminOrganisation = adminOrganisation;
-  }
-
-  public List<RoleAssignment> getRoleAssignmentsForUser() {
-    Authentication auth = SecurityContextHolder
-      .getContext()
-      .getAuthentication();
-    return getRoleAssignmentsForUser(auth);
   }
 
   @Override

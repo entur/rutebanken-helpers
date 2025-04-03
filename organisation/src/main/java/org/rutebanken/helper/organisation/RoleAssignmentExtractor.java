@@ -18,12 +18,18 @@ package org.rutebanken.helper.organisation;
 
 import java.util.List;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 public interface RoleAssignmentExtractor {
   /**
    * Extract role assignments for user from security context.
    */
-  List<RoleAssignment> getRoleAssignmentsForUser();
+  default List<RoleAssignment> getRoleAssignmentsForUser() {
+    Authentication auth = SecurityContextHolder
+      .getContext()
+      .getAuthentication();
+    return getRoleAssignmentsForUser(auth);
+  }
 
   List<RoleAssignment> getRoleAssignmentsForUser(Authentication authentication);
 }
