@@ -1,56 +1,33 @@
 package org.entur.ror.permission;
 
-import java.time.Duration;
 import java.util.List;
-import java.util.function.Predicate;
+import org.entur.oauth2.RoROAuth2Claims;
 import org.rutebanken.helper.organisation.RoleAssignment;
 import org.rutebanken.helper.organisation.RoleAssignmentExtractor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.util.retry.Retry;
 
 /**
- * Role Assignment extractor that retrieves RoleAssignments from the API exposed by the organisation repository Baba.
+ * Base class for role assignment extractors that retrieve Role assignments from the user repository Baba.
+ * Concrete implementations retrieve the role assignments either directly from the database, when running within the
+ * Baba service, or through the REST API exposed by Baba.
  * The user is matched by the preferred named claim in the JWT token.
+ * In case of a machine-to-machine token, the preferred name is not present in the token and roles are extracted
+ * from the Auth0 claim "permissions".
  */
-public class BabaRoleAssignmentExtractor implements RoleAssignmentExtractor {
+public abstract class BabaRoleAssignmentExtractor
+  implements RoleAssignmentExtractor {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-    BabaRoleAssignmentExtractor.class
-  );
-
-  private static final long MAX_RETRY_ATTEMPTS = 3;
   private static final String OAUTH2_CLAIM_PREFERRED_USERNAME =
     "https://ror.entur.io/preferred_username";
 
-  private final WebClient webClient;
-  private final String uri;
-
-  private static final Predicate<Throwable> is5xx = throwable ->
-    throwable instanceof WebClientResponseException webClientResponseException &&
-    webClientResponseException.getStatusCode().is5xxServerError();
-
-  /**
-   *
-   * @param webclient an authorized web client that has access to the user API.
-   * @param uri the URI to the REST service.
-   */
-  public BabaRoleAssignmentExtractor(WebClient webclient, String uri) {
-    this.webClient = webclient;
-    this.uri = uri;
-  }
+  private static final String DEFAULT_ADMIN_ORG = "RB";
 
   @Override
-  public List<RoleAssignment> getRoleAssignmentsForUser(
+  public final List<RoleAssignment> getRoleAssignmentsForUser(
     Authentication authentication
   ) {
-    long t1 = System.currentTimeMillis();
-
     if (
       !(authentication instanceof JwtAuthenticationToken jwtAuthenticationToken)
     ) {
@@ -61,26 +38,40 @@ public class BabaRoleAssignmentExtractor implements RoleAssignmentExtractor {
       .getTokenAttributes()
       .get(OAUTH2_CLAIM_PREFERRED_USERNAME);
 
-    List<RoleAssignment> roleAssignments = webClient
-      .get()
-      .uri(
-        uri,
-        uriBuilder ->
-          uriBuilder
-            .path("/{userName}/roleAssignments")
-            .build(preferredUserName)
-      )
-      .retrieve()
-      .bodyToFlux(RoleAssignment.class)
-      .retryWhen(
-        Retry.backoff(MAX_RETRY_ATTEMPTS, Duration.ofSeconds(1)).filter(is5xx)
-      )
-      .collectList()
-      .block();
+    // if the preferred userName is set, this is a user account
+    if (preferredUserName != null) {
+      return userRoleAssignments(preferredUserName);
+    }
 
-    long t2 = System.currentTimeMillis();
-    LOGGER.trace("Retrieved role assignments in {} ms", t2 - t1);
+    // otherwise this is a machine-to-machine token
+    return parsePermissionsClaim(
+      jwtAuthenticationToken
+        .getTokenAttributes()
+        .get(RoROAuth2Claims.OAUTH2_CLAIM_PERMISSIONS)
+    );
+  }
 
-    return roleAssignments;
+  protected abstract List<RoleAssignment> userRoleAssignments(
+    String preferredUserName
+  );
+
+  private List<RoleAssignment> parsePermissionsClaim(Object permissionsClaim) {
+    if (permissionsClaim instanceof List claimPermissionAsList) {
+      List<String> claimPermissionAsStringList = claimPermissionAsList;
+      return claimPermissionAsStringList
+        .stream()
+        .map(role ->
+          RoleAssignment
+            .builder()
+            .withRole(role)
+            .withOrganisation(DEFAULT_ADMIN_ORG)
+            .build()
+        )
+        .toList();
+    } else {
+      throw new IllegalArgumentException(
+        "Unsupported claim type: " + permissionsClaim
+      );
+    }
   }
 }
