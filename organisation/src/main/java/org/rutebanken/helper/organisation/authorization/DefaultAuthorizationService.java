@@ -115,6 +115,16 @@ public class DefaultAuthorizationService<T> implements AuthorizationService<T> {
       );
   }
 
+  @Override
+  public boolean canViewRoleAssignments() {
+    return roleAssignmentExtractor
+      .getRoleAssignmentsForUser()
+      .stream()
+      .anyMatch(roleAssignment ->
+        matchAdminRole(roleAssignment, ROLE_ROLE_ASSIGNMENTS_VIEW)
+      );
+  }
+
   private boolean isAdminFor(String role) {
     return roleAssignmentExtractor
       .getRoleAssignmentsForUser()

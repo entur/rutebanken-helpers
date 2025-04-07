@@ -70,6 +70,11 @@ public interface AuthorizationService<T> {
   boolean canViewBlockData(T providerId);
 
   /**
+   * Whether the current user can view role assignments for all users.
+   */
+  boolean canViewRoleAssignments();
+
+  /**
    * Validate that the current user can view block data belonging to a given provider.
    * @param providerId The internal code of the provider.
    * @throws org.springframework.security.access.AccessDeniedException if the role is missing.

@@ -31,4 +31,9 @@ public class FullAccessAuthorizationService
   public boolean canViewBlockData(Long providerId) {
     return true;
   }
+
+  @Override
+  public boolean canViewRoleAssignments() {
+    return true;
+  }
 }
