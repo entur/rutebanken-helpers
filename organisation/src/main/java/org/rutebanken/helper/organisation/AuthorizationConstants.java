@@ -29,6 +29,11 @@ public final class AuthorizationConstants {
   public static final String ROLE_ORGANISATION_EDIT = "editOrganisation";
 
   /**
+   * Viewer rights for role assignments for all users in the organisation register.
+   */
+  public static final String ROLE_ROLE_ASSIGNMENTS_VIEW = "readRoleAssignments";
+
+  /**
    * Editor rights for route data for a single provider.
    */
   public static final String ROLE_ROUTE_DATA_EDIT = "editRouteData";
