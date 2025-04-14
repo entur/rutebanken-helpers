@@ -1,6 +1,12 @@
 package org.entur.ror.permission;
 
+import static org.entur.oauth2.RoROAuth2Claims.OAUTH2_CLAIM_ROLE_ASSIGNMENTS;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import org.entur.oauth2.JwtRoleAssignmentExtractor;
 import org.entur.oauth2.RoROAuth2Claims;
 import org.rutebanken.helper.organisation.RoleAssignment;
 import org.rutebanken.helper.organisation.RoleAssignmentExtractor;
@@ -24,6 +30,8 @@ public abstract class BabaRoleAssignmentExtractor
 
   private static final String DEFAULT_ADMIN_ORG = "RB";
 
+  private static final ObjectMapper MAPPER = new ObjectMapper();
+
   @Override
   public final List<RoleAssignment> getRoleAssignmentsForUser(
     Authentication authentication
@@ -43,7 +51,15 @@ public abstract class BabaRoleAssignmentExtractor
       return userRoleAssignments(preferredUserName);
     }
 
-    // otherwise this is a machine-to-machine token
+    // if the role assignment claim is set, this is an external machine-to-machine token
+    Object roleAssignmentsClaim = jwtAuthenticationToken
+      .getTokenAttributes()
+      .get(OAUTH2_CLAIM_ROLE_ASSIGNMENTS);
+    if (roleAssignmentsClaim != null) {
+      return parseRoleAssignmentsClaim(roleAssignmentsClaim);
+    }
+
+    // otherwise this is an internal machine-to-machine token
     return parsePermissionsClaim(
       jwtAuthenticationToken
         .getTokenAttributes()
@@ -55,6 +71,30 @@ public abstract class BabaRoleAssignmentExtractor
     String preferredUserName
   );
 
+  /**
+   * Extract RoleAssignments from the role_assignments claim.
+   * External tokens (from Entur Partner) contain json-encoded RoleAssignments under this claim.
+   */
+  private static List<RoleAssignment> parseRoleAssignmentsClaim(
+    Object roleAssignmentClaim
+  ) {
+    if (roleAssignmentClaim instanceof List roleAssignmentAsList) {
+      List<String> roleAssignmentAsStringList = roleAssignmentAsList;
+      return roleAssignmentAsStringList
+        .stream()
+        .map(BabaRoleAssignmentExtractor::parse)
+        .toList();
+    } else {
+      throw new IllegalArgumentException(
+        "Unsupported claim type: " + roleAssignmentClaim
+      );
+    }
+  }
+
+  /**
+   * Extract RoleAssignments from the permission claim.
+   * Internal tokens (from Entur Internal) contain cross-organization roles under this claim.
+   */
   private List<RoleAssignment> parsePermissionsClaim(Object permissionsClaim) {
     if (permissionsClaim instanceof List claimPermissionAsList) {
       List<String> claimPermissionAsStringList = claimPermissionAsList;
@@ -71,6 +111,23 @@ public abstract class BabaRoleAssignmentExtractor
     } else {
       throw new IllegalArgumentException(
         "Unsupported claim type: " + permissionsClaim
+      );
+    }
+  }
+
+  /**
+   * Parse a JSON-encoded role assignment.
+   */
+  private static RoleAssignment parse(Object roleAssignment) {
+    if (roleAssignment instanceof Map) {
+      return MAPPER.convertValue(roleAssignment, RoleAssignment.class);
+    }
+    try {
+      return MAPPER.readValue((String) roleAssignment, RoleAssignment.class);
+    } catch (IOException e) {
+      throw new IllegalArgumentException(
+        "Exception while parsing role assignments from JSON",
+        e
       );
     }
   }
