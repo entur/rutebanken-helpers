@@ -79,6 +79,7 @@ public class EnturGooglePubSubEmulatorRunner {
         false,
         "-jar",
         pathToEmulator,
+        "--host=localhost",
         "--port=" + emulatorPort
       );
       // wait for the emulator to start up
