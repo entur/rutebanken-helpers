@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import org.entur.oauth2.JwtRoleAssignmentExtractor;
 import org.entur.oauth2.RoROAuth2Claims;
 import org.rutebanken.helper.organisation.RoleAssignment;
 import org.rutebanken.helper.organisation.RoleAssignmentExtractor;
