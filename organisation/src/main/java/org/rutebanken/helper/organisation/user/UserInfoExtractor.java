@@ -5,4 +5,6 @@ package org.rutebanken.helper.organisation.user;
  */
 public interface UserInfoExtractor {
   String getPreferredName();
+
+  String getPreferredUsername();
 }

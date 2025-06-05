@@ -11,14 +11,28 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
  */
 public class JwtUserInfoExtractor implements UserInfoExtractor {
 
+  public static final String CLAIM_ROR_PREFERRED_NAME =
+    "https://ror.entur.io/preferred_name";
+  public static final String CLAIM_ROR_PREFERRED_USERNAME =
+    "https://ror.entur.io/preferred_username";
+
   @Override
   public String getPreferredName() {
+    return getClaim(CLAIM_ROR_PREFERRED_NAME);
+  }
+
+  @Override
+  public String getPreferredUsername() {
+    return getClaim(CLAIM_ROR_PREFERRED_USERNAME);
+  }
+
+  private String getClaim(String claim) {
     Authentication auth = SecurityContextHolder
       .getContext()
       .getAuthentication();
     JwtAuthenticationToken jwtAuthenticationToken =
       (JwtAuthenticationToken) auth;
     Jwt jwt = (Jwt) jwtAuthenticationToken.getPrincipal();
-    return jwt.getClaimAsString("https://ror.entur.io/preferred_name");
+    return jwt.getClaimAsString(claim);
   }
 }
