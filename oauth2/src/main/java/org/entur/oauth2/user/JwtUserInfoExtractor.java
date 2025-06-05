@@ -11,9 +11,9 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
  */
 public class JwtUserInfoExtractor implements UserInfoExtractor {
 
-  public static final String CLAIM_ROR_PREFERRED_NAME =
+  private static final String CLAIM_ROR_PREFERRED_NAME =
     "https://ror.entur.io/preferred_name";
-  public static final String CLAIM_ROR_PREFERRED_USERNAME =
+  private static final String CLAIM_ROR_PREFERRED_USERNAME =
     "https://ror.entur.io/preferred_username";
 
   @Override
