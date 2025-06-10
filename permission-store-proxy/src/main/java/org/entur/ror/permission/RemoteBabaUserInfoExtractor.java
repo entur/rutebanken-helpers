@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.function.Predicate;
 import org.rutebanken.helper.organisation.user.UserInfoExtractor;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -55,17 +56,15 @@ public class RemoteBabaUserInfoExtractor implements UserInfoExtractor {
       throw new AccessDeniedException("Not authenticated with token");
     }
 
-    String preferredUserName = (String) jwtAuthenticationToken
-      .getTokenAttributes()
-      .get(CLAIM_ROR_PREFERRED_USERNAME);
+    AuthenticatedUser authenticatedUser = AuthenticatedUser.of(
+      jwtAuthenticationToken
+    );
 
     List<BabaUser> users = webClient
-      .get()
-      .uri(
-        uri,
-        uriBuilder ->
-          uriBuilder.path("/{userName}/user").build(preferredUserName)
-      )
+      .post()
+      .uri(uri, uriBuilder -> uriBuilder.path("/authenticatedUser").build())
+      .contentType(MediaType.APPLICATION_JSON)
+      .bodyValue(authenticatedUser.toDTO())
       .retrieve()
       .bodyToFlux(BabaUser.class)
       .retryWhen(
@@ -76,12 +75,12 @@ public class RemoteBabaUserInfoExtractor implements UserInfoExtractor {
 
     if (users == null || users.isEmpty()) {
       throw new IllegalArgumentException(
-        "User not found: " + preferredUserName
+        "User not found: " + authenticatedUser.subject()
       );
     }
     if (users.size() > 1) {
       throw new IllegalStateException(
-        "Multiple users found: " + preferredUserName
+        "Multiple users found: " + authenticatedUser.subject()
       );
     }
     return users.get(0);
