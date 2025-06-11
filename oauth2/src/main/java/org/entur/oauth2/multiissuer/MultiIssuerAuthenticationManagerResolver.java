@@ -73,7 +73,7 @@ public class MultiIssuerAuthenticationManagerResolver
   }
 
   /**
-   * Build a @{@link JwtDecoder} for Entur Internal Auth0 tenant.
+   * Build a @{@link JwtDecoder} for Entur Partner Auth0 tenant.
    *
    * @return a @{@link JwtDecoder} for Auth0.
    */

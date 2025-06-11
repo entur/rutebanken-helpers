@@ -6,6 +6,7 @@ import java.util.function.Predicate;
 import org.rutebanken.helper.organisation.RoleAssignment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.util.retry.Retry;
@@ -39,18 +40,16 @@ public class RemoteBabaRoleAssignmentExtractor
   }
 
   @Override
-  protected List<RoleAssignment> userRoleAssignments(String preferredUserName) {
+  protected List<RoleAssignment> userRoleAssignments(
+    AuthenticatedUser authenticatedUser
+  ) {
     long t1 = System.currentTimeMillis();
 
     List<RoleAssignment> roleAssignments = webClient
-      .get()
-      .uri(
-        uri,
-        uriBuilder ->
-          uriBuilder
-            .path("/{userName}/roleAssignments")
-            .build(preferredUserName)
-      )
+      .post()
+      .uri(uri, uriBuilder -> uriBuilder.path("/roleAssignments").build())
+      .contentType(MediaType.APPLICATION_JSON)
+      .bodyValue(authenticatedUser.toDTO())
       .retrieve()
       .bodyToFlux(RoleAssignment.class)
       .retryWhen(
