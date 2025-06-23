@@ -101,6 +101,7 @@
         <!-- empty argLine property, the value is set up by Jacoco during unit tests execution -->
         <argLine/>
 
+        <jreleaser-maven-plugin.version>1.18.0</jreleaser-maven-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -181,15 +182,45 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>${nexus-staging-maven-plugin.version}</version>
-                <extensions>true</extensions>
+                <groupId>org.jreleaser</groupId>
+                <artifactId>jreleaser-maven-plugin</artifactId>
+                <version>${jreleaser-maven-plugin.version}</version>
                 <configuration>
-                    <serverId>ossrh</serverId>
-                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                    <!-- Set this to true and the release will automatically proceed and sync to Central Repository will follow  -->
-                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                    <jreleaser>
+                        <signing>
+                            <active>ALWAYS</active>
+                            <armored>true</armored>
+                        </signing>
+                        <deploy>
+                            <maven>
+                                <mavenCentral>
+                                    <sonatype>
+                                        <active>RELEASE</active>
+                                        <url>https://central.sonatype.com/api/v1/publisher</url>
+                                        <stagingRepositories>target/staging-deploy</stagingRepositories>
+                                    </sonatype>
+                                </mavenCentral>
+                                <nexus2>
+                                    <maven-central>
+                                        <active>SNAPSHOT</active>
+                                        <url>https://ossrh-staging-api.central.sonatype.com/service/local</url>
+                                        <snapshotUrl>https://central.sonatype.com/repository/maven-snapshots</snapshotUrl>
+                                        <applyMavenCentralRules>true</applyMavenCentralRules>
+                                        <snapshotSupported>true</snapshotSupported>
+                                        <closeRepository>true</closeRepository>
+                                        <releaseRepository>true</releaseRepository>
+                                        <stagingRepositories>target/staging-deploy</stagingRepositories>
+                                    </maven-central>
+                                </nexus2>
+                            </maven>
+                        </deploy>
+                        <release>
+                            <github>
+                                <skipTag>false</skipTag>
+                                <skipRelease>true</skipRelease>
+                            </github>
+                        </release>
+                    </jreleaser>
                 </configuration>
             </plugin>
             <plugin>
@@ -213,19 +244,28 @@
 
     <profiles>
         <profile>
-            <id>release</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <distributionManagement>
-                <repository>
-                    <id>ossrh</id>
-                    <name>Sonatype release</name>
-                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-                </repository>
-            </distributionManagement>
+            <id>publication</id>
+            <properties>
+                <altDeploymentRepository>local::default::file:./target/staging-deploy</altDeploymentRepository>
+            </properties>
             <build>
+                <defaultGoal>deploy</defaultGoal>
                 <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <attach>true</attach>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
@@ -235,54 +275,11 @@
                                 <goals>
                                     <goal>jar</goal>
                                 </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <configuration>
-                            <doclint>none</doclint>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>attach-javadocs</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>${maven-gpg-plugin.version}</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                                <phase>verify</phase>
                                 <configuration>
-                                    <passphrase>${env.SONATYPE_GPG_KEY_PASSWORD}</passphrase>
-                                    <gpgArguments>
-                                        <arg>--pinentry-mode</arg>
-                                        <arg>loopback</arg>
-                                    </gpgArguments>
+                                    <attach>true</attach>
                                 </configuration>
                             </execution>
                         </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <serverId>ossrh</serverId>
-                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                        </configuration>
                     </plugin>
                 </plugins>
             </build>
