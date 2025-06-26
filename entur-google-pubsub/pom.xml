@@ -36,7 +36,6 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
 
     <properties>
         <license.licenseResolver>${project.baseUri}/../src/license</license.licenseResolver>
-        <entur.google.pubsub.emulator.download.skip>false</entur.google.pubsub.emulator.download.skip>
     </properties>
 
     <dependencies>
@@ -58,6 +57,16 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
         </dependency>
 
         <!-- Testing -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>gcloud</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
