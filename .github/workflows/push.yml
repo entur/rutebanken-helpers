@@ -70,4 +70,3 @@ jobs:
       push_to_repo: true
       snapshot: false
       next_version: 'minor'
-      settings-xml_file: 'https://raw.githubusercontent.com/entur/ror-maven-settings/master/.m2/settings.xml'
