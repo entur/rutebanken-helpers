@@ -35,6 +35,7 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
     <artifactId>slack</artifactId>
 
     <name>slack</name>
+    <description>This library sends slack message to configured slack url</description>
     <url>https://github.com/entur/rutebanken-helpers</url>
     <dependencies>
         <dependency>

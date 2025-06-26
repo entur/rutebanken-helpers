@@ -35,6 +35,7 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
     <artifactId>organisation</artifactId>
 
     <name>organisation</name>
+    <description>organization helper library,to check extract roles and admin zones </description>
     <url>https://github.com/entur/rutebanken-helpers</url>
     <dependencies>
         <!-- NOTICE that you put the versions in the parent dependency

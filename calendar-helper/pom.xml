@@ -35,6 +35,7 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
     <artifactId>calendar-helper</artifactId>
 
     <name>calendar-helper</name>
+    <description>calendar-helper</description>
     <url>https://github.com/entur/rutebanken-helpers</url>
     <dependencies>
         <!-- NOTICE that you put the versions in the parent dependency
