@@ -66,9 +66,6 @@ jobs:
     name: Publish release to maven central
     uses: entur/gha-maven-central/.github/workflows/maven-publish.yml@v1
     secrets: inherit
-    env:
-     JFROG_USER: ${{ secrets.ARTIFACTORY_AUTH_USER }}
-     JFROG_PASS: ${{ secrets.ARTIFACTORY_AUTH_TOKEN }}
     with:
       push_to_repo: true
       snapshot: false
