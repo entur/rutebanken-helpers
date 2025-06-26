@@ -31,7 +31,7 @@
     <artifactId>permission-store-proxy</artifactId>
 
     <name>permission-store-proxy</name>
-
+    <url>https://github.com/entur/rutebanken-helpers</url>
     <dependencies>
 
         <dependency>

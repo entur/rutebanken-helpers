@@ -35,7 +35,7 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
     <artifactId>organisation</artifactId>
 
     <name>organisation</name>
-
+    <url>https://github.com/entur/rutebanken-helpers</url>
     <dependencies>
         <!-- NOTICE that you put the versions in the parent dependency
         management section, and artifacts without version here. -->

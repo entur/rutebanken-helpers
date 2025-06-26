@@ -35,7 +35,7 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
     <artifactId>slack</artifactId>
 
     <name>slack</name>
-
+    <url>https://github.com/entur/rutebanken-helpers</url>
     <dependencies>
         <dependency>
             <groupId>org.slf4j</groupId>

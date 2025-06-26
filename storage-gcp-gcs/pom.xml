@@ -38,7 +38,7 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
     <description>
         Utilities for reading/writing binary files (blobs) to Google Cloud Storage.
     </description>
-
+    <url>https://github.com/entur/rutebanken-helpers</url>
     <dependencies>
 
         <dependency>

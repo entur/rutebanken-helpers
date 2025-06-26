@@ -35,7 +35,7 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
     <artifactId>hazelcast4-helper</artifactId>
 
     <name>hazelcast4-helper</name>
-
+    <url>https://github.com/entur/rutebanken-helpers</url>
 
 
     <dependencies>

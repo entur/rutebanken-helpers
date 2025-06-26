@@ -33,7 +33,7 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
         Base configuration for Google PubSub clients, to be used for non-Camel clients.
         Camel-based clients should use camel-entur-google-pubsub instead.
     </description>
-
+    <url>https://github.com/entur/rutebanken-helpers</url>
     <properties>
         <license.licenseResolver>${project.baseUri}/../src/license</license.licenseResolver>
     </properties>

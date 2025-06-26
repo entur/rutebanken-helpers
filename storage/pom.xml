@@ -38,7 +38,7 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
     <description>
         Utilities for reading/writing binary files (blobs) to storage.
     </description>
-
+    <url>https://github.com/entur/rutebanken-helpers</url>
     <dependencies>
         <!-- NOTICE that you put the versions in the parent dependency
         management section, and artifacts without version here. -->

@@ -37,7 +37,7 @@
     <description>
         Utilities for reading/writing binary files (blobs) to Amazon Web Services' Simple Storage Service (AWS S3)
     </description>
-
+    <url>https://github.com/entur/rutebanken-helpers</url>
     <dependencyManagement>
         <dependencies>
             <dependency>
