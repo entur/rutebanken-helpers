@@ -67,6 +67,6 @@ jobs:
     uses: entur/gha-maven-central/.github/workflows/maven-publish.yml@v1
     secrets: inherit
     with:
-      push_to_repo: true
+      push_to_repo: false      # Set to false because update action is broken, it update only parent pom.xml and not the submodules
       snapshot: false
       next_version: 'minor'
