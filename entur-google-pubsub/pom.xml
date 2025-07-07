@@ -23,7 +23,7 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
     <parent>
         <groupId>org.entur.ror.helpers</groupId>
         <artifactId>helper</artifactId>
-        <version>5.19.0-SNAPSHOT</version>
+        <version>5.21.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>entur-google-pubsub</artifactId>
