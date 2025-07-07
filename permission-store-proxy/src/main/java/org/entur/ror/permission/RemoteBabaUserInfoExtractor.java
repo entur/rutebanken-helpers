@@ -43,6 +43,9 @@ public class RemoteBabaUserInfoExtractor implements UserInfoExtractor {
     if (babaUser == null) {
       return null;
     }
+    if (babaUser.isClient) {
+      return babaUser.username + "(API Client)";
+    }
     BabaContactDetails babaContactDetails = babaUser.contactDetails;
     return babaContactDetails.firstName + " " + babaContactDetails.lastName;
   }
@@ -54,7 +57,10 @@ public class RemoteBabaUserInfoExtractor implements UserInfoExtractor {
     if (babaUser == null) {
       return null;
     }
-    return getBabaUser().username;
+    if (babaUser.isClient) {
+      return babaUser.username + "(API Client)";
+    }
+    return babaUser.username;
   }
 
   private BabaUser getBabaUser() {
