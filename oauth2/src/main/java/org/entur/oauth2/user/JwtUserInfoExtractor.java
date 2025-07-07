@@ -1,5 +1,6 @@
 package org.entur.oauth2.user;
 
+import javax.annotation.Nullable;
 import org.rutebanken.helper.organisation.user.UserInfoExtractor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,11 +18,13 @@ public class JwtUserInfoExtractor implements UserInfoExtractor {
     "https://ror.entur.io/preferred_username";
 
   @Override
+  @Nullable
   public String getPreferredName() {
     return getClaim(CLAIM_ROR_PREFERRED_NAME);
   }
 
   @Override
+  @Nullable
   public String getPreferredUsername() {
     return getClaim(CLAIM_ROR_PREFERRED_USERNAME);
   }
@@ -30,9 +33,12 @@ public class JwtUserInfoExtractor implements UserInfoExtractor {
     Authentication auth = SecurityContextHolder
       .getContext()
       .getAuthentication();
-    JwtAuthenticationToken jwtAuthenticationToken =
-      (JwtAuthenticationToken) auth;
-    Jwt jwt = (Jwt) jwtAuthenticationToken.getPrincipal();
-    return jwt.getClaimAsString(claim);
+
+    if (auth instanceof JwtAuthenticationToken jwtAuthenticationToken) {
+      Jwt jwt = (Jwt) jwtAuthenticationToken.getPrincipal();
+      return jwt.getClaimAsString(claim);
+    } else {
+      return null;
+    }
   }
 }

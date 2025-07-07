@@ -3,6 +3,7 @@ package org.entur.ror.permission;
 import java.time.Duration;
 import java.util.List;
 import java.util.function.Predicate;
+import javax.annotation.Nullable;
 import org.rutebanken.helper.organisation.user.UserInfoExtractor;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
@@ -36,13 +37,23 @@ public class RemoteBabaUserInfoExtractor implements UserInfoExtractor {
   }
 
   @Override
+  @Nullable
   public String getPreferredName() {
-    BabaContactDetails babaContactDetails = getBabaUser().contactDetails;
+    BabaUser babaUser = getBabaUser();
+    if (babaUser == null) {
+      return null;
+    }
+    BabaContactDetails babaContactDetails = babaUser.contactDetails;
     return babaContactDetails.firstName + " " + babaContactDetails.lastName;
   }
 
   @Override
+  @Nullable
   public String getPreferredUsername() {
+    BabaUser babaUser = getBabaUser();
+    if (babaUser == null) {
+      return null;
+    }
     return getBabaUser().username;
   }
 
@@ -53,7 +64,7 @@ public class RemoteBabaUserInfoExtractor implements UserInfoExtractor {
     if (
       !(authentication instanceof JwtAuthenticationToken jwtAuthenticationToken)
     ) {
-      throw new AccessDeniedException("Not authenticated with token");
+      return null;
     }
 
     AuthenticatedUser authenticatedUser = AuthenticatedUser.of(
