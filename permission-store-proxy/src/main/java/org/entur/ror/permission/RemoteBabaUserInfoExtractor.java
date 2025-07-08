@@ -6,7 +6,6 @@ import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import org.rutebanken.helper.organisation.user.UserInfoExtractor;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -44,7 +43,7 @@ public class RemoteBabaUserInfoExtractor implements UserInfoExtractor {
       return null;
     }
     if (babaUser.isClient) {
-      return babaUser.username + "(API Client)";
+      return babaUser.username + " (API Client)";
     }
     BabaContactDetails babaContactDetails = babaUser.contactDetails;
     return babaContactDetails.firstName + " " + babaContactDetails.lastName;
@@ -58,7 +57,7 @@ public class RemoteBabaUserInfoExtractor implements UserInfoExtractor {
       return null;
     }
     if (babaUser.isClient) {
-      return babaUser.username + "(API Client)";
+      return babaUser.username + " (API Client)";
     }
     return babaUser.username;
   }
