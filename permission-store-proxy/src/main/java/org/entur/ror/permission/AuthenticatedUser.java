@@ -1,6 +1,7 @@
 package org.entur.ror.permission;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
@@ -45,23 +46,23 @@ public final class AuthenticatedUser {
       )
       .orElse("");
 
-    return new AuthenticatedUser(
-      subject,
-      organisationId,
-      permissions,
-      issuer,
-      username
-    );
+    return new AuthenticatedUserBuilder()
+      .withSubject(subject)
+      .withOrganisationId(organisationId)
+      .withPermissions(permissions)
+      .withIssuer(issuer)
+      .withUsername(username)
+      .build();
   }
 
   public static AuthenticatedUser ofDTO(AuthenticatedUserDTO dto) {
-    return new AuthenticatedUser(
-      dto.subject,
-      dto.organisationId,
-      dto.permissions,
-      dto.issuer,
-      dto.username
-    );
+    return new AuthenticatedUserBuilder()
+      .withSubject(dto.subject)
+      .withOrganisationId(dto.organisationId)
+      .withPermissions(dto.permissions)
+      .withIssuer(dto.issuer)
+      .withUsername(dto.username)
+      .build();
   }
 
   AuthenticatedUser(
@@ -71,7 +72,7 @@ public final class AuthenticatedUser {
     String issuer,
     String username
   ) {
-    this.subject = subject;
+    this.subject = Objects.requireNonNull(subject);
     this.organisationId = organisationId;
     this.permissions = permissions;
     this.issuer = issuer;
@@ -148,4 +149,48 @@ public final class AuthenticatedUser {
     String issuer,
     String username
   ) {}
+
+  public static class AuthenticatedUserBuilder {
+
+    private String subject;
+    private long organisationId;
+    private List<String> permissions = List.of();
+    private String issuer;
+    private String username;
+
+    public AuthenticatedUserBuilder withSubject(String subject) {
+      this.subject = subject;
+      return this;
+    }
+
+    public AuthenticatedUserBuilder withOrganisationId(long organisationId) {
+      this.organisationId = organisationId;
+      return this;
+    }
+
+    public AuthenticatedUserBuilder withPermissions(List<String> permissions) {
+      this.permissions = permissions;
+      return this;
+    }
+
+    public AuthenticatedUserBuilder withIssuer(String issuer) {
+      this.issuer = issuer;
+      return this;
+    }
+
+    public AuthenticatedUserBuilder withUsername(String username) {
+      this.username = username;
+      return this;
+    }
+
+    public AuthenticatedUser build() {
+      return new AuthenticatedUser(
+        subject,
+        organisationId,
+        permissions,
+        issuer,
+        username
+      );
+    }
+  }
 }
