@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.util.StringUtils;
 
 /**
  * An authenticated OAuth2 user, identified by an OAuth2 "sub" claim in a JWT token.
@@ -11,11 +12,12 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
  */
 public final class AuthenticatedUser {
 
-  private static final String ENTUR_CLAIM_ORGANISATION_ID =
-    "https://entur.io/organisationID";
-  private static final String OAUTH2_CLAIM_PERMISSIONS = "permissions";
+  public static final long UNKNOWN_ORGANISATION = -1L;
 
-  private static final String ROR_CLAIM_PREFERRED_USERNAME =
+  static final String ENTUR_CLAIM_ORGANISATION_ID =
+    "https://entur.io/organisationID";
+  static final String OAUTH2_CLAIM_PERMISSIONS = "permissions";
+  static final String ROR_CLAIM_PREFERRED_USERNAME =
     "https://ror.entur.io/preferred_username";
 
   private final String subject;
@@ -25,34 +27,34 @@ public final class AuthenticatedUser {
   private final String username;
 
   public static AuthenticatedUser of(JwtAuthenticationToken authentication) {
-    String subject = authentication.getToken().getSubject();
-    String issuer = authentication.getToken().getIssuer().toString();
+    AuthenticatedUserBuilder authenticatedUserBuilder =
+      new AuthenticatedUserBuilder();
+    authenticatedUserBuilder.withSubject(
+      authentication.getToken().getSubject()
+    );
+    authenticatedUserBuilder.withIssuer(
+      authentication.getToken().getIssuer().toString()
+    );
 
-    long organisationId = (long) Optional
+    Optional
       .ofNullable(
         authentication.getToken().getClaim(ENTUR_CLAIM_ORGANISATION_ID)
       )
-      .orElse(-1L);
+      .ifPresent(id -> authenticatedUserBuilder.withOrganisationId((Long) id));
 
-    List<String> permissions = Optional
+    Optional
       .ofNullable(
         authentication.getToken().getClaimAsStringList(OAUTH2_CLAIM_PERMISSIONS)
       )
-      .orElse(List.of());
+      .ifPresent(authenticatedUserBuilder::withPermissions);
 
-    String username = Optional
+    Optional
       .ofNullable(
         authentication.getToken().getClaimAsString(ROR_CLAIM_PREFERRED_USERNAME)
       )
-      .orElse("");
+      .ifPresent(authenticatedUserBuilder::withUsername);
 
-    return new AuthenticatedUserBuilder()
-      .withSubject(subject)
-      .withOrganisationId(organisationId)
-      .withPermissions(permissions)
-      .withIssuer(issuer)
-      .withUsername(username)
-      .build();
+    return authenticatedUserBuilder.build();
   }
 
   public static AuthenticatedUser ofDTO(AuthenticatedUserDTO dto) {
@@ -73,10 +75,22 @@ public final class AuthenticatedUser {
     String username
   ) {
     this.subject = Objects.requireNonNull(subject);
+    this.issuer = Objects.requireNonNull(issuer);
     this.organisationId = organisationId;
     this.permissions = permissions;
-    this.issuer = issuer;
     this.username = username;
+    if (
+      (isPartner() || isInternal()) && organisationId == UNKNOWN_ORGANISATION
+    ) {
+      throw new IllegalArgumentException(
+        "Missing organisation ID for Entur Partner/Internal user " + subject
+      );
+    }
+    if (isRor() && !StringUtils.hasText(username)) {
+      throw new IllegalArgumentException(
+        "Missing username for RoR user " + subject
+      );
+    }
   }
 
   public String subject() {
@@ -139,6 +153,27 @@ public final class AuthenticatedUser {
     );
   }
 
+  @Override
+  public String toString() {
+    return (
+      "AuthenticatedUser{" +
+      "subject='" +
+      subject +
+      '\'' +
+      ", organisationId=" +
+      organisationId +
+      ", permissions=" +
+      permissions +
+      ", issuer='" +
+      issuer +
+      '\'' +
+      ", username='" +
+      username +
+      '\'' +
+      '}'
+    );
+  }
+
   /**
    * A lightweight representation of the authenticated user, to be used for JSON serialization/deserialization.
    */
@@ -153,10 +188,10 @@ public final class AuthenticatedUser {
   public static class AuthenticatedUserBuilder {
 
     private String subject;
-    private long organisationId;
-    private List<String> permissions = List.of();
     private String issuer;
-    private String username;
+    private long organisationId = UNKNOWN_ORGANISATION;
+    private List<String> permissions = List.of();
+    private String username = "";
 
     public AuthenticatedUserBuilder withSubject(String subject) {
       this.subject = subject;
