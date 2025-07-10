@@ -6,9 +6,11 @@ import java.util.function.Predicate;
 import org.rutebanken.helper.organisation.RoleAssignment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 
 /**
@@ -51,6 +53,30 @@ public class RemoteBabaRoleAssignmentExtractor
       .contentType(MediaType.APPLICATION_JSON)
       .bodyValue(authenticatedUser.toDTO())
       .retrieve()
+      // TODO Permission Store migration: for debugging only, to be removed.
+      .onStatus(
+        HttpStatusCode::is4xxClientError,
+        clientResponse ->
+          clientResponse
+            .bodyToMono(String.class)
+            .flatMap(errorBody -> {
+              LOGGER.warn(
+                "Received HTTP status '{}' for /userRoleAssignments and payload '{}'. Error message: {}",
+                clientResponse.statusCode(),
+                authenticatedUser.toDTO(),
+                errorBody
+              );
+              return Mono.error(
+                new WebClientResponseException(
+                  clientResponse.statusCode().value(),
+                  "Bad Request",
+                  clientResponse.headers().asHttpHeaders(),
+                  errorBody.getBytes(),
+                  null
+                )
+              );
+            })
+      )
       .bodyToFlux(RoleAssignment.class)
       .retryWhen(
         Retry.backoff(MAX_RETRY_ATTEMPTS, Duration.ofSeconds(1)).filter(is5xx)
