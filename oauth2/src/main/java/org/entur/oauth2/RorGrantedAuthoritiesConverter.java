@@ -40,7 +40,7 @@ class RorGrantedAuthoritiesConverter
       roles instanceof Collection rolesAsCollection &&
       rolesAsCollection.stream().allMatch(String.class::isInstance)
     ) {
-      return (Collection<String>) rolesAsCollection;
+      return rolesAsCollection;
     } else {
       throw new IllegalArgumentException("Unknown format for claim " + roles);
     }

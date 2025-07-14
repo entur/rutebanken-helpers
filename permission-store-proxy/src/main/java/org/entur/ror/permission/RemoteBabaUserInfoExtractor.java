@@ -18,9 +18,6 @@ import reactor.util.retry.Retry;
  */
 public class RemoteBabaUserInfoExtractor implements UserInfoExtractor {
 
-  private static final String CLAIM_ROR_PREFERRED_USERNAME =
-    "https://ror.entur.io/preferred_username";
-
   private static final Predicate<Throwable> is5xx = throwable ->
     throwable instanceof WebClientResponseException webClientResponseException &&
     webClientResponseException.getStatusCode().is5xxServerError();
