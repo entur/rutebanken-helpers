@@ -1,44 +1,10 @@
 package org.entur.oauth2.user;
 
-import javax.annotation.Nullable;
-import org.rutebanken.helper.organisation.user.UserInfoExtractor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-
 /**
  * Retrieve user information from the JWT token.
+ * User details are extracted from Entur-custom claims (non-standard claims).
+ * @deprecated Use {@link EnturJwtUserInfoExtractor} to use Entur-custom claims or {@link DefaultJwtUserInfoExtractor}
+ * to use standard OIDC claims.
  */
-public class JwtUserInfoExtractor implements UserInfoExtractor {
-
-  private static final String CLAIM_ROR_PREFERRED_NAME =
-    "https://ror.entur.io/preferred_name";
-  private static final String CLAIM_ROR_PREFERRED_USERNAME =
-    "https://ror.entur.io/preferred_username";
-
-  @Override
-  @Nullable
-  public String getPreferredName() {
-    return getClaim(CLAIM_ROR_PREFERRED_NAME);
-  }
-
-  @Override
-  @Nullable
-  public String getPreferredUsername() {
-    return getClaim(CLAIM_ROR_PREFERRED_USERNAME);
-  }
-
-  private String getClaim(String claim) {
-    Authentication auth = SecurityContextHolder
-      .getContext()
-      .getAuthentication();
-
-    if (auth instanceof JwtAuthenticationToken jwtAuthenticationToken) {
-      Jwt jwt = (Jwt) jwtAuthenticationToken.getPrincipal();
-      return jwt.getClaimAsString(claim);
-    } else {
-      return null;
-    }
-  }
-}
+@Deprecated
+public class JwtUserInfoExtractor extends EnturJwtUserInfoExtractor {}
