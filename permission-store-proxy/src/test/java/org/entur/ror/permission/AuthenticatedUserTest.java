@@ -12,12 +12,12 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 
 class AuthenticatedUserTest {
 
-  public static final String ROR_SUBJECT = "rorSubject";
-  public static final String ROR_ISSUER = "https://auth2.entur.org/";
-  public static final String ROR_USERNAME = "rorUsername";
-  public static final String PARTNER_SUBJECT = "partnerSubject";
-  public static final String PARTNER_ISSUER = "https://partner.entur.org/";
-  public static final long PARTNER_ORG = 1L;
+  private static final String ROR_SUBJECT = "rorSubject";
+  private static final String ROR_ISSUER = "https://auth2.entur.org/";
+  private static final String ROR_USERNAME = "rorUsername";
+  private static final String PARTNER_SUBJECT = "partnerSubject";
+  private static final String PARTNER_ISSUER = "https://partner.entur.org/";
+  private static final long PARTNER_ORG = 1L;
 
   @Test
   void testValidRorUser() {
