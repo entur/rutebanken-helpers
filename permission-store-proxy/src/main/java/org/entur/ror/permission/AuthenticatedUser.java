@@ -74,8 +74,8 @@ public final class AuthenticatedUser {
     String issuer,
     String username
   ) {
-    this.subject = Objects.requireNonNull(subject);
-    this.issuer = Objects.requireNonNull(issuer);
+    this.subject = Objects.requireNonNull(subject, "Missing subject");
+    this.issuer = Objects.requireNonNull(issuer, "Missing issuer");
     this.organisationId = organisationId;
     this.permissions = permissions;
     this.username = username;
