@@ -51,10 +51,19 @@ public final class AuthorizationConstants {
 
   /**
    * Viewer rights for NeTEx Blocks for a single provider.
+   * @deprecated Use ROLE_NETEX_PRIVATE_DATA_VIEW
    */
-
+  @Deprecated
   public static final String ROLE_NETEX_BLOCKS_DATA_VIEW =
     "viewNetexBlocksData";
+
+  /**
+   * Viewer rights for private NeTEx data for a single provider.
+   * This includes viewing blocks, dead runs, private ServiceJourneys, raw NeTEx file.
+   */
+
+  public static final String ROLE_NETEX_PRIVATE_DATA_VIEW =
+    "viewPrivateNetexData";
 
   public static final String ENTITY_CLASSIFIER_ALL_TYPES = "*";
   public static final String ENTITY_TYPE = "EntityType";
