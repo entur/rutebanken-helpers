@@ -109,6 +109,11 @@ public class DefaultAuthorizationService<T> implements AuthorizationService<T> {
         ) ||
         matchProviderRole(
           roleAssignment,
+          ROLE_NETEX_PRIVATE_DATA_VIEW,
+          providerOrganisation
+        ) ||
+        matchProviderRole(
+          roleAssignment,
           ROLE_ROUTE_DATA_EDIT,
           providerOrganisation
         )
