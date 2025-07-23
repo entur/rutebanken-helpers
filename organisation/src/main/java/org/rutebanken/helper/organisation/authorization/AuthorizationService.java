@@ -37,6 +37,8 @@ public interface AuthorizationService<T> {
     }
   }
 
+  boolean canViewAllOrganisationData();
+
   /**
    * Whether the current user can view route data belonging to a given provider.
    * @param providerId The internal code of the provider.

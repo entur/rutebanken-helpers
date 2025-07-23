@@ -87,6 +87,43 @@ class DefaultAuthorizationServiceTest {
     assertEquals(isAuthorized, authorizationService.isOrganisationAdmin());
   }
 
+  static Stream<Arguments> testCasesVerifyOrganisationDataViewerPrivileges() {
+    return Stream.of(
+      Arguments.of(
+        AuthorizationConstants.ROLE_ORGANISATION_EDIT,
+        CODESPACE_RB,
+        true
+      ),
+      Arguments.of(
+        AuthorizationConstants.ROLE_ORGANISATION_DATA_VIEW_ALL,
+        CODESPACE_RB,
+        false
+      ),
+      Arguments.of(
+        AuthorizationConstants.ROLE_ROUTE_DATA_EDIT,
+        CODESPACE_RUT,
+        false
+      )
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("testCasesVerifyOrganisationAdministratorPrivileges")
+  void testVerifyOrganisationDataViewerPrivileges(
+    String role,
+    String organisation,
+    boolean isAuthorized
+  ) {
+    List<RoleAssignment> roleAssignments = roleAssignments(role, organisation);
+    AuthorizationService<Long> authorizationService = authorizationService(
+      roleAssignments
+    );
+    assertEquals(
+      isAuthorized,
+      authorizationService.canViewAllOrganisationData()
+    );
+  }
+
   static Stream<Arguments> testCasesVerifyRouteDataEditorPrivileges() {
     return Stream.of(
       Arguments.of(
