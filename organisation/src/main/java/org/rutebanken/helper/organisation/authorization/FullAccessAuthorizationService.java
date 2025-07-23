@@ -18,6 +18,11 @@ public class FullAccessAuthorizationService
   }
 
   @Override
+  public boolean canViewAllOrganisationData() {
+    return true;
+  }
+
+  @Override
   public boolean canViewRouteData(Long providerId) {
     return true;
   }

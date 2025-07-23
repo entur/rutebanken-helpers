@@ -2,6 +2,7 @@ package org.rutebanken.helper.organisation.authorization;
 
 import static org.rutebanken.helper.organisation.AuthorizationConstants.*;
 
+import java.util.Arrays;
 import java.util.function.Function;
 import org.rutebanken.helper.organisation.RoleAssignment;
 import org.rutebanken.helper.organisation.RoleAssignmentExtractor;
@@ -50,6 +51,14 @@ public class DefaultAuthorizationService<T> implements AuthorizationService<T> {
   public boolean isOrganisationAdmin() {
     // ROLE_ORGANISATION_EDIT provides admin privilege on all organisations
     return isAdminFor(ROLE_ORGANISATION_EDIT);
+  }
+
+  @Override
+  public boolean canViewAllOrganisationData() {
+    return isAdminForAny(
+      ROLE_ORGANISATION_EDIT,
+      ROLE_ORGANISATION_DATA_VIEW_ALL
+    );
   }
 
   @Override
@@ -135,6 +144,17 @@ public class DefaultAuthorizationService<T> implements AuthorizationService<T> {
       .getRoleAssignmentsForUser()
       .stream()
       .anyMatch(roleAssignment -> matchAdminRole(roleAssignment, role));
+  }
+
+  private boolean isAdminForAny(String... roles) {
+    return roleAssignmentExtractor
+      .getRoleAssignmentsForUser()
+      .stream()
+      .anyMatch(roleAssignment ->
+        Arrays
+          .stream(roles)
+          .anyMatch(role -> matchAdminRole(roleAssignment, role))
+      );
   }
 
   /**
