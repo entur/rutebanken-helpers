@@ -16,14 +16,27 @@ public final class AuthenticatedUser {
 
   static final String ENTUR_CLAIM_ORGANISATION_ID =
     "https://entur.io/organisationID";
+  /**
+   * TODO Permission store migration: Obsolete, to be removed after migration.
+   */
   static final String OAUTH2_CLAIM_PERMISSIONS = "permissions";
+  /**
+   * TODO Permission store migration: Obsolete, to be removed after migration.
+   */
   static final String ROR_CLAIM_PREFERRED_USERNAME =
     "https://ror.entur.io/preferred_username";
 
   private final String subject;
   private final long organisationId;
+  /**
+   * TODO Permission store migration: Obsolete, to be removed after migration.
+   */
   private final List<String> permissions;
   private final String issuer;
+
+  /**
+   * TODO Permission store migration: Obsolete, to be removed after migration.
+   */
   private final String username;
 
   public static AuthenticatedUser of(JwtAuthenticationToken authentication) {
@@ -133,6 +146,9 @@ public final class AuthenticatedUser {
       .contains(issuer);
   }
 
+  /**
+   * TODO Permission store migration: Obsolete, to be removed after migration.
+   */
   public boolean isRor() {
     return List
       .of(
@@ -172,6 +188,24 @@ public final class AuthenticatedUser {
       '\'' +
       '}'
     );
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o == null || getClass() != o.getClass()) return false;
+    AuthenticatedUser that = (AuthenticatedUser) o;
+    return (
+      organisationId == that.organisationId &&
+      Objects.equals(subject, that.subject) &&
+      Objects.equals(permissions, that.permissions) &&
+      Objects.equals(issuer, that.issuer) &&
+      Objects.equals(username, that.username)
+    );
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(subject, organisationId, permissions, issuer, username);
   }
 
   /**
