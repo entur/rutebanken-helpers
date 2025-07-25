@@ -1,5 +1,7 @@
 package org.entur.ror.permission;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import java.time.Duration;
 import java.util.List;
 import java.util.function.Predicate;
@@ -24,6 +26,7 @@ public class RemoteBabaRoleAssignmentExtractor
   );
 
   private static final long MAX_RETRY_ATTEMPTS = 3;
+  private static final Duration CACHE_TTL = Duration.ofSeconds(10);
 
   private final WebClient webClient;
   private final String uri;
@@ -31,18 +34,37 @@ public class RemoteBabaRoleAssignmentExtractor
   private static final Predicate<Throwable> is5xx = throwable ->
     throwable instanceof WebClientResponseException webClientResponseException &&
     webClientResponseException.getStatusCode().is5xxServerError();
+  private final Cache<AuthenticatedUser, List<RoleAssignment>> roleAssignmentCache;
 
   /**
+   * Implementation of {@link org.rutebanken.helper.organisation.RoleAssignmentExtractor} that retrieves
+   * role assignments by calling the organisation API (baba).
+   * Calls to the API happen often in burst, for example because an application page is refreshed and multiple API
+   * calls are sent at once, or because a @{@link org.springframework.security.access.prepost.PostFilter}
+   * operation tests sequentially every element in a collection.
+   * To reduce the load, this implementation makes use of a short-lived cache (10s)
+   *
    * @param webclient an authorized web client that has access to the user API.
    * @param uri       the URI to the REST service.
    */
   public RemoteBabaRoleAssignmentExtractor(WebClient webclient, String uri) {
     this.webClient = webclient;
     this.uri = uri;
+    roleAssignmentCache =
+      Caffeine.newBuilder().expireAfterWrite(CACHE_TTL).build();
   }
 
   @Override
   protected List<RoleAssignment> userRoleAssignments(
+    AuthenticatedUser authenticatedUser
+  ) {
+    return roleAssignmentCache.get(
+      authenticatedUser,
+      this::retrieveRoleAssignments
+    );
+  }
+
+  private List<RoleAssignment> retrieveRoleAssignments(
     AuthenticatedUser authenticatedUser
   ) {
     long t1 = System.currentTimeMillis();
