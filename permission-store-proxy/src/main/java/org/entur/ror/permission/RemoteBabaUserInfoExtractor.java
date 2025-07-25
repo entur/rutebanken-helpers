@@ -1,5 +1,7 @@
 package org.entur.ror.permission;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import java.time.Duration;
 import java.util.List;
 import java.util.function.Predicate;
@@ -15,6 +17,9 @@ import reactor.util.retry.Retry;
 
 /**
  * UserInfoExtractor that extracts user information from the Baba user repository.
+ * Calls to the API happen often in burst, for example because an application page is refreshed and multiple API
+ * calls are sent at once.
+ * To reduce the load, this implementation makes use of a short-lived cache (10s)
  */
 public class RemoteBabaUserInfoExtractor implements UserInfoExtractor {
 
@@ -23,13 +28,16 @@ public class RemoteBabaUserInfoExtractor implements UserInfoExtractor {
     webClientResponseException.getStatusCode().is5xxServerError();
 
   private static final long MAX_RETRY_ATTEMPTS = 3;
+  private static final Duration CACHE_TTL = Duration.ofSeconds(10);
 
   private final WebClient webClient;
   private final String uri;
+  private final Cache<AuthenticatedUser, BabaUser> babaUserCache;
 
   public RemoteBabaUserInfoExtractor(WebClient webClient, String uri) {
     this.webClient = webClient;
     this.uri = uri;
+    babaUserCache = Caffeine.newBuilder().expireAfterWrite(CACHE_TTL).build();
   }
 
   @Override
@@ -73,6 +81,10 @@ public class RemoteBabaUserInfoExtractor implements UserInfoExtractor {
       jwtAuthenticationToken
     );
 
+    return babaUserCache.get(authenticatedUser, this::getBabaUser);
+  }
+
+  private BabaUser getBabaUser(AuthenticatedUser authenticatedUser) {
     List<BabaUser> users = webClient
       .post()
       .uri(uri, uriBuilder -> uriBuilder.path("/authenticatedUser").build())
