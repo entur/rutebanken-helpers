@@ -1,0 +1,39 @@
+{
+    "type":"record",
+    "name":"StopPlaceChangelogEvent",
+    "namespace":"org.rutebanken.irkalla.avro",
+    "doc": "Event sent when a stop place is created,updated,deactivated or deleted",
+    "fields": [
+        {
+            "name":"stopPlaceId",
+            "type":"string",
+            "doc":"StopPlace netex id"
+        },
+        {
+            "name":"stopPlaceVersion",
+            "type":"long",
+            "doc":"StopPlace version"
+        },
+        {
+            "name": "stopPlaceChanged",
+            "type": [
+                "null",
+                {
+                    "type" : "long",
+                    "logicalType" : "timestamp-millis"
+                }
+            ],
+            "default": null,
+            "doc": "Epoch timestamp (milliseconds) when the change happened"
+        },
+        {
+            "name":"eventType",
+            "doc":"Stop place change types,  REMOVE is used when stop places is deactivated and DELETED is used when stop place is terminated ",
+            "type": {
+                "name": "EnumType",
+                "type": "enum",
+                "symbols": ["CREATE", "UPDATE", "REMOVE", "DELETE"]
+            }
+        }
+    ]
+}
