@@ -1,4 +1,4 @@
-package org.rutebanken.helper.stopplace.changelog.kafka;
+package org.rutebanken.helper.stopplace.changelog.config;
 
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
@@ -9,6 +9,8 @@ import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.rutebanken.helper.stopplace.changelog.kafka.PartitionFinder;
+import org.rutebanken.helper.stopplace.changelog.kafka.PublicationTimeRecordFilterStrategy;
 import org.rutebanken.irkalla.avro.StopPlaceChangelogEvent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -20,7 +22,7 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.adapter.RecordFilterStrategy;
 
 @Configuration
-public class KafkaStopPlaceChangelogConfiguration {
+public class KafkaConfiguration {
 
   @Value(
     "${org.rutebanken.helper.stopplace.changelog.kafka.bootstrap-servers:}"

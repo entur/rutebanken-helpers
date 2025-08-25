@@ -1,88 +1,104 @@
 package org.rutebanken.helper.stopplace.changelog.repository;
 
-import java.io.IOException;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.Map;
-import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-@Component
+/**
+ * Repository for fetching stop place data from the remote API.
+ *
+ * <p>This repository uses Spring's WebClient to fetch stop place data in NeTEx format
+ * from the configured repository URL. The data is fetched synchronously and returned
+ * as an InputStream for processing.</p>
+ *
+ * @see StopPlaceFetchException
+ * @since 5.41.0
+ * @author Entur
+ */
+@Component("stopPlaceChangelogStopPlaceRepository")
 public class StopPlaceRepository {
 
   private static final Logger logger = LoggerFactory.getLogger(
     StopPlaceRepository.class
   );
-  private final RestTemplate tiamatClient;
-  private final String tiamatUrl;
+
+  private final WebClient webClient;
 
   @Autowired
   public StopPlaceRepository(
-    RestTemplate tiamatClient,
+    WebClient webClient,
     @Value(
       "${org.rutebanken.helper.stopplace.changelog.repository.url:}"
     ) String tiamatUrl
   ) {
-    this.tiamatClient = tiamatClient;
-    this.tiamatUrl = tiamatUrl;
+    this.webClient = webClient.mutate().baseUrl(tiamatUrl).build();
   }
 
+  /**
+   * Fetches stop place data for the given stop place ID.
+   *
+   * <p>This method retrieves the complete NeTEx representation of a stop place,
+   * including all versions and relevant related entities (topographic places,
+   * tariff zones, fare zones, etc.).</p>
+   *
+   * @param stopPlaceId the NeTEx ID of the stop place to fetch
+   * @return an InputStream containing the NeTEx XML data
+   * @throws StopPlaceFetchException if the stop place cannot be fetched
+   */
   public InputStream getStopPlaceUpdate(String stopPlaceId) {
-    String stopPlaceUrl = UriComponentsBuilder
-      .fromHttpUrl(tiamatUrl + "/netex")
-      .queryParam("idList", "{idList}")
-      .queryParam("topographicPlaceExportMode", "{topographicPlaceExportMode}")
-      .queryParam("tariffZoneExportMode", "{tariffZoneExportMode}")
-      .queryParam(
-        "groupOfTariffZonesExportMode",
-        "{groupOfTariffZonesExportMode}"
-      )
-      .queryParam("fareZoneExportMode", "{fareZoneExportMode}")
-      .queryParam(
-        "groupOfStopPlacesExportMode",
-        "{groupOfStopPlacesExportMode}"
-      )
-      .queryParam("allVersions", "{allVersions}")
-      .queryParam("size", "{size}")
-      .encode()
-      .toUriString();
+    logger.debug("Fetching stop place update for ID: {}", stopPlaceId);
 
     try {
-      var response = tiamatClient.exchange(
-        stopPlaceUrl,
-        HttpMethod.GET,
-        null,
-        Resource.class,
-        Map.of(
-          "idList",
-          stopPlaceId,
-          "topographicPlaceExportMode",
-          "RELEVANT",
-          "tariffZoneExportMode",
-          "RELEVANT",
-          "groupOfTariffZonesExportMode",
-          "RELEVANT",
-          "fareZoneExportMode",
-          "RELEVANT",
-          "groupOfStopPlacesExportMode",
-          "RELEVANT",
-          "allVersions",
-          true,
-          "size",
-          Integer.MAX_VALUE
+      byte[] responseBytes = webClient
+        .get()
+        .uri(uriBuilder ->
+          uriBuilder
+            .path("/netex")
+            .queryParam("idList", stopPlaceId)
+            .queryParam("topographicPlaceExportMode", "RELEVANT")
+            .queryParam("tariffZoneExportMode", "RELEVANT")
+            .queryParam("groupOfTariffZonesExportMode", "RELEVANT")
+            .queryParam("fareZoneExportMode", "RELEVANT")
+            .queryParam("groupOfStopPlacesExportMode", "RELEVANT")
+            .queryParam("allVersions", true)
+            .queryParam("size", Integer.MAX_VALUE)
+            .build()
         )
+        .retrieve()
+        .bodyToMono(byte[].class)
+        .block(); // Synchronous call for backward compatibility
+
+      if (responseBytes == null || responseBytes.length == 0) {
+        throw new StopPlaceFetchException(
+          stopPlaceId,
+          new IllegalStateException("Empty response from repository")
+        );
+      }
+
+      logger.debug(
+        "Successfully fetched stop place {} ({} bytes)",
+        stopPlaceId,
+        responseBytes.length
       );
-      return Objects.requireNonNull(response.getBody()).getInputStream();
-    } catch (RestClientException | IOException exception) {
-      throw new StopPlaceFetchException(stopPlaceId, exception);
+
+      return new ByteArrayInputStream(responseBytes);
+    } catch (WebClientResponseException e) {
+      logger.error(
+        "HTTP error fetching stop place {}: {} - {}",
+        stopPlaceId,
+        e.getStatusCode(),
+        e.getResponseBodyAsString()
+      );
+      throw new StopPlaceFetchException(stopPlaceId, e);
+    } catch (Exception e) {
+      logger.error("Error fetching stop place {}", stopPlaceId, e);
+      throw new StopPlaceFetchException(stopPlaceId, e);
     }
   }
 }
