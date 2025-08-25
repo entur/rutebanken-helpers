@@ -9,6 +9,7 @@ import org.rutebanken.helper.stopplace.changelog.StopPlaceChangelogListener;
 import org.rutebanken.helper.stopplace.changelog.repository.StopPlaceRepository;
 import org.rutebanken.irkalla.avro.EnumType;
 import org.rutebanken.irkalla.avro.StopPlaceChangelogEvent;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -33,11 +34,6 @@ public class KafkaStopPlaceChangelog implements StopPlaceChangelog {
     this.stopPlaceRepository = stopPlaceRepository;
   }
 
-  @Bean("publicationTimeRecordFilterStrategy")
-  public RecordFilterStrategy<String, StopPlaceChangelogEvent> recordFilterStrategy() {
-    return new PublicationTimeRecordFilterStrategy(Instant.now());
-  }
-
   @Override
   public void registerStopPlaceChangelogListener(
     StopPlaceChangelogListener listener
@@ -54,8 +50,8 @@ public class KafkaStopPlaceChangelog implements StopPlaceChangelog {
 
   @KafkaListener(
     topicPartitions = @TopicPartition(
-      topic = "${org.rutebanken.helper.stopplace.changelog.kafka.topic:ror-stop-place-changelog-dev}",
-      partitions = "#{@finder.partitions(\"${org.rutebanken.helper.stopplace.changelog.kafka.topic:ror-stop-place-changelog-dev}\")}",
+      topic = "${org.rutebanken.helper.stopplace.changelog.kafka.topic:}",
+      partitions = "#{@finder.partitions(\"${org.rutebanken.helper.stopplace.changelog.kafka.topic:}\")}",
       partitionOffsets = @PartitionOffset(partition = "*", initialOffset = "0")
     ),
     filter = "publicationTimeRecordFilterStrategy"
