@@ -30,6 +30,9 @@ public class StopPlaceRepository {
 
   private final WebClient webClient;
 
+  @Value("${org.rutebanken.helper.stopplace.changelog.repository.allVersions:true}")
+  private boolean allVersions;
+
   @Autowired
   public StopPlaceRepository(
     WebClient webClient,
@@ -66,7 +69,7 @@ public class StopPlaceRepository {
             .queryParam("groupOfTariffZonesExportMode", "RELEVANT")
             .queryParam("fareZoneExportMode", "RELEVANT")
             .queryParam("groupOfStopPlacesExportMode", "RELEVANT")
-            .queryParam("allVersions", true)
+            .queryParam("allVersions", allVersions)
             .queryParam("size", Integer.MAX_VALUE)
             .build()
         )
