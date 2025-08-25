@@ -26,6 +26,9 @@ org.rutebanken.helper.stopplace.changelog.kafka=true
 org.rutebanken.helper.stopplace.changelog.kafka.bootstrap-servers=localhost:9092
 org.rutebanken.helper.stopplace.changelog.kafka.schema-registry-url=http://localhost:8081
 org.rutebanken.helper.stopplace.changelog.kafka.topic=stopplace-changelog
+
+# Stop place repository URL for fetching stop place data
+org.rutebanken.helper.stopplace.changelog.repository.url=https://api.entur.io/stop-places/v1
 ```
 
 ### SASL Authentication (for production environments)

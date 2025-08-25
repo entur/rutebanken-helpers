@@ -28,7 +28,7 @@ public class StopPlaceRepository {
   public StopPlaceRepository(
     RestTemplate tiamatClient,
     @Value(
-      "${no.entur.mummu.tiamat.url:https://api.dev.entur.io/stop-places/v1}"
+      "${org.rutebanken.helper.stopplace.changelog.repository.url:}"
     ) String tiamatUrl
   ) {
     this.tiamatClient = tiamatClient;
