@@ -181,6 +181,27 @@ The library consumes events with the following Avro schema:
 
 ## Advanced Configuration
 
+### Custom WebClient Configuration
+
+The library uses Spring's WebClient for HTTP operations with sensible defaults (60s timeout, 10MB buffer). You can provide your own WebClient bean to customize these settings:
+
+```java
+@Configuration
+public class MyWebClientConfig {
+    
+    @Bean("tiamatWebClient")
+    public WebClient customWebClient(WebClient.Builder builder) {
+        return builder
+            .defaultHeader("User-Agent", "MyApp/1.0")
+            .codecs(configurer -> configurer
+                .defaultCodecs()
+                .maxInMemorySize(20 * 1024 * 1024) // 20MB buffer
+            )
+            .build();
+    }
+}
+```
+
 ### Custom Publication Time Filter
 
 You can provide a custom `PublicationTimeRecordFilterStrategy` bean to filter events based on your specific requirements:
