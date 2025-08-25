@@ -3,8 +3,8 @@ package org.rutebanken.helper.stopplace.changelog;
 import java.io.InputStream;
 
 public interface StopPlaceChangelogListener {
-  void onStopPlaceCreated(String id, InputStream stopPlace);
-  void onStopPlaceUpdated(String id, InputStream stopPlace);
-  void onStopPlaceDeactivated(String id, InputStream stopPlace);
-  void onStopPlaceDeleted(String id);
+  default void onStopPlaceCreated(String id, InputStream stopPlace) {}
+  default void onStopPlaceUpdated(String id, InputStream stopPlace) {}
+  default void onStopPlaceDeactivated(String id, InputStream stopPlace) {}
+  default void onStopPlaceDeleted(String id) {}
 }
