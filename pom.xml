@@ -57,6 +57,7 @@
         <module>entur-google-pubsub</module>
         <module>oauth2</module>
         <module>permission-store-proxy</module>
+        <module>stopplace-changelog</module>
     </modules>
 
     <scm>
