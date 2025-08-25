@@ -48,6 +48,9 @@ public class KafkaStopPlaceChangelog implements StopPlaceChangelog {
   public void unregisterStopPlaceChangelogListener(
     StopPlaceChangelogListener listener
   ) {
+    if (listener == null) {
+      throw new IllegalArgumentException("listener must not be null");
+    }
     listeners.remove(listener);
   }
 
