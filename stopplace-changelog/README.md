@@ -47,6 +47,9 @@ org.rutebanken.helper.stopplace.changelog.kafka.schema-registry-basic-auth-user-
 ```properties
 # Consumer group (if not set, each instance gets a unique group ID)
 org.rutebanken.helper.stopplace.changelog.kafka.group-id=my-consumer-group
+
+# Only get the latest version of StopPlace
+org.rutebanken.helper.stopplace.changelog.repository.allVersions=false
 ```
 
 ## Usage
