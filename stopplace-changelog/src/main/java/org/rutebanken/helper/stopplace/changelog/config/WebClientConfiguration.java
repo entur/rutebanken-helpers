@@ -35,21 +35,22 @@ public class WebClientConfiguration {
    * @return a configured WebClient instance
    */
   @Bean("tiamatWebClient")
-  @ConditionalOnMissingBean
-  public WebClient webClient(WebClient.Builder builder) {
+  @ConditionalOnMissingBean(name = "tiamatWebClient")
+  public WebClient webClient() {
     HttpClient httpClient = HttpClient
       .create()
       .responseTimeout(Duration.ofSeconds(60));
 
-    // Allow larger responses for NeTEx data
+    // Allow larger responses for NeTEx data (30MB)
     ExchangeStrategies exchangeStrategies = ExchangeStrategies
       .builder()
       .codecs(configurer ->
-        configurer.defaultCodecs().maxInMemorySize(10 * 1024 * 1024) // 10MB
+        configurer.defaultCodecs().maxInMemorySize(30 * 1024 * 1024) // 30MB
       )
       .build();
 
-    return builder
+    return WebClient
+      .builder()
       .clientConnector(new ReactorClientHttpConnector(httpClient))
       .exchangeStrategies(exchangeStrategies)
       .build();
