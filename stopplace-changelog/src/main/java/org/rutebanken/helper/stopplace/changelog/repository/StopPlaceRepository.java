@@ -30,7 +30,9 @@ public class StopPlaceRepository {
 
   private final WebClient webClient;
 
-  @Value("${org.rutebanken.helper.stopplace.changelog.repository.allVersions:true}")
+  @Value(
+    "${org.rutebanken.helper.stopplace.changelog.repository.allVersions:true}"
+  )
   private boolean allVersions;
 
   @Autowired
