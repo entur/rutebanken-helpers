@@ -59,8 +59,8 @@ public class KafkaConfiguration {
     return new PublicationTimeRecordFilterStrategy(Instant.now());
   }
 
-  @Bean("finder")
-  @ConditionalOnMissingBean(name = "finder")
+  @Bean("stopPlaceChangelogPartitionFinder")
+  @ConditionalOnMissingBean(name = "stopPlaceChangelogPartitionFinder")
   public PartitionFinder partitionFinder(
     ConsumerFactory<String, ?> consumerFactory
   ) {
