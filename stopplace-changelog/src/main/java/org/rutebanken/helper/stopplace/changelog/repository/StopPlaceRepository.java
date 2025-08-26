@@ -31,20 +31,21 @@ public class StopPlaceRepository {
 
   private final WebClient webClient;
 
-  @Value(
-    "${org.rutebanken.helper.stopplace.changelog.repository.allVersions:false}"
-  )
-  private boolean allVersions;
+  private final boolean allVersions;
 
   @Autowired
   public StopPlaceRepository(
     @Qualifier("tiamatWebClient") WebClient webClient,
     @Value(
       "${org.rutebanken.helper.stopplace.changelog.repository.url:}"
-    ) String tiamatUrl
+    ) String tiamatUrl,
+    @Value(
+      "${org.rutebanken.helper.stopplace.changelog.repository.allVersions:true}"
+    ) boolean allVersions
   ) {
     // Use the provided WebClient with its exchange strategies intact
     this.webClient = webClient.mutate().baseUrl(tiamatUrl).build();
+    this.allVersions = allVersions;
   }
 
   /**
@@ -64,8 +65,8 @@ public class StopPlaceRepository {
     try {
       byte[] responseBytes = webClient
         .get()
-        .uri(uriBuilder ->
-          uriBuilder
+        .uri(uriBuilder -> {
+          var uri = uriBuilder
             .path("/netex")
             .queryParam("idList", stopPlaceId)
             .queryParam("topographicPlaceExportMode", "RELEVANT")
@@ -75,8 +76,11 @@ public class StopPlaceRepository {
             .queryParam("groupOfStopPlacesExportMode", "RELEVANT")
             .queryParam("allVersions", allVersions)
             .queryParam("size", Integer.MAX_VALUE)
-            .build()
-        )
+            .build();
+
+          logger.debug("Making HTTP request to: {}", uri);
+          return uri;
+        })
         .retrieve()
         .bodyToMono(byte[].class)
         .block(); // Synchronous call for backward compatibility
