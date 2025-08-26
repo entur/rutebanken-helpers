@@ -33,6 +33,12 @@ public class StopPlaceRepository {
 
   private final boolean allVersions;
 
+  private final String topographicPlaceExportMode;
+  private final String tariffZoneExportMode;
+  private final String groupOfTariffZonesExportMode;
+  private final String fareZoneExportMode;
+  private final String groupOfStopPlacesExportMode;
+
   @Autowired
   public StopPlaceRepository(
     @Qualifier("tiamatWebClient") WebClient webClient,
@@ -40,12 +46,32 @@ public class StopPlaceRepository {
       "${org.rutebanken.helper.stopplace.changelog.repository.url:}"
     ) String tiamatUrl,
     @Value(
+      "${org.rutebanken.helper.stopplace.changelog.repository.topographicPlaceExportMode:RELEVANT}"
+    ) String topographicPlaceExportMode,
+    @Value(
+      "${org.rutebanken.helper.stopplace.changelog.repository.tariffZoneExportMode:RELEVANT}"
+    ) String tariffZoneExportMode,
+    @Value(
+      "${org.rutebanken.helper.stopplace.changelog.repository.groupOfTariffZonesExportMode:RELEVANT}"
+    ) String groupOfTariffZonesExportMode,
+    @Value(
+      "${org.rutebanken.helper.stopplace.changelog.repository.fareZoneExportMode:RELEVANT}"
+    ) String fareZoneExportMode,
+    @Value(
+      "${org.rutebanken.helper.stopplace.changelog.repository.groupOfStopPlacesExportMode:RELEVANT}"
+    ) String groupOfStopPlacesExportMode,
+    @Value(
       "${org.rutebanken.helper.stopplace.changelog.repository.allVersions:true}"
     ) boolean allVersions
   ) {
     // Use the provided WebClient with its exchange strategies intact
     this.webClient = webClient.mutate().baseUrl(tiamatUrl).build();
     this.allVersions = allVersions;
+    this.topographicPlaceExportMode = topographicPlaceExportMode;
+    this.tariffZoneExportMode = tariffZoneExportMode;
+    this.groupOfTariffZonesExportMode = groupOfTariffZonesExportMode;
+    this.fareZoneExportMode = fareZoneExportMode;
+    this.groupOfStopPlacesExportMode = groupOfStopPlacesExportMode;
   }
 
   /**
@@ -69,11 +95,20 @@ public class StopPlaceRepository {
           var uri = uriBuilder
             .path("/netex")
             .queryParam("idList", stopPlaceId)
-            .queryParam("topographicPlaceExportMode", "RELEVANT")
-            .queryParam("tariffZoneExportMode", "RELEVANT")
-            .queryParam("groupOfTariffZonesExportMode", "RELEVANT")
-            .queryParam("fareZoneExportMode", "RELEVANT")
-            .queryParam("groupOfStopPlacesExportMode", "RELEVANT")
+            .queryParam(
+              "topographicPlaceExportMode",
+              topographicPlaceExportMode
+            )
+            .queryParam("tariffZoneExportMode", tariffZoneExportMode)
+            .queryParam(
+              "groupOfTariffZonesExportMode",
+              groupOfTariffZonesExportMode
+            )
+            .queryParam("fareZoneExportMode", fareZoneExportMode)
+            .queryParam(
+              "groupOfStopPlacesExportMode",
+              groupOfStopPlacesExportMode
+            )
             .queryParam("allVersions", allVersions)
             .queryParam("size", Integer.MAX_VALUE)
             .build();

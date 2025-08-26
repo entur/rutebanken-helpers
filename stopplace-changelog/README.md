@@ -48,9 +48,33 @@ org.rutebanken.helper.stopplace.changelog.kafka.schema-registry-basic-auth-user-
 # Consumer group (if not set, each instance gets a unique group ID)
 org.rutebanken.helper.stopplace.changelog.kafka.group-id=my-consumer-group
 
-# Only get the latest version of StopPlace
+# Fetch all versions or just the latest version of StopPlace (default: true)
 org.rutebanken.helper.stopplace.changelog.repository.allVersions=false
+
+# Control which related entities are exported with the stop place data
+# Possible values for all export modes: ALL, RELEVANT, NONE (default: RELEVANT)
+
+# Topographic places (municipalities, counties, etc.)
+org.rutebanken.helper.stopplace.changelog.repository.topographicPlaceExportMode=RELEVANT
+
+# Tariff zones
+org.rutebanken.helper.stopplace.changelog.repository.tariffZoneExportMode=RELEVANT
+
+# Groups of tariff zones
+org.rutebanken.helper.stopplace.changelog.repository.groupOfTariffZonesExportMode=RELEVANT
+
+# Fare zones
+org.rutebanken.helper.stopplace.changelog.repository.fareZoneExportMode=RELEVANT
+
+# Groups of stop places
+org.rutebanken.helper.stopplace.changelog.repository.groupOfStopPlacesExportMode=RELEVANT
 ```
+
+#### Export Mode Values
+
+- **ALL**: Export all related entities of this type
+- **RELEVANT**: Export only entities directly related to the stop place (default)
+- **NONE**: Do not export entities of this type
 
 ## Usage
 
