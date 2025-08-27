@@ -34,10 +34,10 @@ import reactor.netty.http.client.HttpClient;
 
 @EnableKafka
 @Configuration
-/*@ConditionalOnProperty(
-  name = "org.rutebanken.helper.stopplace.changelog.enabled:false",
+@ConditionalOnProperty(
+  name = "org.rutebanken.helper.stopplace.changelog.enabled",
   havingValue = "true"
-)*/
+)
 public class StopPlaceChangelogConfiguration {
 
   /**
