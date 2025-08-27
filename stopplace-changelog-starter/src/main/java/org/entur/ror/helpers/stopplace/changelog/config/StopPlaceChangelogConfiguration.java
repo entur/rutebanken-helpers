@@ -40,35 +40,6 @@ import reactor.netty.http.client.HttpClient;
 )*/
 public class StopPlaceChangelogConfiguration {
 
-  @Value(
-    "${org.rutebanken.helper.stopplace.changelog.kafka.bootstrap-servers:}"
-  )
-  private String bootstrapServers;
-
-  @Value("${org.rutebanken.helper.stopplace.changelog.kafka.group-id:}")
-  private String groupId;
-
-  @Value(
-    "${org.rutebanken.helper.stopplace.changelog.kafka.schema-registry-url:}"
-  )
-  private String schemaRegistryUrl;
-
-  @Value(
-    "${org.rutebanken.helper.stopplace.changelog.kafka.security-protocol:}"
-  )
-  private String securityProtocol;
-
-  @Value("${org.rutebanken.helper.stopplace.changelog.kafka.sasl-mechanism:}")
-  private String saslMechanism;
-
-  @Value("${org.rutebanken.helper.stopplace.changelog.kafka.sasl-jaas-config:}")
-  private String saslJaasConfig;
-
-  @Value(
-    "${org.rutebanken.helper.stopplace.changelog.kafka.schema-registry-basic-auth-user-info:}"
-  )
-  private String schemaRegistryBasicAuthUserInfo;
-
   /**
    * Creates a default WebClient bean with sensible defaults.
    *
@@ -163,7 +134,29 @@ public class StopPlaceChangelogConfiguration {
 
   @Bean
   @ConditionalOnMissingBean
-  public ConsumerFactory<String, Object> consumerFactory() {
+  public ConsumerFactory<String, Object> consumerFactory(
+    @Value(
+      "${org.rutebanken.helper.stopplace.changelog.kafka.bootstrap-servers:}"
+    ) String bootstrapServers,
+    @Value(
+      "${org.rutebanken.helper.stopplace.changelog.kafka.group-id:}"
+    ) String groupId,
+    @Value(
+      "${org.rutebanken.helper.stopplace.changelog.kafka.schema-registry-url:}"
+    ) String schemaRegistryUrl,
+    @Value(
+      "${org.rutebanken.helper.stopplace.changelog.kafka.security-protocol:}"
+    ) String securityProtocol,
+    @Value(
+      "${org.rutebanken.helper.stopplace.changelog.kafka.sasl-mechanism:}"
+    ) String saslMechanism,
+    @Value(
+      "${org.rutebanken.helper.stopplace.changelog.kafka.sasl-jaas-config:}"
+    ) String saslJaasConfig,
+    @Value(
+      "${org.rutebanken.helper.stopplace.changelog.kafka.schema-registry-basic-auth-user-info:}"
+    ) String schemaRegistryBasicAuthUserInfo
+  ) {
     Map<String, Object> props = new HashMap<>();
     props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
 
