@@ -1,3 +1,1 @@
-org.entur.ror.helpers.stopplace.changelog.config.KafkaConfiguration
-org.entur.ror.helpers.stopplace.changelog.config.StopPlaceRepositoryConfig
-org.entur.ror.helpers.stopplace.changelog.config.TiamatWebClientConfiguration
+org.entur.ror.helpers.stopplace.changelog.config.StopPlaceChangelogConfiguration

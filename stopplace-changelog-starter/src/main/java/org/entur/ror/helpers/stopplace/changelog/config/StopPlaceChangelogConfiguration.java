@@ -2,30 +2,39 @@ package org.entur.ror.helpers.stopplace.changelog.config;
 
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.rutebanken.helper.stopplace.changelog.StopPlaceChangelog;
+import org.rutebanken.helper.stopplace.changelog.kafka.KafkaStopPlaceChangelog;
 import org.rutebanken.helper.stopplace.changelog.kafka.PartitionFinder;
 import org.rutebanken.helper.stopplace.changelog.kafka.PublicationTimeRecordFilterStrategy;
+import org.rutebanken.helper.stopplace.changelog.repository.StopPlaceRepository;
 import org.rutebanken.irkalla.avro.StopPlaceChangelogEvent;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.adapter.RecordFilterStrategy;
-
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
 
 @EnableKafka
 @Configuration
-public class KafkaConfiguration {
+public class StopPlaceChangelogConfiguration {
 
   @Value(
     "${org.rutebanken.helper.stopplace.changelog.kafka.bootstrap-servers:}"
@@ -55,6 +64,84 @@ public class KafkaConfiguration {
     "${org.rutebanken.helper.stopplace.changelog.kafka.schema-registry-basic-auth-user-info:}"
   )
   private String schemaRegistryBasicAuthUserInfo;
+
+  /**
+   * Creates a default WebClient bean with sensible defaults.
+   *
+   * <p>Configuration:
+   * <ul>
+   *   <li>Connection timeout: 30 seconds</li>
+   *   <li>Response timeout: 60 seconds</li>
+   *   <li>Max in-memory buffer: 10MB (for large NeTEx responses)</li>
+   * </ul>
+   *
+   * @return a configured WebClient instance
+   */
+  @Bean("tiamatWebClient")
+  @ConditionalOnMissingBean(name = "tiamatWebClient")
+  public WebClient webClient() {
+    HttpClient httpClient = HttpClient
+      .create()
+      .responseTimeout(Duration.ofSeconds(60));
+
+    // Allow larger responses for NeTEx data (30MB)
+    ExchangeStrategies exchangeStrategies = ExchangeStrategies
+      .builder()
+      .codecs(configurer ->
+        configurer.defaultCodecs().maxInMemorySize(30 * 1024 * 1024) // 30MB
+      )
+      .build();
+
+    return WebClient
+      .builder()
+      .clientConnector(new ReactorClientHttpConnector(httpClient))
+      .exchangeStrategies(exchangeStrategies)
+      .build();
+  }
+
+  @Bean
+  public StopPlaceRepository stopPlaceRepository(
+    @Qualifier("tiamatWebClient") WebClient webClient,
+    @Value(
+      "${org.rutebanken.helper.stopplace.changelog.repository.url:}"
+    ) String tiamatUrl,
+    @Value(
+      "${org.rutebanken.helper.stopplace.changelog.repository.topographicPlaceExportMode:RELEVANT}"
+    ) String topographicPlaceExportMode,
+    @Value(
+      "${org.rutebanken.helper.stopplace.changelog.repository.tariffZoneExportMode:RELEVANT}"
+    ) String tariffZoneExportMode,
+    @Value(
+      "${org.rutebanken.helper.stopplace.changelog.repository.groupOfTariffZonesExportMode:RELEVANT}"
+    ) String groupOfTariffZonesExportMode,
+    @Value(
+      "${org.rutebanken.helper.stopplace.changelog.repository.fareZoneExportMode:RELEVANT}"
+    ) String fareZoneExportMode,
+    @Value(
+      "${org.rutebanken.helper.stopplace.changelog.repository.groupOfStopPlacesExportMode:RELEVANT}"
+    ) String groupOfStopPlacesExportMode,
+    @Value(
+      "${org.rutebanken.helper.stopplace.changelog.repository.allVersions:true}"
+    ) boolean allVersions
+  ) {
+    return new StopPlaceRepository(
+      webClient,
+      tiamatUrl,
+      topographicPlaceExportMode,
+      tariffZoneExportMode,
+      groupOfTariffZonesExportMode,
+      fareZoneExportMode,
+      groupOfStopPlacesExportMode,
+      allVersions
+    );
+  }
+
+  @Bean
+  StopPlaceChangelog stopPlaceChangelog(
+    StopPlaceRepository stopPlaceRepository
+  ) {
+    return new KafkaStopPlaceChangelog(stopPlaceRepository);
+  }
 
   @Bean("publicationTimeRecordFilterStrategy")
   @ConditionalOnMissingBean(name = "publicationTimeRecordFilterStrategy")
