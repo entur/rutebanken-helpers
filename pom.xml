@@ -58,6 +58,7 @@
         <module>oauth2</module>
         <module>permission-store-proxy</module>
         <module>stopplace-changelog</module>
+        <module>stopplace-changelog-starter</module>
     </modules>
 
     <scm>
