@@ -51,7 +51,8 @@ public class KafkaStopPlaceChangelog implements StopPlaceChangelog {
       partitions = "#{@stopPlaceChangelogPartitionFinder.partitions(\"${org.rutebanken.helper.stopplace.changelog.kafka.topic:}\")}",
       partitionOffsets = @PartitionOffset(partition = "*", initialOffset = "0")
     ),
-    filter = "publicationTimeRecordFilterStrategy"
+    filter = "publicationTimeRecordFilterStrategy",
+    containerFactory = "tiamatChangelogListenerContainerFactory"
   )
   public void consume(
     @Payload ConsumerRecord<String, StopPlaceChangelogEvent> message

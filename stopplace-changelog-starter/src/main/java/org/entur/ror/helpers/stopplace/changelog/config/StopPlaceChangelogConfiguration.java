@@ -127,13 +127,13 @@ public class StopPlaceChangelogConfiguration {
   @Bean("stopPlaceChangelogPartitionFinder")
   @ConditionalOnMissingBean(name = "stopPlaceChangelogPartitionFinder")
   public PartitionFinder partitionFinder(
-    ConsumerFactory<String, ?> consumerFactory
+    ConsumerFactory<String, ?> tiamatChangelogConsumerFactory
   ) {
-    return new PartitionFinder(consumerFactory);
+    return new PartitionFinder(tiamatChangelogConsumerFactory);
   }
 
-  @Bean
-  @ConditionalOnMissingBean
+  @Bean("tiamatChangelogConsumerFactory")
+  @ConditionalOnMissingBean(name = "tiamatChangelogConsumerFactory")
   public ConsumerFactory<String, Object> consumerFactory(
     @Value(
       "${org.rutebanken.helper.stopplace.changelog.kafka.bootstrap-servers:}"
@@ -205,14 +205,14 @@ public class StopPlaceChangelogConfiguration {
     return new DefaultKafkaConsumerFactory<>(props);
   }
 
-  @Bean
-  @ConditionalOnMissingBean
-  public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory(
-    ConsumerFactory<String, Object> consumerFactory
+  @Bean("tiamatChangelogListenerContainerFactory")
+  @ConditionalOnMissingBean(name = "tiamatChangelogListenerContainerFactory")
+  public ConcurrentKafkaListenerContainerFactory<String, Object> containerFactory(
+    ConsumerFactory<String, Object> tiamatChangelogConsumerFactory
   ) {
     ConcurrentKafkaListenerContainerFactory<String, Object> factory =
       new ConcurrentKafkaListenerContainerFactory<>();
-    factory.setConsumerFactory(consumerFactory);
+    factory.setConsumerFactory(tiamatChangelogConsumerFactory);
     return factory;
   }
 }
