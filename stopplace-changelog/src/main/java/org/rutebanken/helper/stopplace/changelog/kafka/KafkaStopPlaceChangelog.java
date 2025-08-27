@@ -1,6 +1,5 @@
 package org.rutebanken.helper.stopplace.changelog.kafka;
 
-import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -9,13 +8,10 @@ import org.rutebanken.helper.stopplace.changelog.StopPlaceChangelogListener;
 import org.rutebanken.helper.stopplace.changelog.repository.StopPlaceRepository;
 import org.rutebanken.irkalla.avro.EnumType;
 import org.rutebanken.irkalla.avro.StopPlaceChangelogEvent;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.PartitionOffset;
 import org.springframework.kafka.annotation.TopicPartition;
-import org.springframework.kafka.listener.adapter.RecordFilterStrategy;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
@@ -55,6 +51,8 @@ public class KafkaStopPlaceChangelog implements StopPlaceChangelog {
   }
 
   @KafkaListener(
+    id = "tiamatChangelogListener",
+    autoStartup = "${org.rutebanken.helper.stopplace.changelog.kafka.autostartup:true}",
     topicPartitions = @TopicPartition(
       topic = "${org.rutebanken.helper.stopplace.changelog.kafka.topic:}",
       partitions = "#{@stopPlaceChangelogPartitionFinder.partitions(\"${org.rutebanken.helper.stopplace.changelog.kafka.topic:}\")}",
