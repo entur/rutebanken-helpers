@@ -1,6 +1,5 @@
-package org.rutebanken.helper.stopplace.changelog.config;
+package org.entur.ror.helpers.stopplace.changelog.config;
 
-import java.time.Duration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,6 +7,8 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
+
+import java.time.Duration;
 
 /**
  * Configuration for WebClient used in stop place repository operations.
@@ -19,7 +20,7 @@ import reactor.netty.http.client.HttpClient;
  * @author Entur
  */
 @Configuration
-public class WebClientConfiguration {
+public class TiamatWebClientConfiguration {
 
   /**
    * Creates a default WebClient bean with sensible defaults.

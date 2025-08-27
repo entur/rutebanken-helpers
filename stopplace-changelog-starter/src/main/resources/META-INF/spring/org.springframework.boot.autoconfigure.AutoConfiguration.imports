@@ -1,0 +1,2 @@
+org.entur.ror.helpers.stopplace.changelog.config.KafkaConfiguration
+org.entur.ror.helpers.stopplace.changelog.config.StopPlaceRepositoryConfig

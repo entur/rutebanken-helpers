@@ -4,10 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
@@ -22,7 +18,6 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
  * @since 5.41.0
  * @author Entur
  */
-@Component("stopPlaceChangelogStopPlaceRepository")
 public class StopPlaceRepository {
 
   private static final Logger logger = LoggerFactory.getLogger(
@@ -39,32 +34,16 @@ public class StopPlaceRepository {
   private final String fareZoneExportMode;
   private final String groupOfStopPlacesExportMode;
 
-  @Autowired
   public StopPlaceRepository(
-    @Qualifier("tiamatWebClient") WebClient webClient,
-    @Value(
-      "${org.rutebanken.helper.stopplace.changelog.repository.url:}"
-    ) String tiamatUrl,
-    @Value(
-      "${org.rutebanken.helper.stopplace.changelog.repository.topographicPlaceExportMode:RELEVANT}"
-    ) String topographicPlaceExportMode,
-    @Value(
-      "${org.rutebanken.helper.stopplace.changelog.repository.tariffZoneExportMode:RELEVANT}"
-    ) String tariffZoneExportMode,
-    @Value(
-      "${org.rutebanken.helper.stopplace.changelog.repository.groupOfTariffZonesExportMode:RELEVANT}"
-    ) String groupOfTariffZonesExportMode,
-    @Value(
-      "${org.rutebanken.helper.stopplace.changelog.repository.fareZoneExportMode:RELEVANT}"
-    ) String fareZoneExportMode,
-    @Value(
-      "${org.rutebanken.helper.stopplace.changelog.repository.groupOfStopPlacesExportMode:RELEVANT}"
-    ) String groupOfStopPlacesExportMode,
-    @Value(
-      "${org.rutebanken.helper.stopplace.changelog.repository.allVersions:true}"
-    ) boolean allVersions
+    WebClient webClient,
+    String tiamatUrl,
+    String topographicPlaceExportMode,
+    String tariffZoneExportMode,
+    String groupOfTariffZonesExportMode,
+    String fareZoneExportMode,
+    String groupOfStopPlacesExportMode,
+    boolean allVersions
   ) {
-    // Use the provided WebClient with its exchange strategies intact
     this.webClient = webClient.mutate().baseUrl(tiamatUrl).build();
     this.allVersions = allVersions;
     this.topographicPlaceExportMode = topographicPlaceExportMode;
