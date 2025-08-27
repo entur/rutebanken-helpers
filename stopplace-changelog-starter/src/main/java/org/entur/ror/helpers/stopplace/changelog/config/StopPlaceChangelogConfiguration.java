@@ -75,7 +75,7 @@ public class StopPlaceChangelogConfiguration {
   }
 
   @Bean
-  public StopPlaceRepository stopPlaceRepository(
+  public StopPlaceRepository tiamatStopPlaceRepository(
     @Qualifier("tiamatWebClient") WebClient webClient,
     @Value(
       "${org.rutebanken.helper.stopplace.changelog.repository.url:}"
