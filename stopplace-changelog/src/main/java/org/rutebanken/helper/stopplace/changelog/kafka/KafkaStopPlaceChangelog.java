@@ -44,6 +44,8 @@ public class KafkaStopPlaceChangelog implements StopPlaceChangelog {
   }
 
   @KafkaListener(
+    id = "tiamatChangelogListener",
+    autoStartup = "${org.rutebanken.helper.stopplace.changelog.kafka.autostartup:true}",
     topicPartitions = @TopicPartition(
       topic = "${org.rutebanken.helper.stopplace.changelog.kafka.topic:}",
       partitions = "#{@stopPlaceChangelogPartitionFinder.partitions(\"${org.rutebanken.helper.stopplace.changelog.kafka.topic:}\")}",
