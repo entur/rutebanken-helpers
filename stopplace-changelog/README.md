@@ -78,8 +78,8 @@ org.rutebanken.helper.stopplace.changelog.repository.groupOfStopPlacesExportMode
 
 #### Export Mode Values
 
-- **ALL**: Export all related entities of this type
-- **RELEVANT**: Export only entities directly related to the stop place (default)
+- **ALL**: Export all entities of this type
+- **RELEVANT**: Export only entities referenced by the stop place (default)
 - **NONE**: Do not export entities of this type
 
 ## Usage
