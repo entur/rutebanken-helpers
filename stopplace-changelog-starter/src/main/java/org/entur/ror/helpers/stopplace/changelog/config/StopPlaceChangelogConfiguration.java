@@ -141,9 +141,6 @@ public class StopPlaceChangelogConfiguration {
       "${org.rutebanken.helper.stopplace.changelog.kafka.bootstrap-servers:}"
     ) String bootstrapServers,
     @Value(
-      "${org.rutebanken.helper.stopplace.changelog.kafka.group-id:}"
-    ) String groupId,
-    @Value(
       "${org.rutebanken.helper.stopplace.changelog.kafka.schema-registry-url:}"
     ) String schemaRegistryUrl,
     @Value(
@@ -161,11 +158,6 @@ public class StopPlaceChangelogConfiguration {
   ) {
     Map<String, Object> props = new HashMap<>();
     props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-
-    // Only set group ID if explicitly provided
-    if (groupId != null && !groupId.isEmpty()) {
-      props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
-    }
 
     props.put(
       ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
