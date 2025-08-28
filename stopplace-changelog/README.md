@@ -20,7 +20,7 @@ Add the dependency to your `pom.xml`:
 
 ```properties
 # Enable the stopplace changelog
-org.rutebanken.helper.stopplace.changelog.kafka=true
+org.rutebanken.helper.stopplace.changelog.enabled=true
 
 # Kafka broker configuration
 org.rutebanken.helper.stopplace.changelog.kafka.bootstrap-servers=localhost:9092
