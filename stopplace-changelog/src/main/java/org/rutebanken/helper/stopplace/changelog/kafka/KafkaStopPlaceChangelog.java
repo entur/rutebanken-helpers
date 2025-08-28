@@ -51,8 +51,7 @@ public class KafkaStopPlaceChangelog implements StopPlaceChangelog {
     autoStartup = "${org.rutebanken.helper.stopplace.changelog.kafka.autostartup:true}",
     topicPartitions = @TopicPartition(
       topic = "${org.rutebanken.helper.stopplace.changelog.kafka.topic:}",
-      partitions = "#{@stopPlaceChangelogPartitionFinder.partitions(\"${org.rutebanken.helper.stopplace.changelog.kafka.topic:}\")}",
-      partitionOffsets = @PartitionOffset(partition = "*", initialOffset = "0")
+      partitions = "#{@stopPlaceChangelogPartitionFinder.partitions(\"${org.rutebanken.helper.stopplace.changelog.kafka.topic:}\")}"
     ),
     filter = "publicationTimeRecordFilterStrategy",
     containerFactory = "tiamatChangelogListenerContainerFactory"
