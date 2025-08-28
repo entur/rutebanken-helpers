@@ -9,7 +9,6 @@ import org.rutebanken.helper.stopplace.changelog.repository.StopPlaceRepository;
 import org.rutebanken.irkalla.avro.EnumType;
 import org.rutebanken.irkalla.avro.StopPlaceChangelogEvent;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.annotation.PartitionOffset;
 import org.springframework.kafka.annotation.TopicPartition;
 import org.springframework.messaging.handler.annotation.Payload;
 
