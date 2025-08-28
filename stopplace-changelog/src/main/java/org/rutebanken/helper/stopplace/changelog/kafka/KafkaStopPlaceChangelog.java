@@ -47,7 +47,6 @@ public class KafkaStopPlaceChangelog implements StopPlaceChangelog {
 
   @KafkaListener(
     id = CHANGELOG_LISTENER,
-    groupId = "${org.rutebanken.helper.stopplace.changelog.kafka.group-id:#{T(java.util.UUID).randomUUID().toString()}}",
     autoStartup = "${org.rutebanken.helper.stopplace.changelog.kafka.autostartup:true}",
     topicPartitions = @TopicPartition(
       topic = "${org.rutebanken.helper.stopplace.changelog.kafka.topic:}",
