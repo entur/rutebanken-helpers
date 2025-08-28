@@ -1,12 +1,12 @@
 package org.rutebanken.helper.stopplace.changelog.kafka;
 
 import java.time.Instant;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.rutebanken.irkalla.avro.StopPlaceChangelogEvent;
-import org.springframework.kafka.listener.adapter.RecordFilterStrategy;
 
+/**
+ * Filter StopPlaceChangelogEvent based on the provided publication time.
+ */
 public class PublicationTimeRecordFilterStrategy
-  implements RecordFilterStrategy<String, StopPlaceChangelogEvent> {
+  extends BasePublicationTimeRecordFilterStrategy {
 
   private final Instant publicationTime;
 
@@ -15,14 +15,7 @@ public class PublicationTimeRecordFilterStrategy
   }
 
   @Override
-  public boolean filter(
-    ConsumerRecord<String, StopPlaceChangelogEvent> consumerRecord
-  ) {
-    var changedTime = consumerRecord.value().getStopPlaceChanged();
-    if (changedTime == null) {
-      return true;
-    }
-
-    return changedTime.isBefore(publicationTime);
+  protected Instant publicationTime() {
+    return publicationTime;
   }
 }
