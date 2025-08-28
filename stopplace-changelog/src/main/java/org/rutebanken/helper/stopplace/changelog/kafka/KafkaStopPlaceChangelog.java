@@ -15,6 +15,8 @@ import org.springframework.messaging.handler.annotation.Payload;
 
 public class KafkaStopPlaceChangelog implements StopPlaceChangelog {
 
+  public static final String CHANGELOG_LISTENER = "tiamatChangelogListener";
+
   private final Set<StopPlaceChangelogListener> listeners = new HashSet<>();
 
   private final StopPlaceRepository stopPlaceRepository;
@@ -44,7 +46,7 @@ public class KafkaStopPlaceChangelog implements StopPlaceChangelog {
   }
 
   @KafkaListener(
-    id = "tiamatChangelogListener",
+    id = CHANGELOG_LISTENER,
     autoStartup = "${org.rutebanken.helper.stopplace.changelog.kafka.autostartup:true}",
     topicPartitions = @TopicPartition(
       topic = "${org.rutebanken.helper.stopplace.changelog.kafka.topic:}",

@@ -47,8 +47,7 @@ org.rutebanken.helper.stopplace.changelog.kafka.schema-registry-basic-auth-user-
 ```properties
 
 # Whether to automatically start the listener on application startup.
-# If false, the listener can be started programmatically through the KafkaListenerEndpointRegistry.
-# The listener id is 'tiamatChangelogListener'
+# If false, the listener can be started programmatically through ChangelogConsumerController.
 org.rutebanken.helper.stopplace.changelog.kafka.autostartup=true
 
 # Consumer group (if not set, each instance gets a unique group ID)
