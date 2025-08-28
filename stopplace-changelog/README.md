@@ -274,4 +274,4 @@ mvn test
 
 ### Generating Avro Classes
 
-Avro classes are automatically generated from the schema in `src/main/avro/` during the compile phase.
+Avro classes are automatically generated from the schema in `target/generated-sources` during the compile phase.
