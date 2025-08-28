@@ -20,7 +20,7 @@ Add the dependency to your `pom.xml`:
 
 ```properties
 # Enable the stopplace changelog
-org.rutebanken.helper.stopplace.changelog.kafka=true
+org.rutebanken.helper.stopplace.changelog.enabled=true
 
 # Kafka broker configuration
 org.rutebanken.helper.stopplace.changelog.kafka.bootstrap-servers=localhost:9092
@@ -47,8 +47,7 @@ org.rutebanken.helper.stopplace.changelog.kafka.schema-registry-basic-auth-user-
 ```properties
 
 # Whether to automatically start the listener on application startup.
-# If false, the listener can be started programmatically through the KafkaListenerEndpointRegistry.
-# The listener id is 'tiamatChangelogListener'
+# If false, the listener can be started programmatically through ChangelogConsumerController.
 org.rutebanken.helper.stopplace.changelog.kafka.autostartup=true
 
 # Consumer group (if not set, each instance gets a unique group ID)
@@ -275,4 +274,4 @@ mvn test
 
 ### Generating Avro Classes
 
-Avro classes are automatically generated from the schema in `src/main/avro/` during the compile phase.
+Avro classes are automatically generated from the schema in `target/generated-sources` during the compile phase.

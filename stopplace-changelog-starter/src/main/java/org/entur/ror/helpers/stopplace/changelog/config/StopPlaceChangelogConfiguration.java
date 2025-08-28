@@ -11,6 +11,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.rutebanken.helper.stopplace.changelog.StopPlaceChangelog;
+import org.rutebanken.helper.stopplace.changelog.kafka.ChangelogConsumerController;
 import org.rutebanken.helper.stopplace.changelog.kafka.KafkaStopPlaceChangelog;
 import org.rutebanken.helper.stopplace.changelog.kafka.PartitionFinder;
 import org.rutebanken.helper.stopplace.changelog.kafka.PublicationTimeRecordFilterStrategy;
@@ -25,6 +26,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.adapter.RecordFilterStrategy;
@@ -214,5 +216,12 @@ public class StopPlaceChangelogConfiguration {
       new ConcurrentKafkaListenerContainerFactory<>();
     factory.setConsumerFactory(tiamatChangelogConsumerFactory);
     return factory;
+  }
+
+  @Bean("tiamatChangeLogConsumerController")
+  ChangelogConsumerController changeLogConsumerController(
+    KafkaListenerEndpointRegistry registry
+  ) {
+    return new ChangelogConsumerController(registry);
   }
 }
