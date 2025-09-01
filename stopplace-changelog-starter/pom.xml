@@ -5,11 +5,15 @@
     <parent>
         <groupId>org.entur.ror.helpers</groupId>
         <artifactId>helper</artifactId>
-        <version>5.43.0-SNAPSHOT</version>
+        <version>5.43.0</version>
         <relativePath>..</relativePath>
     </parent>
 
     <artifactId>stopplace-changelog-starter</artifactId>
+
+    <name>stopplace-changelog-starter</name>
+    <description>stopplace-changelog-starter</description>
+    <url>https://github.com/entur/rutebanken-helpers</url>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>

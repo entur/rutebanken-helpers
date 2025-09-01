@@ -6,11 +6,15 @@
     <parent>
         <groupId>org.entur.ror.helpers</groupId>
         <artifactId>helper</artifactId>
-        <version>5.43.0-SNAPSHOT</version>
+        <version>5.43.0</version>
         <relativePath>..</relativePath>
     </parent>
 
     <artifactId>stopplace-changelog</artifactId>
+
+    <name>stopplace-changelog</name>
+    <description>stopplace-changelog</description>
+    <url>https://github.com/entur/rutebanken-helpers</url>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -59,13 +63,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <repositories>
-        <repository>
-            <id>confluent</id>
-            <url>https://packages.confluent.io/maven/</url>
-        </repository>
-    </repositories>
 
     <build>
         <plugins>
