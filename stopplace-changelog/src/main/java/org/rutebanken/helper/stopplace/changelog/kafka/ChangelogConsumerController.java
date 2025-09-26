@@ -31,4 +31,14 @@ public class ChangelogConsumerController {
       .getListenerContainer(KafkaStopPlaceChangelog.CHANGELOG_LISTENER)
       .stop();
   }
+
+  /**
+   *
+   * Return true if the Kafka consumer is running.
+   */
+  public boolean isRunning() {
+    return registry
+      .getListenerContainer(KafkaStopPlaceChangelog.CHANGELOG_LISTENER)
+      .isRunning();
+  }
 }

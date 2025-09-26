@@ -10,7 +10,7 @@ Add the starter dependency to your `pom.xml`:
 <dependency>
     <groupId>org.entur.ror.helpers</groupId>
     <artifactId>stopplace-changelog-starter</artifactId>
-    <version>5.43.0-SNAPSHOT</version>
+    <version>5.45.0-SNAPSHOT</version>
 </dependency>
 ```
 
