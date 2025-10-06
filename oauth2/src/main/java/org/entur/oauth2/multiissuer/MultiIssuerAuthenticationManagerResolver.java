@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import org.entur.oauth2.RoRJwtDecoderBuilder;
-import org.entur.oauth2.RorAuthenticationConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -33,9 +32,6 @@ public class MultiIssuerAuthenticationManagerResolver
   private final String enturInternalAuth0Issuer;
   private final String enturPartnerAuth0Audience;
   private final String enturPartnerAuth0Issuer;
-  private final String rorAuth0Audience;
-  private final String rorAuth0Issuer;
-  private final String rorAuth0ClaimNamespace;
 
   private final BearerTokenResolver resolver = new DefaultBearerTokenResolver();
   private final Map<String, AuthenticationManager> authenticationManagers =
@@ -54,9 +50,6 @@ public class MultiIssuerAuthenticationManagerResolver
     this.enturInternalAuth0Issuer = enturInternalAuth0Issuer;
     this.enturPartnerAuth0Audience = enturPartnerAuth0Audience;
     this.enturPartnerAuth0Issuer = enturPartnerAuth0Issuer;
-    this.rorAuth0Audience = rorAuth0Audience;
-    this.rorAuth0Issuer = rorAuth0Issuer;
-    this.rorAuth0ClaimNamespace = rorAuth0ClaimNamespace;
   }
 
   /**
@@ -68,7 +61,6 @@ public class MultiIssuerAuthenticationManagerResolver
     return new RoRJwtDecoderBuilder()
       .withIssuer(enturInternalAuth0Issuer)
       .withAudience(enturInternalAuth0Audience)
-      .withAuth0ClaimNamespace(rorAuth0ClaimNamespace)
       .build();
   }
 
@@ -81,20 +73,6 @@ public class MultiIssuerAuthenticationManagerResolver
     return new RoRJwtDecoderBuilder()
       .withIssuer(enturPartnerAuth0Issuer)
       .withAudience(enturPartnerAuth0Audience)
-      .withAuth0ClaimNamespace(rorAuth0ClaimNamespace)
-      .build();
-  }
-
-  /**
-   * Build a @{@link JwtDecoder} for Ror Auth0 tenant.
-   *
-   * @return a @{@link JwtDecoder} for Auth0.
-   */
-  protected JwtDecoder rorAuth0JwtDecoder() {
-    return new RoRJwtDecoderBuilder()
-      .withIssuer(rorAuth0Issuer)
-      .withAudience(rorAuth0Audience)
-      .withAuth0ClaimNamespace(rorAuth0ClaimNamespace)
       .build();
   }
 
@@ -109,10 +87,6 @@ public class MultiIssuerAuthenticationManagerResolver
       enturPartnerAuth0Issuer.equals(issuer)
     ) {
       return enturPartnerAuth0JwtDecoder();
-    } else if (
-      StringUtils.hasText(rorAuth0Issuer) && rorAuth0Issuer.equals(issuer)
-    ) {
-      return rorAuth0JwtDecoder();
     } else {
       throw new IllegalArgumentException(
         "Received JWT token with unknown OAuth2 issuer: " + issuer
@@ -135,7 +109,7 @@ public class MultiIssuerAuthenticationManagerResolver
     return Optional
       .ofNullable(issuer)
       .map(this::jwtDecoder)
-      .map(this::jwtAuthenticationProvider)
+      .map(JwtAuthenticationProvider::new)
       .orElseThrow(() ->
         new IllegalArgumentException(
           "Received JWT token with null OAuth2 issuer"
@@ -149,16 +123,5 @@ public class MultiIssuerAuthenticationManagerResolver
         toIssuer(request),
         this::fromIssuer
       );
-  }
-
-  private JwtAuthenticationProvider jwtAuthenticationProvider(
-    JwtDecoder jwtDecoder
-  ) {
-    JwtAuthenticationProvider jwtAuthenticationProvider =
-      new JwtAuthenticationProvider(jwtDecoder);
-    jwtAuthenticationProvider.setJwtAuthenticationConverter(
-      new RorAuthenticationConverter()
-    );
-    return jwtAuthenticationProvider;
   }
 }

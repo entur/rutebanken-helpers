@@ -12,7 +12,6 @@ public class RoRJwtDecoderBuilder {
 
   private String issuer;
   private String audience;
-  private String auth0ClaimNamespace;
 
   public RoRJwtDecoderBuilder withIssuer(String issuer) {
     this.issuer = issuer;
@@ -21,13 +20,6 @@ public class RoRJwtDecoderBuilder {
 
   public RoRJwtDecoderBuilder withAudience(String audience) {
     this.audience = audience;
-    return this;
-  }
-
-  public RoRJwtDecoderBuilder withAuth0ClaimNamespace(
-    String auth0ClaimNamespace
-  ) {
-    this.auth0ClaimNamespace = auth0ClaimNamespace;
     return this;
   }
 
@@ -42,9 +34,6 @@ public class RoRJwtDecoderBuilder {
     OAuth2TokenValidator<Jwt> withAudience =
       new DelegatingOAuth2TokenValidator<>(withIssuer, audienceValidator);
     jwtDecoder.setJwtValidator(withAudience);
-    jwtDecoder.setClaimSetConverter(
-      new RorAuth0RolesClaimAdapter(auth0ClaimNamespace)
-    );
     return jwtDecoder;
   }
 }
