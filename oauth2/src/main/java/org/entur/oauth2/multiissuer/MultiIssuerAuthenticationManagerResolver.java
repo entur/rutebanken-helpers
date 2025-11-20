@@ -2,6 +2,7 @@ package org.entur.oauth2.multiissuer;
 
 import com.nimbusds.jwt.JWTParser;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,8 +31,10 @@ public class MultiIssuerAuthenticationManagerResolver
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   private final String enturInternalAuth0Audience;
+  private final List<String> enturInternalAuth0Audiences;
   private final String enturInternalAuth0Issuer;
   private final String enturPartnerAuth0Audience;
+  private final List<String> enturPartnerAuth0Audiences;
   private final String enturPartnerAuth0Issuer;
   private final String rorAuth0Audience;
   private final String rorAuth0Issuer;
@@ -41,6 +44,7 @@ public class MultiIssuerAuthenticationManagerResolver
   private final Map<String, AuthenticationManager> authenticationManagers =
     new ConcurrentHashMap<>();
 
+  @Deprecated
   protected MultiIssuerAuthenticationManagerResolver(
     String enturInternalAuth0Audience,
     String enturInternalAuth0Issuer,
@@ -50,9 +54,35 @@ public class MultiIssuerAuthenticationManagerResolver
     String rorAuth0Issuer,
     String rorAuth0ClaimNamespace
   ) {
+    this(
+      enturInternalAuth0Audience,
+      null,
+      enturInternalAuth0Issuer,
+      enturPartnerAuth0Audience,
+      null,
+      enturPartnerAuth0Issuer,
+      rorAuth0Audience,
+      rorAuth0Issuer,
+      rorAuth0ClaimNamespace
+    );
+  }
+
+  protected MultiIssuerAuthenticationManagerResolver(
+    String enturInternalAuth0Audience,
+    List<String> enturInternalAuth0Audiences,
+    String enturInternalAuth0Issuer,
+    String enturPartnerAuth0Audience,
+    List<String> enturPartnerAuth0Audiences,
+    String enturPartnerAuth0Issuer,
+    String rorAuth0Audience,
+    String rorAuth0Issuer,
+    String rorAuth0ClaimNamespace
+  ) {
     this.enturInternalAuth0Audience = enturInternalAuth0Audience;
+    this.enturInternalAuth0Audiences = enturInternalAuth0Audiences;
     this.enturInternalAuth0Issuer = enturInternalAuth0Issuer;
     this.enturPartnerAuth0Audience = enturPartnerAuth0Audience;
+    this.enturPartnerAuth0Audiences = enturPartnerAuth0Audiences;
     this.enturPartnerAuth0Issuer = enturPartnerAuth0Issuer;
     this.rorAuth0Audience = rorAuth0Audience;
     this.rorAuth0Issuer = rorAuth0Issuer;
@@ -65,11 +95,20 @@ public class MultiIssuerAuthenticationManagerResolver
    * @return a @{@link JwtDecoder} for Auth0.
    */
   protected JwtDecoder enturInternalAuth0JwtDecoder() {
-    return new RoRJwtDecoderBuilder()
+    RoRJwtDecoderBuilder builder = new RoRJwtDecoderBuilder()
       .withIssuer(enturInternalAuth0Issuer)
-      .withAudience(enturInternalAuth0Audience)
-      .withAuth0ClaimNamespace(rorAuth0ClaimNamespace)
-      .build();
+      .withAuth0ClaimNamespace(rorAuth0ClaimNamespace);
+
+    if (
+      enturInternalAuth0Audiences != null &&
+      !enturInternalAuth0Audiences.isEmpty()
+    ) {
+      builder.withAudiences(enturInternalAuth0Audiences);
+    } else if (enturInternalAuth0Audience != null) {
+      builder.withAudience(enturInternalAuth0Audience);
+    }
+
+    return builder.build();
   }
 
   /**
@@ -78,11 +117,20 @@ public class MultiIssuerAuthenticationManagerResolver
    * @return a @{@link JwtDecoder} for Auth0.
    */
   protected JwtDecoder enturPartnerAuth0JwtDecoder() {
-    return new RoRJwtDecoderBuilder()
+    RoRJwtDecoderBuilder builder = new RoRJwtDecoderBuilder()
       .withIssuer(enturPartnerAuth0Issuer)
-      .withAudience(enturPartnerAuth0Audience)
-      .withAuth0ClaimNamespace(rorAuth0ClaimNamespace)
-      .build();
+      .withAuth0ClaimNamespace(rorAuth0ClaimNamespace);
+
+    if (
+      enturPartnerAuth0Audiences != null &&
+      !enturPartnerAuth0Audiences.isEmpty()
+    ) {
+      builder.withAudiences(enturPartnerAuth0Audiences);
+    } else if (enturPartnerAuth0Audience != null) {
+      builder.withAudience(enturPartnerAuth0Audience);
+    }
+
+    return builder.build();
   }
 
   /**
