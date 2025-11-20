@@ -1,5 +1,6 @@
 package org.entur.oauth2;
 
+import java.util.List;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -12,6 +13,7 @@ public class RoRJwtDecoderBuilder {
 
   private String issuer;
   private String audience;
+  private List<String> audiences;
   private String auth0ClaimNamespace;
 
   public RoRJwtDecoderBuilder withIssuer(String issuer) {
@@ -21,6 +23,13 @@ public class RoRJwtDecoderBuilder {
 
   public RoRJwtDecoderBuilder withAudience(String audience) {
     this.audience = audience;
+    this.audiences = null;
+    return this;
+  }
+
+  public RoRJwtDecoderBuilder withAudiences(List<String> audiences) {
+    this.audiences = audiences;
+    this.audience = null;
     return this;
   }
 
@@ -32,11 +41,19 @@ public class RoRJwtDecoderBuilder {
   }
 
   public JwtDecoder build() {
+    OAuth2TokenValidator<Jwt> audienceValidator;
+    if (audiences != null && !audiences.isEmpty()) {
+      audienceValidator = new AudienceValidator(audiences);
+    } else if (audience != null) {
+      audienceValidator = new AudienceValidator(audience);
+    } else {
+      throw new IllegalStateException(
+        "Either audience or audiences must be set"
+      );
+    }
+
     NimbusJwtDecoder jwtDecoder = JwtDecoders.fromIssuerLocation(issuer);
 
-    OAuth2TokenValidator<Jwt> audienceValidator = new AudienceValidator(
-      audience
-    );
     OAuth2TokenValidator<Jwt> withIssuer =
       JwtValidators.createDefaultWithIssuer(issuer);
     OAuth2TokenValidator<Jwt> withAudience =
