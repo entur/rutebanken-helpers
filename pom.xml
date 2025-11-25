@@ -103,7 +103,7 @@
         <!-- empty argLine property, the value is set up by Jacoco during unit tests execution -->
         <argLine/>
 
-        <jreleaser-maven-plugin.version>1.18.0</jreleaser-maven-plugin.version>
+        <jreleaser-maven-plugin.version>1.21.0</jreleaser-maven-plugin.version>
     </properties>
 
     <dependencyManagement>
