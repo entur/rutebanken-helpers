@@ -216,7 +216,7 @@ class DefaultAuthorizationServiceTest {
         true
       ),
       Arguments.of(
-        AuthorizationConstants.ROLE_NETEX_BLOCKS_DATA_VIEW,
+        AuthorizationConstants.ROLE_NETEX_PRIVATE_DATA_VIEW,
         CODESPACE_RUT,
         true
       ),
@@ -226,7 +226,7 @@ class DefaultAuthorizationServiceTest {
         false
       ),
       Arguments.of(
-        AuthorizationConstants.ROLE_NETEX_BLOCKS_DATA_VIEW,
+        AuthorizationConstants.ROLE_NETEX_PRIVATE_DATA_VIEW,
         CODESPACE_XXX,
         false
       )

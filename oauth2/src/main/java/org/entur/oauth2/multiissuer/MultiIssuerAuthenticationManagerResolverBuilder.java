@@ -10,9 +10,6 @@ public class MultiIssuerAuthenticationManagerResolverBuilder {
   private String enturPartnerAuth0Audience;
   private List<String> enturPartnerAuth0Audiences;
   private String enturPartnerAuth0Issuer;
-  private String rorAuth0Audience;
-  private String rorAuth0Issuer;
-  private String rorAuth0ClaimNamespace;
 
   public MultiIssuerAuthenticationManagerResolverBuilder withEnturInternalAuth0Audience(
     String enturInternalAuth0Audience
@@ -60,27 +57,6 @@ public class MultiIssuerAuthenticationManagerResolverBuilder {
     return this;
   }
 
-  public MultiIssuerAuthenticationManagerResolverBuilder withRorAuth0Audience(
-    String rorAuth0Audience
-  ) {
-    this.rorAuth0Audience = rorAuth0Audience;
-    return this;
-  }
-
-  public MultiIssuerAuthenticationManagerResolverBuilder withRorAuth0Issuer(
-    String rorAuth0Issuer
-  ) {
-    this.rorAuth0Issuer = rorAuth0Issuer;
-    return this;
-  }
-
-  public MultiIssuerAuthenticationManagerResolverBuilder withRorAuth0ClaimNamespace(
-    String rorAuth0ClaimNamespace
-  ) {
-    this.rorAuth0ClaimNamespace = rorAuth0ClaimNamespace;
-    return this;
-  }
-
   public MultiIssuerAuthenticationManagerResolver build() {
     return new MultiIssuerAuthenticationManagerResolver(
       enturInternalAuth0Audience,
@@ -88,10 +64,7 @@ public class MultiIssuerAuthenticationManagerResolverBuilder {
       enturInternalAuth0Issuer,
       enturPartnerAuth0Audience,
       enturPartnerAuth0Audiences,
-      enturPartnerAuth0Issuer,
-      rorAuth0Audience,
-      rorAuth0Issuer,
-      rorAuth0ClaimNamespace
+      enturPartnerAuth0Issuer
     );
   }
 }

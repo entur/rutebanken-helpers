@@ -113,11 +113,6 @@ public class DefaultAuthorizationService<T> implements AuthorizationService<T> {
         matchAdminRole(roleAssignment, ROLE_ROUTE_DATA_ADMIN) ||
         matchProviderRole(
           roleAssignment,
-          ROLE_NETEX_BLOCKS_DATA_VIEW,
-          providerOrganisation
-        ) ||
-        matchProviderRole(
-          roleAssignment,
           ROLE_NETEX_PRIVATE_DATA_VIEW,
           providerOrganisation
         ) ||
