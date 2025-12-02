@@ -6,13 +6,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import org.entur.oauth2.RoRJwtDecoderBuilder;
-import org.entur.oauth2.RorAuthenticationConverter;
+import org.entur.oauth2.AudienceValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationManagerResolver;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2TokenValidator;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtDecoders;
+import org.springframework.security.oauth2.jwt.JwtValidators;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 import org.springframework.security.oauth2.server.resource.web.DefaultBearerTokenResolver;
@@ -20,10 +25,10 @@ import org.springframework.util.StringUtils;
 
 /**
  * Resolve the @{@link AuthenticationManager} that should authenticate the current JWT token.
- * This is achieved by extracting the issuer from the token and matching it against either the Entur Partner, Entur Internal
- * or the RoR Auth0 issuer URI.
- * The three @{@link AuthenticationManager}s are instantiated during the first request and then cached.
- * If any of the three issuers is not configured, then corresponding tokens will be rejected.
+ * This is achieved by extracting the issuer from the token and matching it against either the Entur Partner or Entur Internal
+ * Auth0 issuer URI.
+ * The @{@link AuthenticationManager}s are instantiated during the first request and then cached.
+ * If any of the issuers is not configured, then corresponding tokens will be rejected.
  */
 public class MultiIssuerAuthenticationManagerResolver
   implements AuthenticationManagerResolver<HttpServletRequest> {
@@ -36,9 +41,6 @@ public class MultiIssuerAuthenticationManagerResolver
   private final String enturPartnerAuth0Audience;
   private final List<String> enturPartnerAuth0Audiences;
   private final String enturPartnerAuth0Issuer;
-  private final String rorAuth0Audience;
-  private final String rorAuth0Issuer;
-  private final String rorAuth0ClaimNamespace;
 
   private final BearerTokenResolver resolver = new DefaultBearerTokenResolver();
   private final Map<String, AuthenticationManager> authenticationManagers =
@@ -50,9 +52,7 @@ public class MultiIssuerAuthenticationManagerResolver
     String enturInternalAuth0Issuer,
     String enturPartnerAuth0Audience,
     String enturPartnerAuth0Issuer,
-    String rorAuth0Audience,
-    String rorAuth0Issuer,
-    String rorAuth0ClaimNamespace
+    String auth0ClaimNamespace
   ) {
     this(
       enturInternalAuth0Audience,
@@ -60,10 +60,7 @@ public class MultiIssuerAuthenticationManagerResolver
       enturInternalAuth0Issuer,
       enturPartnerAuth0Audience,
       null,
-      enturPartnerAuth0Issuer,
-      rorAuth0Audience,
-      rorAuth0Issuer,
-      rorAuth0ClaimNamespace
+      enturPartnerAuth0Issuer
     );
   }
 
@@ -73,10 +70,7 @@ public class MultiIssuerAuthenticationManagerResolver
     String enturInternalAuth0Issuer,
     String enturPartnerAuth0Audience,
     List<String> enturPartnerAuth0Audiences,
-    String enturPartnerAuth0Issuer,
-    String rorAuth0Audience,
-    String rorAuth0Issuer,
-    String rorAuth0ClaimNamespace
+    String enturPartnerAuth0Issuer
   ) {
     this.enturInternalAuth0Audience = enturInternalAuth0Audience;
     this.enturInternalAuth0Audiences = enturInternalAuth0Audiences;
@@ -84,9 +78,6 @@ public class MultiIssuerAuthenticationManagerResolver
     this.enturPartnerAuth0Audience = enturPartnerAuth0Audience;
     this.enturPartnerAuth0Audiences = enturPartnerAuth0Audiences;
     this.enturPartnerAuth0Issuer = enturPartnerAuth0Issuer;
-    this.rorAuth0Audience = rorAuth0Audience;
-    this.rorAuth0Issuer = rorAuth0Issuer;
-    this.rorAuth0ClaimNamespace = rorAuth0ClaimNamespace;
   }
 
   /**
@@ -95,20 +86,31 @@ public class MultiIssuerAuthenticationManagerResolver
    * @return a @{@link JwtDecoder} for Auth0.
    */
   protected JwtDecoder enturInternalAuth0JwtDecoder() {
-    RoRJwtDecoderBuilder builder = new RoRJwtDecoderBuilder()
-      .withIssuer(enturInternalAuth0Issuer)
-      .withAuth0ClaimNamespace(rorAuth0ClaimNamespace);
-
+    OAuth2TokenValidator<Jwt> audienceValidator;
     if (
       enturInternalAuth0Audiences != null &&
       !enturInternalAuth0Audiences.isEmpty()
     ) {
-      builder.withAudiences(enturInternalAuth0Audiences);
+      audienceValidator = new AudienceValidator(enturInternalAuth0Audiences);
     } else if (enturInternalAuth0Audience != null) {
-      builder.withAudience(enturInternalAuth0Audience);
+      audienceValidator = new AudienceValidator(enturInternalAuth0Audience);
+    } else {
+      throw new IllegalStateException(
+        "Either audience or audiences must be set for Entur Internal Auth0"
+      );
     }
 
-    return builder.build();
+    NimbusJwtDecoder jwtDecoder = JwtDecoders.fromIssuerLocation(
+      enturInternalAuth0Issuer
+    );
+
+    OAuth2TokenValidator<Jwt> withIssuer =
+      JwtValidators.createDefaultWithIssuer(enturInternalAuth0Issuer);
+    OAuth2TokenValidator<Jwt> withAudience =
+      new DelegatingOAuth2TokenValidator<>(withIssuer, audienceValidator);
+    jwtDecoder.setJwtValidator(withAudience);
+
+    return jwtDecoder;
   }
 
   /**
@@ -117,33 +119,31 @@ public class MultiIssuerAuthenticationManagerResolver
    * @return a @{@link JwtDecoder} for Auth0.
    */
   protected JwtDecoder enturPartnerAuth0JwtDecoder() {
-    RoRJwtDecoderBuilder builder = new RoRJwtDecoderBuilder()
-      .withIssuer(enturPartnerAuth0Issuer)
-      .withAuth0ClaimNamespace(rorAuth0ClaimNamespace);
-
+    OAuth2TokenValidator<Jwt> audienceValidator;
     if (
       enturPartnerAuth0Audiences != null &&
       !enturPartnerAuth0Audiences.isEmpty()
     ) {
-      builder.withAudiences(enturPartnerAuth0Audiences);
+      audienceValidator = new AudienceValidator(enturPartnerAuth0Audiences);
     } else if (enturPartnerAuth0Audience != null) {
-      builder.withAudience(enturPartnerAuth0Audience);
+      audienceValidator = new AudienceValidator(enturPartnerAuth0Audience);
+    } else {
+      throw new IllegalStateException(
+        "Either audience or audiences must be set for Entur Partner Auth0"
+      );
     }
 
-    return builder.build();
-  }
+    NimbusJwtDecoder jwtDecoder = JwtDecoders.fromIssuerLocation(
+      enturPartnerAuth0Issuer
+    );
 
-  /**
-   * Build a @{@link JwtDecoder} for Ror Auth0 tenant.
-   *
-   * @return a @{@link JwtDecoder} for Auth0.
-   */
-  protected JwtDecoder rorAuth0JwtDecoder() {
-    return new RoRJwtDecoderBuilder()
-      .withIssuer(rorAuth0Issuer)
-      .withAudience(rorAuth0Audience)
-      .withAuth0ClaimNamespace(rorAuth0ClaimNamespace)
-      .build();
+    OAuth2TokenValidator<Jwt> withIssuer =
+      JwtValidators.createDefaultWithIssuer(enturPartnerAuth0Issuer);
+    OAuth2TokenValidator<Jwt> withAudience =
+      new DelegatingOAuth2TokenValidator<>(withIssuer, audienceValidator);
+    jwtDecoder.setJwtValidator(withAudience);
+
+    return jwtDecoder;
   }
 
   private JwtDecoder jwtDecoder(String issuer) {
@@ -157,10 +157,6 @@ public class MultiIssuerAuthenticationManagerResolver
       enturPartnerAuth0Issuer.equals(issuer)
     ) {
       return enturPartnerAuth0JwtDecoder();
-    } else if (
-      StringUtils.hasText(rorAuth0Issuer) && rorAuth0Issuer.equals(issuer)
-    ) {
-      return rorAuth0JwtDecoder();
     } else {
       throw new IllegalArgumentException(
         "Received JWT token with unknown OAuth2 issuer: " + issuer
@@ -202,11 +198,6 @@ public class MultiIssuerAuthenticationManagerResolver
   private JwtAuthenticationProvider jwtAuthenticationProvider(
     JwtDecoder jwtDecoder
   ) {
-    JwtAuthenticationProvider jwtAuthenticationProvider =
-      new JwtAuthenticationProvider(jwtDecoder);
-    jwtAuthenticationProvider.setJwtAuthenticationConverter(
-      new RorAuthenticationConverter()
-    );
-    return jwtAuthenticationProvider;
+    return new JwtAuthenticationProvider(jwtDecoder);
   }
 }

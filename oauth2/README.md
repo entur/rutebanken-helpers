@@ -31,17 +31,6 @@ Add this dependency to your Maven project:
 
 ### Resource Server (JWT Validation)
 
-#### RoRJwtDecoderBuilder
-Build a JWT decoder with audience validation and custom claim support:
-
-```java
-JwtDecoder jwtDecoder = new RoRJwtDecoderBuilder()
-    .withIssuer("https://your-auth-server.com/")
-    .withAudience("your-api-audience")
-    .withAuth0ClaimNamespace("https://your-namespace/")
-    .build();
-```
-
 #### MultiIssuerAuthenticationManagerResolverBuilder
 Support multiple JWT issuers in a single application:
 
@@ -93,31 +82,12 @@ String token = tokenService.getToken();
 
 ### User Information and Authorities
 
-#### JwtUserInfoExtractor
-Extract user information from JWT claims:
-
-- `EnturJwtUserInfoExtractor`: Extract from Entur-specific custom claims
-- `DefaultJwtUserInfoExtractor`: Extract from standard OIDC claims
+#### DefaultJwtUserInfoExtractor
+Extract user information from standard OIDC JWT claims:
 
 ```java
-EnturJwtUserInfoExtractor extractor = new EnturJwtUserInfoExtractor();
-String preferredName = extractor.getPreferredName(jwt);
-```
-
-#### RorGrantedAuthoritiesConverter
-Convert JWT role claims to Spring Security granted authorities:
-
-```java
-RorGrantedAuthoritiesConverter converter = new RorGrantedAuthoritiesConverter();
-Collection<GrantedAuthority> authorities = converter.convert(jwt);
-```
-
-#### JwtRoleAssignmentExtractor
-Extract role assignments from JWT claims:
-
-```java
-JwtRoleAssignmentExtractor extractor = new JwtRoleAssignmentExtractor();
-List<RoleAssignment> roleAssignments = extractor.getRoleAssignmentsFromClaims(claims);
+DefaultJwtUserInfoExtractor extractor = new DefaultJwtUserInfoExtractor();
+String preferredName = extractor.getPreferredName();
 ```
 
 ## Configuration
@@ -145,7 +115,7 @@ spring:
 
 ## Custom OAuth2 Claims
 
-The library defines standard claim names in `RoROAuth2Claims`:
+The library uses standard OAuth2 claim names:
 
 - `roles`: User roles
 - `role_assignments`: Detailed role assignments with organization context
@@ -162,10 +132,11 @@ public class SecurityConfig {
     
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
-        JwtDecoder jwtDecoder = new RoRJwtDecoderBuilder()
-            .withIssuer("https://auth.example.com/")
-            .withAudience("my-api")
-            .build();
+        MultiIssuerAuthenticationManagerResolver resolver = 
+            new MultiIssuerAuthenticationManagerResolverBuilder()
+                .withEnturInternalAuth0Issuer("https://auth.example.com/")
+                .withEnturInternalAuth0Audience("my-api")
+                .build();
             
         http
             .authorizeExchange(exchanges -> exchanges
@@ -173,7 +144,7 @@ public class SecurityConfig {
                 .anyExchange().authenticated()
             )
             .oauth2ResourceServer(oauth2 -> oauth2
-                .jwt(jwt -> jwt.jwtDecoder(jwtDecoder))
+                .authenticationManagerResolver(resolver)
             );
             
         return http.build();

@@ -1,7 +1,6 @@
 package org.entur.ror.permission;
 
 import static org.entur.ror.permission.AuthenticatedUser.ENTUR_CLAIM_ORGANISATION_ID;
-import static org.entur.ror.permission.AuthenticatedUser.ROR_CLAIM_PREFERRED_USERNAME;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Map;
@@ -12,59 +11,9 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 
 class AuthenticatedUserTest {
 
-  private static final String ROR_SUBJECT = "rorSubject";
-  private static final String ROR_ISSUER = "https://auth2.entur.org/";
-  private static final String ROR_USERNAME = "rorUsername";
   private static final String PARTNER_SUBJECT = "partnerSubject";
   private static final String PARTNER_ISSUER = "https://partner.entur.org/";
   private static final long PARTNER_ORG = 1L;
-
-  @Test
-  void testValidRorUser() {
-    Map<String, Object> claims = Map.of(
-      JwtClaimNames.SUB,
-      ROR_SUBJECT,
-      JwtClaimNames.ISS,
-      ROR_ISSUER,
-      ROR_CLAIM_PREFERRED_USERNAME,
-      ROR_USERNAME
-    );
-
-    Jwt jwt = Jwt
-      .withTokenValue("token")
-      .header("alg", "none")
-      .claims(existingClaims -> existingClaims.putAll(claims))
-      .build();
-
-    JwtAuthenticationToken authentication = new JwtAuthenticationToken(jwt);
-
-    AuthenticatedUser user = AuthenticatedUser.of(authentication);
-    assertEquals(ROR_SUBJECT, user.subject());
-    assertEquals(ROR_USERNAME, user.username());
-    assertTrue(user.isRor());
-  }
-
-  @Test
-  void testRorUserMissingUsername() {
-    Map<String, Object> claims = Map.of(
-      JwtClaimNames.SUB,
-      ROR_SUBJECT,
-      JwtClaimNames.ISS,
-      ROR_ISSUER
-    );
-
-    Jwt jwt = Jwt
-      .withTokenValue("token")
-      .header("alg", "none")
-      .claims(existingClaims -> existingClaims.putAll(claims))
-      .build();
-
-    JwtAuthenticationToken authentication = new JwtAuthenticationToken(jwt);
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> AuthenticatedUser.of(authentication)
-    );
-  }
 
   @Test
   void testValidEnturPartnerUser() {

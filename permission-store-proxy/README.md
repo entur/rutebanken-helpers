@@ -119,11 +119,6 @@ Your JWT tokens must include:
 - Staging: `https://partner.staging.entur.org/`
 - Development: `https://partner.dev.entur.org/`
 
-#### RoR (Legacy - To Be Deprecated)
-- Production: `https://auth2.entur.org/`
-- Staging: `https://ror-entur-staging.eu.auth0.com/`
-- Development: `https://ror-entur-dev.eu.auth0.com/`
-
 ### Baba API Endpoints
 
 The module calls the following Baba API endpoints:

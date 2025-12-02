@@ -9,13 +9,7 @@ The `oauth2` module is a helper library for Spring Boot applications that provid
 ```
 org.entur.oauth2
 ├── Core Authentication & Authorization
-│   ├── AudienceValidator.java
-│   ├── RoRJwtDecoderBuilder.java
-│   ├── RorGrantedAuthoritiesConverter.java
-│   ├── RorAuthenticationConverter.java
-│   ├── RorAuth0RolesClaimAdapter.java
-│   ├── RoROAuth2Claims.java
-│   └── JwtRoleAssignmentExtractor.java
+│   └── AudienceValidator.java
 │
 ├── Multi-Issuer Support
 │   ├── multiissuer/MultiIssuerAuthenticationManagerResolver.java
@@ -28,8 +22,6 @@ org.entur.oauth2
 │   └── AuthorizedClientServiceReactiveOAuth2AuthorizedClientManagerBuilder.java
 │
 └── User Information Extraction
-    ├── user/JwtUserInfoExtractor.java (deprecated)
-    ├── user/EnturJwtUserInfoExtractor.java
     ├── user/DefaultJwtUserInfoExtractor.java
     └── user/support/AuthenticationUtil.java
 ```
@@ -37,18 +29,6 @@ org.entur.oauth2
 ## Key Components
 
 ### 1. JWT Validation and Decoding
-
-**RoRJwtDecoderBuilder**
-- Builds JWT decoders with audience and issuer validation
-- Integrates Auth0-specific claim namespace handling
-- Usage:
-  ```java
-  JwtDecoder decoder = new RoRJwtDecoderBuilder()
-      .withIssuer("https://auth.example.com/")
-      .withAudience("my-api-audience")
-      .withAuth0ClaimNamespace("https://entur.io/")
-      .build();
-  ```
 
 **AudienceValidator**
 - Validates JWT audience claims
@@ -58,10 +38,9 @@ org.entur.oauth2
 ### 2. Multi-Issuer Authentication
 
 **MultiIssuerAuthenticationManagerResolver**
-- Supports three OAuth2 issuers:
+- Supports OAuth2 issuers:
   - Entur Internal Auth0 tenant
-  - Entur Partner Auth0 tenant  
-  - RoR Auth0 tenant
+  - Entur Partner Auth0 tenant
 - Lazily instantiates and caches AuthenticationManagers
 - Extracts issuer from JWT token and routes to appropriate handler
 - Rejects tokens from unconfigured issuers
@@ -71,11 +50,8 @@ The resolver extracts the issuer from incoming JWT tokens and dynamically select
 
 ### 3. Authorities and Roles
 
-**RorGrantedAuthoritiesConverter**
-- Extracts roles from JWT claim `RoROAuth2Claims.OAUTH2_CLAIM_ROLES`
-- Handles Entur Partner role prefix (`ror_`) removal
-- Converts to Spring Security authorities with `ROLE_` prefix
-- Example: `ror_admin` → `ROLE_admin`
+The library uses Spring Security's standard JWT role extraction from the "roles" claim.
+Roles are automatically prefixed with `ROLE_` for Spring Security authorization.
 
 ### 4. Authorized HTTP Clients
 
@@ -101,16 +77,9 @@ WebClient client = new AuthorizedWebClientBuilder(webClientBuilder)
 
 ### 5. User Information Extraction
 
-**EnturJwtUserInfoExtractor**
-- Extracts user information from Entur-custom JWT claims
-- Used for Entur-specific claim structures
-
 **DefaultJwtUserInfoExtractor**
 - Extracts user information from standard OIDC claims
 - Follows OpenID Connect specifications
-
-**JwtUserInfoExtractor** (Deprecated)
-- Legacy class, use `EnturJwtUserInfoExtractor` instead
 
 ## Dependencies
 
@@ -142,7 +111,6 @@ spring:
 Additional Entur-specific configuration:
 - Entur Internal Auth0: audience, issuer
 - Entur Partner Auth0: audience, issuer
-- RoR Auth0: audience, issuer, claim namespace
 
 ## Integration Patterns
 
