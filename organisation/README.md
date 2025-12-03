@@ -1,6 +1,6 @@
 # Organisation Helper Library
 
-A Java library for managing role-based authorization and access control in Entur RoR applications.
+A Java library for managing role-based authorization and access control in Entur applications.
 
 ## Overview
 
@@ -23,7 +23,7 @@ Add the following dependency to your `pom.xml`:
 <dependency>
     <groupId>org.entur.ror.helpers</groupId>
     <artifactId>organisation</artifactId>
-    <version>5.49.0-SNAPSHOT</version>
+    <version>5.51.0-SNAPSHOT</version>
 </dependency>
 ```
 

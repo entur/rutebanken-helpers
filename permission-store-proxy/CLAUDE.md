@@ -11,14 +11,14 @@ This module serves as a proxy/adapter layer between Spring Security OAuth2 authe
 1. Extract authenticated user information from JWT tokens
 2. Retrieve role assignments for users from the Baba API
 3. Cache user information and role assignments for performance
-4. Support multiple authentication issuers (Internal, Partner, RoR legacy)
+4. Support multiple authentication issuers (Internal, Partner)
 
 ## Key Components
 
 ### Authentication Models
 
 - **`AuthenticatedUser`**: Represents an OAuth2 authenticated user or M2M client, extracted from JWT tokens
-  - Supports multiple issuers (Internal, Partner, RoR legacy)
+  - Supports multiple issuers (Internal, Partner)
   - Includes subject, organisation ID, permissions, issuer, and username
   - Distinguishes between end users and machine-to-machine clients
   - Provides DTO for serialization
@@ -78,7 +78,6 @@ The module expects the following JWT claims:
 - **Custom claims**:
   - `https://entur.io/organisationID`: Organisation ID (required for Internal/Partner users)
   - `permissions`: List of permission strings (legacy)
-  - `https://ror.entur.io/preferred_username`: Username (required for RoR users)
 
 ### Supported Issuers
 
@@ -91,11 +90,6 @@ The module expects the following JWT claims:
 - `https://partner.dev.entur.org/`
 - `https://partner.staging.entur.org/`
 - `https://partner.entur.org/`
-
-**RoR (Legacy, to be deprecated)**:
-- `https://ror-entur-dev.eu.auth0.com/`
-- `https://ror-entur-staging.eu.auth0.com/`
-- `https://auth2.entur.org/`
 
 ## Usage
 
@@ -144,15 +138,12 @@ Both extractors use Caffeine cache with:
 ### Validation
 - Missing subject or issuer throws `NullPointerException`
 - Missing organisation ID for Internal/Partner users throws `IllegalArgumentException`
-- Missing username for RoR users throws `IllegalArgumentException`
 - Non-JWT authentication throws `AccessDeniedException`
 
 ## Migration Notes
 
 The codebase includes several `TODO Permission Store migration` comments indicating ongoing migration work:
 - Legacy `permissions` claim will be removed
-- Legacy `preferred_username` claim will be removed
-- RoR issuer support will be removed
 - Debug logging for 4xx errors will be removed
 
 ## Testing

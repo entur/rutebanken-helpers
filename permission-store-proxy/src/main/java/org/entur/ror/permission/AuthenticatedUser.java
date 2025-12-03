@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.util.StringUtils;
 
 /**
  * An authenticated OAuth2 user, identified by an OAuth2 "sub" claim in a JWT token.
@@ -20,11 +19,6 @@ public final class AuthenticatedUser {
    * TODO Permission store migration: Obsolete, to be removed after migration.
    */
   static final String OAUTH2_CLAIM_PERMISSIONS = "permissions";
-  /**
-   * TODO Permission store migration: Obsolete, to be removed after migration.
-   */
-  static final String ROR_CLAIM_PREFERRED_USERNAME =
-    "https://ror.entur.io/preferred_username";
 
   private final String subject;
   private final long organisationId;
@@ -61,12 +55,6 @@ public final class AuthenticatedUser {
       )
       .ifPresent(authenticatedUserBuilder::withPermissions);
 
-    Optional
-      .ofNullable(
-        authentication.getToken().getClaimAsString(ROR_CLAIM_PREFERRED_USERNAME)
-      )
-      .ifPresent(authenticatedUserBuilder::withUsername);
-
     return authenticatedUserBuilder.build();
   }
 
@@ -97,11 +85,6 @@ public final class AuthenticatedUser {
     ) {
       throw new IllegalArgumentException(
         "Missing organisation ID for Entur Partner/Internal user " + subject
-      );
-    }
-    if (isRor() && !StringUtils.hasText(username)) {
-      throw new IllegalArgumentException(
-        "Missing username for RoR user " + subject
       );
     }
   }
@@ -142,19 +125,6 @@ public final class AuthenticatedUser {
         "https://partner.dev.entur.org/",
         "https://partner.staging.entur.org/",
         "https://partner.entur.org/"
-      )
-      .contains(issuer);
-  }
-
-  /**
-   * TODO Permission store migration: Obsolete, to be removed after migration.
-   */
-  public boolean isRor() {
-    return List
-      .of(
-        "https://ror-entur-dev.eu.auth0.com/",
-        "https://ror-entur-staging.eu.auth0.com/",
-        "https://auth2.entur.org/"
       )
       .contains(issuer);
   }

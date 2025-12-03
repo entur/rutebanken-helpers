@@ -56,14 +56,6 @@ public final class AuthorizationConstants {
   public static final String ROLE_ROUTE_DATA_ADMIN = "adminEditRouteData";
 
   /**
-   * Viewer rights for NeTEx Blocks for a single provider.
-   * @deprecated Use ROLE_NETEX_PRIVATE_DATA_VIEW
-   */
-  @Deprecated
-  public static final String ROLE_NETEX_BLOCKS_DATA_VIEW =
-    "viewNetexBlocksData";
-
-  /**
    * Viewer rights for private NeTEx data for a single provider.
    * This includes viewing blocks, dead runs, private ServiceJourneys, raw NeTEx file.
    */
