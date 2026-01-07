@@ -1,8 +1,5 @@
 package org.entur.oauth2;
 
-import static org.entur.oauth2.RoROAuth2Claims.OAUTH2_CLAIM_PERMISSIONS;
-import static org.entur.oauth2.RoROAuth2Claims.OAUTH2_CLAIM_ROLE_ASSIGNMENTS;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.List;
@@ -18,17 +15,24 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
  * Extract {@link RoleAssignment}s from {@link JwtAuthenticationToken}.
  * <ul>
  *     <li>For user tokens, role assignments are expected to be defined in the claim
- *   {@link RoROAuth2Claims#OAUTH2_CLAIM_ROLE_ASSIGNMENTS}, in JSON format.</li>
+ *   "role_assignments", in JSON format.</li>
  *     <li>For internal machine-to-machine tokens, the role assignments are derived from the claim
- *   {@link RoROAuth2Claims#OAUTH2_CLAIM_PERMISSIONS} that Auth0 builds from the internal client configuration:
+ *   "permissions" that Auth0 builds from the internal client configuration:
  *   each permission is converted into a role assignment tied to the admin organisation ("RB").
  *   Permission granted to an internal client are always cross-organisation (not limited to a given provider)</li>
  * </ul>
+ * @deprecated This class relies on Entur-specific OAuth2 claims that are not in use anymore.
+ * To be removed after permission store migration.
  */
+@Deprecated
 public class JwtRoleAssignmentExtractor implements RoleAssignmentExtractor {
 
   private static final ObjectMapper MAPPER = new ObjectMapper();
   private static final String DEFAULT_ADMIN_ORG = "RB";
+
+  private static final String OAUTH2_CLAIM_ROLE_ASSIGNMENTS =
+    "role_assignments";
+  private static final String OAUTH2_CLAIM_PERMISSIONS = "permissions";
 
   private final String adminOrganisation;
 

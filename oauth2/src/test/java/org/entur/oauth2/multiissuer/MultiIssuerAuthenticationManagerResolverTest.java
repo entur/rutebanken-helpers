@@ -38,7 +38,6 @@ class MultiIssuerAuthenticationManagerResolverTest {
       new MultiIssuerAuthenticationManagerResolverBuilder()
         .withEnturPartnerAuth0Audiences(List.of("audience1", "audience2"))
         .withEnturPartnerAuth0Issuer("https://partner.auth0.com/")
-        .withRorAuth0ClaimNamespace("https://entur.io/")
         .build();
 
     // Just verify that the builder accepts multiple audiences and creates a resolver
@@ -54,7 +53,6 @@ class MultiIssuerAuthenticationManagerResolverTest {
       new MultiIssuerAuthenticationManagerResolverBuilder()
         .withEnturPartnerAuth0Audience("single-audience")
         .withEnturPartnerAuth0Issuer("https://partner.auth0.com/")
-        .withRorAuth0ClaimNamespace("https://entur.io/")
         .build();
 
     // Just verify backward compatibility
@@ -70,7 +68,6 @@ class MultiIssuerAuthenticationManagerResolverTest {
       new MultiIssuerAuthenticationManagerResolverBuilder()
         .withEnturInternalAuth0Audiences(List.of("audience1", "audience2"))
         .withEnturInternalAuth0Issuer("https://internal.auth0.com/")
-        .withRorAuth0ClaimNamespace("https://entur.io/")
         .build();
 
     // Just verify that the builder accepts multiple audiences and creates a resolver
@@ -86,7 +83,6 @@ class MultiIssuerAuthenticationManagerResolverTest {
       new MultiIssuerAuthenticationManagerResolverBuilder()
         .withEnturInternalAuth0Audience("single-audience")
         .withEnturInternalAuth0Issuer("https://internal.auth0.com/")
-        .withRorAuth0ClaimNamespace("https://entur.io/")
         .build();
 
     // Just verify backward compatibility
