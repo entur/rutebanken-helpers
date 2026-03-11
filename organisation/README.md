@@ -23,7 +23,7 @@ Add the following dependency to your `pom.xml`:
 <dependency>
     <groupId>org.entur.ror.helpers</groupId>
     <artifactId>organisation</artifactId>
-    <version>6.0.0-SNAPSHOT</version>
+    <version>6.2.0-SNAPSHOT</version>
 </dependency>
 ```
 
