@@ -42,6 +42,8 @@ import reactor.netty.http.client.HttpClient;
 )
 public class StopPlaceChangelogConfiguration {
 
+  private static final String ET_CLIENT_NAME = "Et-Client-Name";
+
   /**
    * Creates a default WebClient bean with sensible defaults.
    *
@@ -56,7 +58,11 @@ public class StopPlaceChangelogConfiguration {
    */
   @Bean("tiamatWebClient")
   @ConditionalOnMissingBean(name = "tiamatWebClient")
-  public WebClient webClient() {
+  public WebClient webClient(
+    @Value(
+      "${org.rutebanken.helper.stopplace.changelog.repository.etClientName:}"
+    ) String etClientName
+  ) {
     HttpClient httpClient = HttpClient
       .create()
       .responseTimeout(Duration.ofSeconds(60));
@@ -71,6 +77,11 @@ public class StopPlaceChangelogConfiguration {
 
     return WebClient
       .builder()
+      .defaultHeaders(headers -> {
+        if (etClientName != null && !etClientName.isEmpty()) {
+          headers.set(ET_CLIENT_NAME, etClientName);
+        }
+      })
       .clientConnector(new ReactorClientHttpConnector(httpClient))
       .exchangeStrategies(exchangeStrategies)
       .build();
