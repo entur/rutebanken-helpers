@@ -195,5 +195,9 @@ For issues and questions, please refer to the [rutebanken-helpers](https://githu
 
 ## Related Modules
 
-- **[organisation](../organisation)**: Core organization and role assignment interfaces
-- **[oauth2](../oauth2)**: OAuth2 helper utilities
+- **[organisation](../organisation/README.md)**: Core organization and role assignment interfaces
+- **[oauth2](../oauth2/README.md)**: OAuth2 helper utilities
+
+---
+
+[Back to root](../README.md)
