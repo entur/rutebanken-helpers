@@ -130,6 +130,9 @@ org.rutebanken.helper.stopplace.changelog.kafka.group-id=my-consumer-group
 # Fetch all versions or just the latest version of StopPlace (default: true)
 org.rutebanken.helper.stopplace.changelog.repository.allVersions=false
 
+# Set the Et-Client-Name header for requests to Tiamat (optional)
+org.rutebanken.helper.stopplace.changelog.repository.etClientName=my-application
+
 # Control which related entities are exported with the stop place data
 # Possible values: ALL, RELEVANT, NONE (default: RELEVANT)
 
