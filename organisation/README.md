@@ -263,3 +263,7 @@ This library is part of the [Rutebanken Helpers](https://github.com/entur/ruteba
 ## Support
 
 For issues and questions, please use the GitHub issue tracker.
+
+---
+
+[Back to root](../README.md)

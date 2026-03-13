@@ -40,3 +40,7 @@ mvn test
 ### Generating Avro Classes
 
 Avro classes are automatically generated from the schema in `target/generated-sources` during the compile phase.
+
+---
+
+[Back to root](../README.md)

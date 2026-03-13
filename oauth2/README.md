@@ -186,4 +186,4 @@ Licensed under the EUPL, Version 1.2 or later.
 ## Links
 
 - [GitHub Repository](https://github.com/entur/rutebanken-helpers)
-- [Parent Project README](../README.md)
+- [Back to root](../README.md)
