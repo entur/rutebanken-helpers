@@ -101,7 +101,7 @@
         <testcontainers-junit-jupiter.version>1.20.6</testcontainers-junit-jupiter.version>
         <testcontainers-gcloud.version>1.20.6</testcontainers-gcloud.version>
         <testcontainers-localstack.version>1.20.6</testcontainers-localstack.version>
-        <sping-boot-loader-tools.version>4.0.4</sping-boot-loader-tools.version>
+        <spring-boot-loader-tools.version>4.0.4</spring-boot-loader-tools.version>
 
         <!-- empty argLine property, the value is set up by Jacoco during unit tests execution -->
         <argLine/>
