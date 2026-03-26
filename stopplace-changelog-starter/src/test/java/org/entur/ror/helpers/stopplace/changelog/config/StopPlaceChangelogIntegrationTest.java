@@ -2,7 +2,6 @@ package org.entur.ror.helpers.stopplace.changelog.config;
 
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
@@ -29,13 +28,13 @@ import org.rutebanken.irkalla.avro.EnumType;
 import org.rutebanken.irkalla.avro.StopPlaceChangelogEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.ContainerTestUtils;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * Integration test for the StopPlace Changelog starter configuration.
@@ -43,15 +42,7 @@ import org.springframework.test.context.TestPropertySource;
  * all the necessary beans and that the Kafka listener works correctly.
  */
 @SpringBootTest(classes = TestApplication.class)
-@EmbeddedKafka(
-  partitions = 3,
-  topics = "test-stop-place-changelog",
-  brokerProperties = {
-    "listeners=PLAINTEXT://localhost:0",
-    "port=0",
-    "auto.create.topics.enable=true",
-  }
-)
+@EmbeddedKafka(partitions = 3, topics = "test-stop-place-changelog")
 @TestPropertySource(
   properties = {
     "org.rutebanken.helper.stopplace.changelog.enabled=true",
@@ -71,7 +62,7 @@ class StopPlaceChangelogIntegrationTest {
   @Autowired
   private ChangelogConsumerController changelogConsumerController;
 
-  @MockBean
+  @MockitoBean
   private StopPlaceRepository stopPlaceRepository;
 
   @Autowired
