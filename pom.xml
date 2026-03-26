@@ -178,7 +178,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-loader-tools</artifactId>
-                <version>${sping-boot-loader-tools.version}</version>
+                <version>${spring-boot-loader-tools.version}</version>
             </dependency>
 
         </dependencies>
