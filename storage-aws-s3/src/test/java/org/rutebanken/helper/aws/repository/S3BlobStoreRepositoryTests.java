@@ -1,5 +1,7 @@
 package org.rutebanken.helper.aws.repository;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -9,10 +11,9 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.rutebanken.helper.storage.BlobAlreadyExistsException;
 import org.rutebanken.helper.storage.model.BlobDescriptor;
 import org.testcontainers.containers.localstack.LocalStackContainer;
@@ -50,7 +51,7 @@ public class S3BlobStoreRepositoryTests {
     }
   }
 
-  @BeforeClass
+  @BeforeAll
   public static void init() {
     localStack =
       new LocalStackContainer(
@@ -61,7 +62,7 @@ public class S3BlobStoreRepositoryTests {
     localStack.start();
   }
 
-  @Before
+  @BeforeEach
   public void setUp() {
     s3Client =
       S3Client
@@ -91,14 +92,14 @@ public class S3BlobStoreRepositoryTests {
       new ByteArrayInputStream(original.getBytes())
     );
     assertBlobExists(TEST_BUCKET, "myblob", true);
-    Assert.assertEquals(
+    assertEquals(
       original,
       new String(blobStore.getBlob("myblob").readAllBytes())
     );
-    Assert.assertTrue(blobStore.delete("myblob"));
+    assertTrue(blobStore.delete("myblob"));
   }
 
-  @Test(expected = BlobAlreadyExistsException.class)
+  @Test
   public void cannotOverWriteExistingObject() {
     String original = "another bytes the dust";
     assertBlobExists(TEST_BUCKET, "anotherblob", false);
@@ -107,9 +108,14 @@ public class S3BlobStoreRepositoryTests {
       new ByteArrayInputStream(original.getBytes())
     );
     assertBlobExists(TEST_BUCKET, "anotherblob", true);
-    blobStore.uploadNewBlob(
-      "anotherblob",
-      new ByteArrayInputStream("something silly".getBytes())
+    assertThrows(
+      BlobAlreadyExistsException.class,
+      () -> {
+        blobStore.uploadNewBlob(
+          "anotherblob",
+          new ByteArrayInputStream("something silly".getBytes())
+        );
+      }
     );
   }
 
@@ -129,7 +135,7 @@ public class S3BlobStoreRepositoryTests {
     HeadObjectResponse response = s3Client.headObject(request ->
       request.bucket(TEST_BUCKET).key("json")
     );
-    Assert.assertEquals(contentType, response.contentType());
+    assertEquals(contentType, response.contentType());
   }
 
   @Test
@@ -140,7 +146,7 @@ public class S3BlobStoreRepositoryTests {
     blobStore.uploadBlob("smallfile", asStream(content));
     blobStore.copyBlob(TEST_BUCKET, "smallfile", targetBucket, "tinyfile");
     blobStore.setContainerName(targetBucket);
-    Assert.assertEquals(
+    assertEquals(
       content,
       new String(blobStore.getBlob("tinyfile").readAllBytes())
     );
@@ -166,7 +172,7 @@ public class S3BlobStoreRepositoryTests {
       "barelyworthmentioningfile"
     );
     blobStore.setContainerName(targetBucket);
-    Assert.assertEquals(
+    assertEquals(
       content,
       new String(blobStore.getBlob("barelyworthmentioningfile").readAllBytes())
     );
@@ -221,17 +227,13 @@ public class S3BlobStoreRepositoryTests {
       response =
         s3Client.headObject(request -> request.bucket(bucket).key(key));
     } catch (NoSuchKeyException ignored) {}
-    if (!exists && response != null) {
-      Assert.fail(bucket + " / " + key + " exists");
-    }
-    if (exists && response == null) {
-      Assert.fail(bucket + " / " + key + " does not exist");
-    }
+    assertFalse(!exists && response != null, bucket + " / " + key + " exists");
+    assertFalse(
+      exists && response == null,
+      bucket + " / " + key + " does not exist"
+    );
     if (expectedMetadata != null) {
-      Assert.assertEquals(
-        expectedMetadata,
-        mimeDecodeValues(response.metadata())
-      );
+      assertEquals(expectedMetadata, mimeDecodeValues(response.metadata()));
     }
   }
 
