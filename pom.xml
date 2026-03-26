@@ -22,12 +22,12 @@
     <parent>
         <groupId>org.entur.ror</groupId>
         <artifactId>superpom</artifactId>
-        <version>4.10.0</version>
+        <version>6.1.0</version>
     </parent>
 
     <groupId>org.entur.ror.helpers</groupId>
     <artifactId>helper</artifactId>
-    <version>6.2.0-SNAPSHOT</version>
+    <version>7.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>entur-helper</name>
@@ -98,7 +98,10 @@
         <prettier-java.version>2.1.0</prettier-java.version>
         <prettier-maven-plugin.version>0.22</prettier-maven-plugin.version>
         <plugin.prettier.goal>write</plugin.prettier.goal>
-
+        <testcontainers-junit-jupiter.version>1.20.6</testcontainers-junit-jupiter.version>
+        <testcontainers-gcloud.version>1.20.6</testcontainers-gcloud.version>
+        <testcontainers-localstack.version>1.20.6</testcontainers-localstack.version>
+        <sping-boot-loader-tools.version>4.0.4</sping-boot-loader-tools.version>
 
         <!-- empty argLine property, the value is set up by Jacoco during unit tests execution -->
         <argLine/>
@@ -152,6 +155,30 @@
                 <artifactId>hamcrest</artifactId>
                 <version>${hamcrest.version}</version>
                 <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>${testcontainers-junit-jupiter.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>localstack</artifactId>
+                <version>${testcontainers-localstack.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>gcloud</artifactId>
+                <version>${testcontainers-gcloud.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-loader-tools</artifactId>
+                <version>${sping-boot-loader-tools.version}</version>
             </dependency>
 
         </dependencies>
