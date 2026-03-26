@@ -38,7 +38,7 @@
         <dependency>
             <groupId>org.entur.ror.helpers</groupId>
             <artifactId>organisation</artifactId>
-            <version>7.0.0-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
