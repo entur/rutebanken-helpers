@@ -1,6 +1,5 @@
 package org.entur.oauth2;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import org.rutebanken.helper.organisation.RoleAssignment;
