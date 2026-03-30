@@ -1,7 +1,5 @@
 package org.entur.oauth2;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import org.rutebanken.helper.organisation.RoleAssignment;
@@ -10,6 +8,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Extract {@link RoleAssignment}s from {@link JwtAuthenticationToken}.
@@ -118,7 +118,7 @@ public class JwtRoleAssignmentExtractor implements RoleAssignmentExtractor {
     }
     try {
       return MAPPER.readValue((String) roleAssignment, RoleAssignment.class);
-    } catch (IOException e) {
+    } catch (JacksonException e) {
       throw new IllegalArgumentException(
         "Exception while parsing role assignments from JSON",
         e

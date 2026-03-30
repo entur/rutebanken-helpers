@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.entur.ror.helpers</groupId>
         <artifactId>helper</artifactId>
-        <version>6.2.0-SNAPSHOT</version>
+        <version>7.0.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -54,7 +54,7 @@
         <dependency>
             <groupId>org.entur.ror.helpers</groupId>
             <artifactId>storage</artifactId>
-            <version>6.2.0-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <!--
         # AWS API clients
@@ -84,6 +84,11 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>localstack</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
