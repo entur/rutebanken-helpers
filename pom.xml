@@ -67,20 +67,6 @@
         <url>https://github.com/entur/rutebanken-helpers/tree/master</url>
         <tag>HEAD</tag>
     </scm>
-
-    <distributionManagement>
-        <repository>
-            <id>central</id>
-            <name>entur2-releases</name>
-            <url>https://entur2.jfrog.io/entur2/libs-release-local</url>
-        </repository>
-        <snapshotRepository>
-            <id>snapshots</id>
-            <name>entur2-snapshots</name>
-            <url>https://entur2.jfrog.io/entur2/libs-snapshot-local</url>
-        </snapshotRepository>
-    </distributionManagement>
-
     <properties>
         <license.licenseName>eupl-1.2</license.licenseName>
         <license.licenseResolver>${project.baseUri}/src/license</license.licenseResolver>
