@@ -172,6 +172,47 @@ class MultiIssuerAuthenticationManagerResolverTest {
     );
   }
 
+  @Test
+  @SuppressWarnings("deprecation")
+  void testDeprecatedConstructorProducesUsableResolver() {
+    // The deprecated single-audience constructor delegates through the list-based and
+    // timeout-aware constructors. Building via it must still yield a resolver that rejects unknown
+    // issuers.
+    MultiIssuerAuthenticationManagerResolver resolver =
+      new MultiIssuerAuthenticationManagerResolver(
+        "test-internal-audience",
+        "test-internal-issuer",
+        "test-partner-audience",
+        "test-partner-issuer",
+        "test-claim-namespace"
+      );
+
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> resolver.fromIssuer("unknown")
+    );
+  }
+
+  @Test
+  void testAudienceListConstructorProducesUsableResolver() {
+    // The list-based constructor applies the default JWKS timeouts. Building via it must yield a
+    // resolver that rejects unknown issuers.
+    MultiIssuerAuthenticationManagerResolver resolver =
+      new MultiIssuerAuthenticationManagerResolver(
+        null,
+        List.of("test-internal-audience"),
+        "test-internal-issuer",
+        null,
+        List.of("test-partner-audience"),
+        "test-partner-issuer"
+      );
+
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> resolver.fromIssuer("unknown")
+    );
+  }
+
   /**
    * Builds an unsigned JWT carrying only the issuer claim. The resolver reads the issuer from the
    * token to select a decoder and does not verify the signature while doing so, so an unsigned
