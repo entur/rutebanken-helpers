@@ -6,12 +6,6 @@ on:
   pull_request:
     branches:
       - master
-env:
-    SONATYPE_GPG_KEY_BASE64: ${{ secrets.SONATYPE_GPG_KEY_BASE64 }}
-    SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
-    SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
-    SONATYPE_GPG_KEY_PASSWORD: ${{ secrets.SONATYPE_GPG_KEY_PASSWORD }}
-
 jobs:
   maven-package:
     if: "!contains(github.event.head_commit.message, 'ci skip')"
@@ -61,6 +55,7 @@ jobs:
     uses: entur/gha-maven-central/.github/workflows/maven-publish.yml@v1
     secrets: inherit
     with:
-      push_to_repo: false      # Set to false because update action is broken, it update only parent pom.xml and not the submodules
+      java_version: 17         # match the test JDK
+      push_to_repo: true       # write the released version and the next snapshot back to master
       snapshot: false
       next_version: 'minor'
