@@ -1,0 +1,25 @@
+name: Release
+
+# Manual release. Pushes to master already release a minor; this is for a patch, a major, or a
+# re-run after a failed publish.
+on:
+  workflow_dispatch:
+    inputs:
+      next_version:
+        description: "Increment to apply to the version in pom.xml"
+        required: true
+        default: minor
+        type: choice
+        options: [minor, patch, major]
+
+jobs:
+  publish-release:
+    if: github.ref == 'refs/heads/master'
+    name: Publish release to maven central
+    uses: entur/gha-maven-central/.github/workflows/maven-publish.yml@v1
+    secrets: inherit
+    with:
+      java_version: 17 # match the test JDK
+      push_to_repo: true # write the released version and the next snapshot back to master
+      snapshot: false
+      next_version: ${{ inputs.next_version }}
