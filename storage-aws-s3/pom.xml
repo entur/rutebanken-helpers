@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.entur.ror.helpers</groupId>
         <artifactId>helper</artifactId>
-        <version>7.2.1-SNAPSHOT</version>
+        <version>7.3.0</version>
         <relativePath>..</relativePath>
     </parent>
 
