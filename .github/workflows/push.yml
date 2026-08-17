@@ -1,4 +1,4 @@
-name: Build and push
+name: Build
 on:
   push:
     branches:
@@ -49,13 +49,3 @@ jobs:
         uses: actions/upload-artifact@v4.6.2
         with:
           path: target/*.jar
-  publish-release:
-    if: github.repository_owner == 'entur' && github.event_name == 'push'
-    name: Publish release to maven central
-    uses: entur/gha-maven-central/.github/workflows/maven-publish.yml@v1
-    secrets: inherit
-    with:
-      java_version: 17         # match the test JDK
-      push_to_repo: true       # write the released version and the next snapshot back to master
-      snapshot: false
-      next_version: 'minor'
