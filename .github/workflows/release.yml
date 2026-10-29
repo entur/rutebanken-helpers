@@ -16,7 +16,7 @@ jobs:
   publish-release:
     if: github.ref == 'refs/heads/master'
     name: Publish release to maven central
-    uses: entur/gha-maven-central/.github/workflows/maven-publish.yml@v1
+    uses: entur/gha-maven-central/.github/workflows/maven-publish.yml@v1.3.1
     secrets: inherit
     with:
       java_version: 17 # match the test JDK
