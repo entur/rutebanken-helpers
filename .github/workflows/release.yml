@@ -19,6 +19,7 @@ jobs:
     uses: entur/gha-maven-central/.github/workflows/maven-publish.yml@v1.3.1
     secrets: inherit
     with:
+      java_distribution: temurin
       java_version: 17 # match the test JDK
       push_to_repo: true # write the released version and the next snapshot back to master
       snapshot: false
