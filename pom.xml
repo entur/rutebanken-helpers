@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.entur.ror</groupId>
         <artifactId>superpom</artifactId>
-        <version>6.1.0</version>
+        <version>6.5.0</version>
     </parent>
 
     <groupId>org.entur.ror.helpers</groupId>
@@ -71,7 +71,7 @@
         <license.licenseName>eupl-1.2</license.licenseName>
         <license.licenseResolver>${project.baseUri}/src/license</license.licenseResolver>
 
-        <spring-cloud-gcp.version>5.11.3</spring-cloud-gcp.version>
+        <spring-cloud-gcp.version>5.13.11</spring-cloud-gcp.version>
         <!-- Kubernetes client version aligned on camel-kubernetes transitive dependency -->
         <kubernetes-client.version>7.9.0</kubernetes-client.version>
         <commons-io.version>2.22.0</commons-io.version>
@@ -84,10 +84,10 @@
         <prettier-java.version>2.1.0</prettier-java.version>
         <prettier-maven-plugin.version>0.22</prettier-maven-plugin.version>
         <plugin.prettier.goal>write</plugin.prettier.goal>
-        <testcontainers-junit-jupiter.version>1.20.6</testcontainers-junit-jupiter.version>
-        <testcontainers-gcloud.version>1.20.6</testcontainers-gcloud.version>
-        <testcontainers-localstack.version>1.20.6</testcontainers-localstack.version>
-        <spring-boot-loader-tools.version>4.0.4</spring-boot-loader-tools.version>
+        <testcontainers-junit-jupiter.version>1.21.4</testcontainers-junit-jupiter.version>
+        <testcontainers-gcloud.version>1.21.4</testcontainers-gcloud.version>
+        <testcontainers-localstack.version>1.21.4</testcontainers-localstack.version>
+        <spring-boot-loader-tools.version>4.1.2</spring-boot-loader-tools.version>
 
         <!-- empty argLine property, the value is set up by Jacoco during unit tests execution -->
         <argLine/>
