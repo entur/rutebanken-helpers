@@ -1,6 +1,6 @@
 package org.entur.ror.permission;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Details about an authenticated user, either a user account in the Baba database or a machine-to-machine client.

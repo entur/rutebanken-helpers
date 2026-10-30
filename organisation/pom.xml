@@ -53,6 +53,10 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
             <artifactId>guava</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>

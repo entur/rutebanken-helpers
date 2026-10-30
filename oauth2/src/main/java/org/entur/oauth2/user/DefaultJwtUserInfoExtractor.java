@@ -2,7 +2,7 @@ package org.entur.oauth2.user;
 
 import static org.entur.oauth2.user.support.AuthenticationUtil.getClaim;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.rutebanken.helper.organisation.user.UserInfoExtractor;
 import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 
