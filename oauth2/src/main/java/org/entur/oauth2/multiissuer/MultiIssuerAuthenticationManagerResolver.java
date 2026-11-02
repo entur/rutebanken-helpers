@@ -2,6 +2,7 @@ package org.entur.oauth2.multiissuer;
 
 import com.nimbusds.jwt.JWTParser;
 import jakarta.servlet.http.HttpServletRequest;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -9,19 +10,21 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.entur.oauth2.AudienceValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationManagerResolver;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 import org.springframework.security.oauth2.server.resource.web.DefaultBearerTokenResolver;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestOperations;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * Resolve the @{@link AuthenticationManager} that should authenticate the current JWT token.
@@ -33,6 +36,23 @@ import org.springframework.util.StringUtils;
 public class MultiIssuerAuthenticationManagerResolver
   implements AuthenticationManagerResolver<HttpServletRequest> {
 
+  /**
+   * Default connect timeout for the JWKS/OIDC-discovery HTTP client. Chosen to be generous enough
+   * for a cold TLS handshake to Auth0 over the public internet, but still bounded so a genuine
+   * outage fails fast instead of tying up worker threads. Deliberately larger than Spring
+   * Security 7's 500 ms default, which was too short for that handshake.
+   */
+  public static final Duration DEFAULT_JWKS_CONNECT_TIMEOUT =
+    Duration.ofSeconds(3);
+
+  /**
+   * Default read timeout for the JWKS/OIDC-discovery HTTP client. See
+   * {@link #DEFAULT_JWKS_CONNECT_TIMEOUT} for the rationale.
+   */
+  public static final Duration DEFAULT_JWKS_READ_TIMEOUT = Duration.ofSeconds(
+    5
+  );
+
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   private final String enturInternalAuth0Audience;
@@ -41,6 +61,8 @@ public class MultiIssuerAuthenticationManagerResolver
   private final String enturPartnerAuth0Audience;
   private final List<String> enturPartnerAuth0Audiences;
   private final String enturPartnerAuth0Issuer;
+  private final Duration jwksConnectTimeout;
+  private final Duration jwksReadTimeout;
 
   private final BearerTokenResolver resolver = new DefaultBearerTokenResolver();
   private final Map<String, AuthenticationManager> authenticationManagers =
@@ -72,12 +94,36 @@ public class MultiIssuerAuthenticationManagerResolver
     List<String> enturPartnerAuth0Audiences,
     String enturPartnerAuth0Issuer
   ) {
+    this(
+      enturInternalAuth0Audience,
+      enturInternalAuth0Audiences,
+      enturInternalAuth0Issuer,
+      enturPartnerAuth0Audience,
+      enturPartnerAuth0Audiences,
+      enturPartnerAuth0Issuer,
+      DEFAULT_JWKS_CONNECT_TIMEOUT,
+      DEFAULT_JWKS_READ_TIMEOUT
+    );
+  }
+
+  protected MultiIssuerAuthenticationManagerResolver(
+    String enturInternalAuth0Audience,
+    List<String> enturInternalAuth0Audiences,
+    String enturInternalAuth0Issuer,
+    String enturPartnerAuth0Audience,
+    List<String> enturPartnerAuth0Audiences,
+    String enturPartnerAuth0Issuer,
+    Duration jwksConnectTimeout,
+    Duration jwksReadTimeout
+  ) {
     this.enturInternalAuth0Audience = enturInternalAuth0Audience;
     this.enturInternalAuth0Audiences = enturInternalAuth0Audiences;
     this.enturInternalAuth0Issuer = enturInternalAuth0Issuer;
     this.enturPartnerAuth0Audience = enturPartnerAuth0Audience;
     this.enturPartnerAuth0Audiences = enturPartnerAuth0Audiences;
     this.enturPartnerAuth0Issuer = enturPartnerAuth0Issuer;
+    this.jwksConnectTimeout = jwksConnectTimeout;
+    this.jwksReadTimeout = jwksReadTimeout;
   }
 
   /**
@@ -100,9 +146,10 @@ public class MultiIssuerAuthenticationManagerResolver
       );
     }
 
-    NimbusJwtDecoder jwtDecoder = JwtDecoders.fromIssuerLocation(
-      enturInternalAuth0Issuer
-    );
+    NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder
+      .withIssuerLocation(enturInternalAuth0Issuer)
+      .restOperations(jwksRestOperations())
+      .build();
 
     OAuth2TokenValidator<Jwt> withIssuer =
       JwtValidators.createDefaultWithIssuer(enturInternalAuth0Issuer);
@@ -133,9 +180,10 @@ public class MultiIssuerAuthenticationManagerResolver
       );
     }
 
-    NimbusJwtDecoder jwtDecoder = JwtDecoders.fromIssuerLocation(
-      enturPartnerAuth0Issuer
-    );
+    NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder
+      .withIssuerLocation(enturPartnerAuth0Issuer)
+      .restOperations(jwksRestOperations())
+      .build();
 
     OAuth2TokenValidator<Jwt> withIssuer =
       JwtValidators.createDefaultWithIssuer(enturPartnerAuth0Issuer);
@@ -144,6 +192,20 @@ public class MultiIssuerAuthenticationManagerResolver
     jwtDecoder.setJwtValidator(withAudience);
 
     return jwtDecoder;
+  }
+
+  /**
+   * Build the {@link RestOperations} used by the {@link NimbusJwtDecoder}s for OIDC discovery and
+   * ongoing JWKS key-set fetches. Configured with explicit connect/read timeouts so it does not
+   * inherit Spring Security 7's 500 ms default, which is too short for a cold TLS handshake to
+   * Auth0.
+   */
+  RestOperations jwksRestOperations() {
+    SimpleClientHttpRequestFactory requestFactory =
+      new SimpleClientHttpRequestFactory();
+    requestFactory.setConnectTimeout(jwksConnectTimeout);
+    requestFactory.setReadTimeout(jwksReadTimeout);
+    return new RestTemplate(requestFactory);
   }
 
   private JwtDecoder jwtDecoder(String issuer) {
