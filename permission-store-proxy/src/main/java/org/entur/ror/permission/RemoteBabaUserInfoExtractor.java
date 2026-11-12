@@ -5,7 +5,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import java.time.Duration;
 import java.util.List;
 import java.util.function.Predicate;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.rutebanken.helper.organisation.user.UserInfoExtractor;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;

@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.entur.ror.helpers</groupId>
         <artifactId>helper</artifactId>
-        <version>7.1.0-SNAPSHOT</version>
+        <version>7.4.1-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -38,12 +38,12 @@
         <dependency>
             <groupId>org.apache.avro</groupId>
             <artifactId>avro</artifactId>
-            <version>1.12.0</version>
+            <version>1.12.2</version>
         </dependency>
         <dependency>
             <groupId>io.confluent</groupId>
             <artifactId>kafka-avro-serializer</artifactId>
-            <version>7.6.0</version>
+            <version>7.9.10</version>
         </dependency>
 
         <!-- Test dependencies -->
@@ -76,7 +76,7 @@
             <plugin>
                 <groupId>org.apache.avro</groupId>
                 <artifactId>avro-maven-plugin</artifactId>
-                <version>1.12.0</version>
+                <version>1.12.2</version>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>

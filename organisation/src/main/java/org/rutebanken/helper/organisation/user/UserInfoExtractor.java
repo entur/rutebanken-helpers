@@ -1,6 +1,6 @@
 package org.rutebanken.helper.organisation.user;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Retrieve user information of the current user.

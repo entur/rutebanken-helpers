@@ -16,6 +16,17 @@ This library provides:
 - HTTP repository for fetching stop place data
 - Publication time filtering for events
 
+## Avro Class Allowlist
+
+Since Avro 1.12.2, classes resolved by name during deserialization must be allowlisted in
+`org.apache.avro.util.ClassSecurityValidator`. The Kafka consumer uses the Confluent
+`KafkaAvroDeserializer` with `specific.avro.reader=true`, which resolves the generated
+`StopPlaceChangelogEvent` class by name. The starter registers the generated classes
+automatically. When using this core module without the starter, call
+`StopPlaceChangelogAvroClassSecurity.trustGeneratedClasses()` once before the first record is
+deserialized, otherwise every poll fails with
+`SecurityException: Forbidden org.rutebanken.irkalla.avro.StopPlaceChangelogEvent!`.
+
 ## Event Types
 
 - **CREATE**: A new stop place has been created

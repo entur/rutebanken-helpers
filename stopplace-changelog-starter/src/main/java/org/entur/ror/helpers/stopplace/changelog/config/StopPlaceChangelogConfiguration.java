@@ -2,6 +2,7 @@ package org.entur.ror.helpers.stopplace.changelog.config;
 
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
+import jakarta.annotation.PostConstruct;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.rutebanken.helper.stopplace.changelog.StopPlaceChangelog;
+import org.rutebanken.helper.stopplace.changelog.avro.StopPlaceChangelogAvroClassSecurity;
 import org.rutebanken.helper.stopplace.changelog.kafka.ChangelogConsumerController;
 import org.rutebanken.helper.stopplace.changelog.kafka.KafkaStopPlaceChangelog;
 import org.rutebanken.helper.stopplace.changelog.kafka.PartitionFinder;
@@ -43,6 +45,19 @@ import reactor.netty.http.client.HttpClient;
 public class StopPlaceChangelogConfiguration {
 
   private static final String ET_CLIENT_NAME = "Et-Client-Name";
+
+  /**
+   * Registers the generated Avro classes as trusted Avro classes.
+   *
+   * <p>Since Avro 1.12.2 the {@code KafkaAvroDeserializer} can only resolve the reader class by
+   * name if it is allowlisted in {@link org.apache.avro.util.ClassSecurityValidator}. The Kafka
+   * listener containers are started as {@code SmartLifecycle} beans once the application context
+   * refresh is complete, so this runs before the first record is deserialized.
+   */
+  @PostConstruct
+  void trustStopPlaceChangelogAvroClasses() {
+    StopPlaceChangelogAvroClassSecurity.trustGeneratedClasses();
+  }
 
   /**
    * Creates a default WebClient bean with sensible defaults.

@@ -1,15 +1,21 @@
 package org.entur.pubsub.base.config;
 
-import com.google.cloud.spring.autoconfigure.pubsub.GcpPubSubAutoConfiguration;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.context.TypeExcludeFilter;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.FilterType;
 
 /**
- * Specific Spring configuration.
- * There is currently none defined, the class is kept for backward compatibility.
+ * Component scan for the consumers and admin. Imported explicitly by each application.
  */
 @Configuration
-@AutoConfigureBefore(GcpPubSubAutoConfiguration.class)
-@ComponentScan("org.entur.pubsub")
+// Repeat the filter @SpringBootApplication applies, or every @TestConfiguration here leaks into
+// consumers' test contexts.
+@ComponentScan(
+  value = "org.entur.pubsub",
+  excludeFilters = @ComponentScan.Filter(
+    type = FilterType.CUSTOM,
+    classes = TypeExcludeFilter.class
+  )
+)
 public class GooglePubSubConfig {}

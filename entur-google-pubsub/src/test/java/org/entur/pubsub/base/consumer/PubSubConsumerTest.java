@@ -1,8 +1,10 @@
 package org.entur.pubsub.base.consumer;
 
 import com.google.cloud.spring.pubsub.core.PubSubTemplate;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -12,9 +14,15 @@ import org.entur.pubsub.base.EnturGooglePubSubConsumer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.availability.AvailabilityChangeEvent;
+import org.springframework.boot.availability.LivenessState;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.TestPropertySource;
 
+@Import(PubSubConsumerTest.EnturGooglePubSubConsumerTestConfiguration.class)
 class PubSubConsumerTest extends BasePubSubIntegrationTest {
 
   public static final String TEST_QUEUE = "TestQueue";
@@ -26,8 +34,16 @@ class PubSubConsumerTest extends BasePubSubIntegrationTest {
   private static final CompletableFuture<String> messageContent =
     new CompletableFuture<>();
 
+  private static final List<LivenessState> LIVENESS =
+    new CopyOnWriteArrayList<>();
+
   @TestConfiguration
   static class EnturGooglePubSubConsumerTestConfiguration {
+
+    @Bean
+    ApplicationListener<AvailabilityChangeEvent<LivenessState>> livenessRecorder() {
+      return event -> LIVENESS.add(event.getState());
+    }
 
     @Bean
     public EnturGooglePubSubConsumer pubSubConsumer() {
@@ -53,6 +69,10 @@ class PubSubConsumerTest extends BasePubSubIntegrationTest {
       TEST_PAYLOAD,
       messageContent.get(10, TimeUnit.SECONDS),
       "The consumer should have received the payload"
+    );
+    Assertions.assertFalse(
+      LIVENESS.contains(LivenessState.BROKEN),
+      "a working subscriber must not be reported as failed"
     );
   }
 }

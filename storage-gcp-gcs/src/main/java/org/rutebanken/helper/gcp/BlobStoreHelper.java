@@ -488,14 +488,47 @@ public class BlobStoreHelper {
     }
   }
 
+  /**
+   * Download the content of a blob and return it as an InputStream.
+   * The blob is downloaded exactly once, and the bytes handed to the caller are the bytes that
+   * were verified against the MD5 checksum reported by the server.
+   */
   public static InputStream getBlobInputStream(Blob blob) {
-    validateBlob(blob);
-    return new ByteArrayInputStream(blob.getContent());
+    byte[] blobContent = blob.getContent();
+    validateBlobContent(blob, blobContent);
+    return new ByteArrayInputStream(blobContent);
   }
 
+  /**
+   * Download the content of a blob and verify it against the MD5 checksum reported by the server.
+   *
+   * @deprecated this downloads the blob for the sole purpose of validating it and then discards the
+   * downloaded bytes, so the bytes that the caller goes on to use are never the bytes that were
+   * verified. Download the content once and call {@link #validateBlobContent(Blob, byte[])} on it.
+   */
+  @Deprecated(since = "7.4.0")
   public static void validateBlob(Blob blob) {
-    byte[] blobContent = blob.getContent();
+    validateBlobContent(blob, blob.getContent());
+  }
+
+  /**
+   * Verify the given blob content against the MD5 checksum reported by the server.
+   * The verification is skipped when the server reports no MD5 checksum, which is the case for
+   * composite objects, that is objects created by a compose operation or by a parallel composite
+   * upload.
+   *
+   * @throws BlobStoreException if the checksums do not match.
+   */
+  public static void validateBlobContent(Blob blob, byte[] blobContent) {
     String serverMd5 = blob.getMd5ToHexString();
+    if (serverMd5 == null) {
+      LOGGER.debug(
+        "Skipping MD5 validation of blob '{}' in bucket '{}': the server reported no MD5 checksum",
+        blob.getName(),
+        blob.getBucket()
+      );
+      return;
+    }
     String clientMd5 = DigestUtils.md5Hex(blobContent);
     if (!clientMd5.equals(serverMd5)) {
       throw new BlobStoreException(

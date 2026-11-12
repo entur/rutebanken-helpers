@@ -1,4 +1,4 @@
-name: Build and push
+name: Build
 on:
   push:
     branches:
@@ -6,26 +6,20 @@ on:
   pull_request:
     branches:
       - master
-env:
-    SONATYPE_GPG_KEY_BASE64: ${{ secrets.SONATYPE_GPG_KEY_BASE64 }}
-    SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
-    SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
-    SONATYPE_GPG_KEY_PASSWORD: ${{ secrets.SONATYPE_GPG_KEY_PASSWORD }}
-
 jobs:
   maven-package:
     if: "!contains(github.event.head_commit.message, 'ci skip')"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6.1.0
         with:
-          java-version: 17.0.13
-          distribution: liberica
+          java-version: 17.0.21+9
+          distribution: temurin
       - name: Cache Maven dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v6.1.0
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
@@ -52,15 +46,6 @@ jobs:
                   -Dsonar.host.url=https://sonarcloud.io \
                   -Dsonar.token=${SONAR_TOKEN}
       - name: Upload artifact
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v7.0.2
         with:
           path: target/*.jar
-  publish-release:
-    if: github.repository_owner == 'entur' && github.event_name == 'push'
-    name: Publish release to maven central
-    uses: entur/gha-maven-central/.github/workflows/maven-publish.yml@v1
-    secrets: inherit
-    with:
-      push_to_repo: false      # Set to false because update action is broken, it update only parent pom.xml and not the submodules
-      snapshot: false
-      next_version: 'minor'
