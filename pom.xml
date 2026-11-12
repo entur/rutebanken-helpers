@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.entur.ror</groupId>
         <artifactId>superpom</artifactId>
-        <version>6.5.0</version>
+        <version>7.2.0</version>
     </parent>
 
     <groupId>org.entur.ror.helpers</groupId>
@@ -68,10 +68,13 @@
         <tag>HEAD</tag>
     </scm>
     <properties>
+        <!-- The superpom defaults to Java 25; this library must remain usable by Java 17 applications -->
+        <java.version>17</java.version>
+
         <license.licenseName>eupl-1.2</license.licenseName>
         <license.licenseResolver>${project.baseUri}/src/license</license.licenseResolver>
 
-        <spring-cloud-gcp.version>5.13.11</spring-cloud-gcp.version>
+        <spring-cloud-gcp.version>8.3.1</spring-cloud-gcp.version>
         <!-- Kubernetes client version aligned on camel-kubernetes transitive dependency -->
         <kubernetes-client.version>7.9.0</kubernetes-client.version>
         <commons-io.version>2.22.0</commons-io.version>
@@ -204,7 +207,9 @@
                     <jreleaser>
                         <signing>
                             <active>ALWAYS</active>
-                            <armored>true</armored>
+                            <pgp>
+                                <armored>true</armored>
+                            </pgp>
                         </signing>
                         <deploy>
                             <maven>
