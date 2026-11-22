@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.entur.ror</groupId>
         <artifactId>superpom</artifactId>
-        <version>7.2.0</version>
+        <version>7.4.0</version>
     </parent>
 
     <groupId>org.entur.ror.helpers</groupId>
@@ -83,7 +83,7 @@
         <hamcrest.version>3.0</hamcrest.version>
         <jakarta.annotation-api.version>3.0.0</jakarta.annotation-api.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
-        <sonar-maven-plugin.version>5.8.0.7211</sonar-maven-plugin.version>
+        <sonar-maven-plugin.version>5.9.0.7382</sonar-maven-plugin.version>
         <prettier-java.version>2.1.0</prettier-java.version>
         <prettier-maven-plugin.version>0.22</prettier-maven-plugin.version>
         <plugin.prettier.goal>write</plugin.prettier.goal>
@@ -95,7 +95,7 @@
         <!-- empty argLine property, the value is set up by Jacoco during unit tests execution -->
         <argLine/>
 
-        <jreleaser-maven-plugin.version>1.26.0</jreleaser-maven-plugin.version>
+        <jreleaser-maven-plugin.version>1.27.0</jreleaser-maven-plugin.version>
     </properties>
 
     <dependencyManagement>
